@@ -1,0 +1,73 @@
+/* Application wide styles */
+
+.label {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #333333;
+    -fx-effect: dropshadow( gaussian , rgba(255,255,255,0.5) , 0,0,0,1 );
+}
+
+.button {
+    -fx-text-fill: white;
+    -fx-font-family: "Arial Narrow";
+    -fx-font-weight: bold;
+    -fx-background-color: linear-gradient(#61a2b1, #2A5058);
+    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );
+}
+
+.button:hover{
+    -fx-base: #395bae;
+}
+
+/* Component specific styles */
+
+
+.main-panel {
+    -fx-background-image: url("../images/background.jpg");
+}
+
+.hello-message {
+    -fx-text-fill: #AA0000;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow( gaussian , rgba(255,255,255,0.5) , 0,0,0,1 );
+}
+
+/*
+ * Style sheet for updated SearchDemo.java JavaFX FXML example
+ */
+
+#app-border {
+  -fx-border-color: grey;
+  -fx-border-width: 3;
+}
+
+#footer {
+  -fx-border-color: grey;
+  -fx-border-width: 1;
+  -fx-padding: 5;
+}
+
+#app-title {
+  -fx-font-size: 20pt;
+  -fx-font-weight: normal;
+  -fx-text-fill: grey;
+  -fx-padding: 15 0 0 0;
+}
+
+.text-field.validation_error {
+    -fx-background-color: red,
+    linear-gradient(
+        to bottom,
+        derive(red,70%) 5%,
+        derive(red,90%) 40%
+    );
+}
+
+.text-field.validation_warning {
+    -fx-background-color: orange,
+    linear-gradient(
+        to bottom,
+        derive(orange,70%) 5%,
+        derive(orange,90%) 40%
+    );
+}
