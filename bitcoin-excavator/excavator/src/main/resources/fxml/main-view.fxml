@@ -4,9 +4,6 @@
 <?import javafx.scene.image.*?>
 <?import javafx.scene.web.*?>
 <?import javafx.geometry.*?>
-<?import com.bitcoin.controller.ResultCellValueFactory?>
-<?import com.bitcoin.controller.ResultTableColumn?>
-
 
 <BorderPane id="app-border" fx:controller="com.bitcoin.controller.MainViewController" 
   xmlns:fx="http://javafx.com/fxml">

@@ -1,122 +1,165 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-	<modelVersion>4.0.0</modelVersion>
+    <groupId>com.bitcoin</groupId>
+    <artifactId>bitcoin-excavator</artifactId>
+    <name>bitcoin-excavator</name>
 
-	<groupId>com.bitcoin</groupId>
-	<artifactId>bitcoin-excavator</artifactId>
-	<name>bitcoin-excavator</name>
+    <modules>
+        <module>wallet</module>
+        <module>excavator</module>
+    </modules>
 
-	<packaging>jar</packaging>
-	<version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
 
-	<organization>
-		<!-- Used as the 'Vendor' for JNLP generation -->
-		<name>"Michał Szczygieł and Aleksander Śmierciak"</name>
-	</organization>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
 
-	<properties>
-		<slf4j.version>1.6.1</slf4j.version>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<lwjgl.version>2.8.5</lwjgl.version>
-	</properties>
+    <version>1.0-SNAPSHOT</version>
 
-	<build>
+    <organization>
+        <name>"Michał Szczygieł and Aleksander Śmierciak"</name>
+    </organization>
 
-		<finalName>bitcoin-excavator</finalName>
+    <build>
+        <finalName>bitcoin-excavator</finalName>
 
-		<plugins>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.1</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
 
-			<plugin>
-				<groupId>com.zenjava</groupId>
-				<artifactId>javafx-maven-plugin</artifactId>
-				<version>2.0</version>
-				<configuration>
+            <!-- This plugin installs the bitcoin wallet jar from the project's lib to the local
+                repository for normal Maven consumption -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.2.1</version>
+                <inherited>false</inherited>
+                <executions>
+                    <execution>
+                        <id>install-bitcoin-wallet-jar</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <executable>mvn</executable>
+                    <arguments>
+                        <argument>install:install-file</argument>
+                        <argument>-Dfile=${basedir}\lib\bitcoinj-tools-0.12-SNAPSHOT.jar</argument>
+                        <argument>-DgroupId=com.google</argument>
+                        <argument>-DartifactId=bitcoinj</argument>
+                        <argument>-Dversion=0.12</argument>
+                        <argument>-Dpackaging=jar</argument>
+                    </arguments>
+                </configuration>
+            </plugin>
 
-					<mainClass>com.bitcoin.MainApp</mainClass>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.2.1</version>
+                <inherited>false</inherited>
+                <executions>
+                    <execution>
+                        <id>install-restfx-jar</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <executable>mvn</executable>
+                    <arguments>
+                        <argument>install:install-file</argument>
+                        <argument>-Dfile=${basedir}\lib\restfx-1.0.jar</argument>
+                        <argument>-DgroupId=com.restfx</argument>
+                        <argument>-DartifactId=restfx</argument>
+                        <argument>-Dversion=1.0</argument>
+                        <argument>-Dpackaging=jar</argument>
+                    </arguments>
+                </configuration>
+            </plugin>
 
-					<!-- only required if signing the jar file -->
-					<keyStoreAlias>example-user</keyStoreAlias>
-					<keyStorePassword>example-password</keyStorePassword>
-					<allPermissions>true</allPermissions>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.2.1</version>
+                <inherited>false</inherited>
+                <executions>
+                    <execution>
+                        <id>install-restfx-jar</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <executable>mvn</executable>
+                    <arguments>
+                        <argument>install:install-file</argument>
+                        <argument>-Dfile=${basedir}\lib\restfx-server-1.0.jar</argument>
+                        <argument>-DgroupId=com.restfx</argument>
+                        <argument>-DartifactId=restfx-server</argument>
+                        <argument>-Dversion=1.0</argument>
+                        <argument>-Dpackaging=jar</argument>
+                    </arguments>
+                </configuration>
+            </plugin>
 
-				</configuration>
-			</plugin>
+        </plugins>
 
-		</plugins>
-	</build>
+        <pluginManagement>
+            <plugins>
+                <!--This plugin's configuration is used to store Eclipse m2e settings
+                    only. It has no influence on the Maven build itself. -->
+                <plugin>
+                    <groupId>org.eclipse.m2e</groupId>
+                    <artifactId>lifecycle-mapping</artifactId>
+                    <version>1.0.0</version>
+                    <configuration>
+                        <lifecycleMappingMetadata>
+                            <pluginExecutions>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>
+                                            org.codehaus.mojo
+                                        </groupId>
+                                        <artifactId>
+                                            exec-maven-plugin
+                                        </artifactId>
+                                        <versionRange>
+                                            [1.2.1,)
+                                        </versionRange>
+                                        <goals>
+                                            <goal>exec</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore />
+                                    </action>
+                                </pluginExecution>
+                            </pluginExecutions>
+                        </lifecycleMappingMetadata>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
 
-
-	<dependencies>
-
-		<!-- MigLayout -->
-
-		<dependency>
-			<groupId>com.miglayout</groupId>
-			<artifactId>miglayout-javafx</artifactId>
-			<version>4.2</version>
-		</dependency>
-
-		<!-- Apache Commons -->
-
-		<dependency>
-			<groupId>commons-lang</groupId>
-			<artifactId>commons-lang</artifactId>
-			<version>2.6</version>
-		</dependency>
-
-		<!-- Logging -->
-
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>${slf4j.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>jcl-over-slf4j</artifactId>
-			<version>${slf4j.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>
-			<version>${slf4j.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>1.2.16</version>
-		</dependency>
-
-		<!-- Mining -->
-
-		<dependency>
-			<groupId>org.lwjgl.lwjgl</groupId>
-			<artifactId>lwjgl</artifactId>
-			<version>${lwjgl.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.lwjgl.lwjgl</groupId>
-			<artifactId>lwjgl_util</artifactId>
-			<version>${lwjgl.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.codehaus.jackson</groupId>
-			<artifactId>jackson-mapper-asl</artifactId>
-			<version>1.9.11</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-codec</groupId>
-			<artifactId>commons-codec</artifactId>
-			<version>1.7</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-cli</groupId>
-			<artifactId>commons-cli</artifactId>
-			<version>1.2</version>
-		</dependency>
-
-	</dependencies>
+    </build>
 
 </project>
