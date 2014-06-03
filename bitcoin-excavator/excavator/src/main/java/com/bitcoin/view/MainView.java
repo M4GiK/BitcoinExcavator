@@ -6,26 +6,21 @@
 package com.bitcoin.view;
 
 import java.util.Locale;
+import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 import com.bitcoin.controller.MainViewController;
 import com.bitcoin.util.GuiUtils;
 
 import com.bitcoin.util.TextFieldValidator;
+import com.google.common.base.Throwables;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.SceneBuilder;
 import javafx.stage.Stage;
 import com.aquafx_project.AquaFx;
-import javafx.application.Application;
-import javafx.application.Platform;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
-import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
@@ -35,14 +30,15 @@ import org.slf4j.LoggerFactory;
 
 
 /**
- * TODO COMMENTS MISSING!
- * 
+ * This class represents the main view for setting all properties to mining bitcoins.
+ * Also this class initialize view for proper display.
+ *
  * @author m4gik <michal.szczygiel@wp.pl>
- * 
+ *
  */
 public class MainView extends Application {
 
-    /** **/
+    /** Application name **/
     public static String APP_NAME = "bitcoin-excavator";
 
     /** **/
@@ -60,9 +56,8 @@ public class MainView extends Application {
     private static final Logger log = LoggerFactory.getLogger(MainView.class);
 
     /**
-     * 
-     * TODO Comments missing. This method overrides an existing method.
-     * 
+     * This method starts and initialize instance of the window which present excavator view.
+     *
      * @see javafx.application.Application#start(javafx.stage.Stage)
      */
     @Override
@@ -75,12 +70,17 @@ public class MainView extends Application {
         try {
             init(mainWindow);
         } catch (Throwable t) {
-            // Nicer message for the case where the block store file is locked.
+            if (Throwables.getRootCause(t) instanceof MissingResourceException) {
+                // Nicer message for the case where the block store file is locked.
+                GuiUtils.informationalAlert("Wrong properties", "Something goes wrong: \n" + t.toString());
+                throw t;
+            } else {
                 GuiUtils.informationalAlert("Already running", "This application is already running and cannot be started twice."
                         + "\nOr something goes wrong: \n" + t.toString());
                 throw t;
             }
         }
+    }
 
     /**
      *
@@ -92,12 +92,13 @@ public class MainView extends Application {
             AquaFx.style();
         }
 
-        String fxmlFile = "main-view.fxml";
+        String fxmlFile = "excavator-view.fxml";
         Locale locale = Locale.getDefault();
 
         // Load the GUI. The Controller class will be automagically created and wired up.
         URL location = getClass().getResource("/fxml/" + fxmlFile);
-        FXMLLoader loader = FXMLLoader.load(location, ResourceBundle.getBundle("/fxml/main-view", locale));
+        FXMLLoader loader = new FXMLLoader(location);//,
+        loader.setResources(ResourceBundle.getBundle("fxml/excavator", locale));
         mainUI = loader.load();
 
         MainViewController controller = loader.getController();
@@ -105,10 +106,10 @@ public class MainView extends Application {
         // Configure the window with a StackPane so we can overlay things on top of the main UI.
         uiStack = new StackPane(mainUI);
         mainWindow.setTitle(APP_NAME);
-        mainWindow.setWidth(650);
-        mainWindow.setHeight(500);
         final Scene scene = new Scene(uiStack);
-        TextFieldValidator.configureScene(scene);   // Add CSS that we need.
+
+        // Add CSS that we need.
+        TextFieldValidator.configureScene(scene);
         mainWindow.setScene(scene);
 
         mainWindow.show();

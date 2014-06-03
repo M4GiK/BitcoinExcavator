@@ -22,7 +22,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import net.glxn.qrgen.QRCode;
 import net.glxn.qrgen.image.ImageType;
-import wallet.Main;
+import wallet.view.MainView;
 import wallet.utils.GuiUtils;
 
 import java.awt.*;
@@ -32,7 +32,7 @@ import java.net.URI;
 
 // This control can be used with Scene Builder as long as we don't use any Java 8 features yet. Once Oracle release
 // a new Scene Builder compiled against Java 8, we'll be able to use lambdas and so on here. Until that day comes,
-// this file specifically must be recompiled against Java 7 for main.fxml to be editable visually.
+// this file specifically must be recompiled against Java 7 for wallet-view.fxml to be editable visually.
 //
 // From the java directory:
 //
@@ -70,7 +70,7 @@ public class ClickableBitcoinAddress extends AnchorPane {
     }
 
     public String uri() {
-        return BitcoinURI.convertToBitcoinURI(getAddress(), null, Main.APP_NAME, null);
+        return BitcoinURI.convertToBitcoinURI(getAddress(), null, MainView.APP_NAME, null);
     }
 
     public String getAddress() {
@@ -133,7 +133,7 @@ public class ClickableBitcoinAddress extends AnchorPane {
         // non-centered on the screen. Finally fade/blur it in.
         Pane pane = new Pane(view);
         pane.setMaxSize(qrImage.getWidth(), qrImage.getHeight());
-        final Main.OverlayUI<ClickableBitcoinAddress> overlay = Main.instance.overlayUI(pane, this);
+        final MainView.OverlayUI<ClickableBitcoinAddress> overlay = MainView.instance.overlayUI(pane, this);
         view.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
