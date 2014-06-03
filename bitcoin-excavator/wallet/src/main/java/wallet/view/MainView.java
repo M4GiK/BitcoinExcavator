@@ -22,6 +22,8 @@ import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import wallet.controller.MainViewController;
 import wallet.utils.GuiUtils;
 import wallet.utils.TextFieldValidator;
@@ -40,6 +42,12 @@ import static wallet.utils.GuiUtils.*;
  *
  */
 public class MainView extends Application {
+
+    /**
+     * Logger for monitoring runtime.
+     */
+    private static final Logger log = LoggerFactory.getLogger(MainView.class);
+
     /** Application name **/
     public static String APP_NAME = "bitcoin-excavator-wallet";
 
@@ -78,7 +86,7 @@ public class MainView extends Application {
         }
 
         // Load the GUI. The MainViewController class will be automagically created and wired up.
-        URL location = getClass().getResource("../wallet-view.fxml");
+        URL location = getClass().getResource("/wallet/wallet-view.fxml");
         FXMLLoader loader = new FXMLLoader(location);
         mainUI = loader.load();
         MainViewController controller = loader.getController();
@@ -103,18 +111,22 @@ public class MainView extends Application {
 
         // Create the app kit. It won't do any heavyweight initialization until after we start it.
         bitcoin = new WalletAppKit(params, new File("."), APP_NAME);
+        System.out.println("DEBUGING:");
         if (params == RegTestParams.get()) {
+            System.out.println("DEBUGING2:");
             bitcoin.connectToLocalHost();   // You should run a regtest mode bitcoind locally.
         } else if (params == MainNetParams.get()) {
+            System.out.println("DEBUGING3:");
             // Checkpoints are block headers that ship inside our app: for a new user,
             // we pick the last header
             // in the checkpoints file and then download the rest from the network.
             // It makes things much faster. Checkpoint files are made using the BuildCheckpoints
             // tool and usually we have to download the last months worth or more (takes a few seconds).
-            bitcoin.setCheckpoints(getClass().getResourceAsStream("checkpoints"));
+            bitcoin.setCheckpoints(getClass().getResourceAsStream("/wallet/checkpoints"));
             // As an example!
             //bitcoin.useTor();
         }
+        System.out.println("DEBUGING:");
 
         // Now configure and start the appkit. This will take a second or two
         // - we could show a temporary splash screen
@@ -124,13 +136,14 @@ public class MainView extends Application {
                .setUserAgent(APP_NAME, "1.0");
         bitcoin.startAsync();
         bitcoin.awaitRunning();
-
+        System.out.println("DEBUGING:");
         // Don't make the user wait for confirmations for now, as the intention
         // is they're sending it their own money!
         bitcoin.wallet().allowSpendingUnconfirmedTransactions();
         bitcoin.peerGroup().setMaxConnections(11);
         System.out.println(bitcoin.wallet());
         controller.onBitcoinSetup();
+        System.out.println("DEBUGING:");
         mainWindow.show();
     }
 

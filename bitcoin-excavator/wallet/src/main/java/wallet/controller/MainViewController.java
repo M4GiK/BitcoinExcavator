@@ -44,7 +44,7 @@ public class MainViewController {
 
     public void sendMoneyOut(ActionEvent event) {
         // Hide this UI and show the send money UI. This UI won't be clickable until the user dismisses send_money.
-        MainView.instance.overlayUI("send-money.fxml");
+        MainView.instance.overlayUI("/wallet/send-money.fxml");
     }
 
     public class ProgressBarUpdater extends DownloadListener {
