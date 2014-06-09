@@ -4,6 +4,7 @@ import com.google.bitcoin.core.*;
 import javafx.animation.*;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
+import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
@@ -13,7 +14,9 @@ import javafx.util.Duration;
 import wallet.controls.ClickableBitcoinAddress;
 import wallet.view.MainView;
 
+import java.net.URL;
 import java.util.Date;
+import java.util.ResourceBundle;
 
 import static wallet.view.MainView.bitcoin;
 import static wallet.utils.GuiUtils.checkGuiThread;
@@ -22,7 +25,7 @@ import static wallet.utils.GuiUtils.checkGuiThread;
  * Gets created auto-magically by FXMLLoader via reflection. The widget fields are set to the GUI controls they're named
  * after. This class handles all the updates and event handling for the main UI.
  */
-public class MainViewController {
+public class MainViewController implements Initializable {
     public ProgressBar syncProgress;
     public VBox syncBox;
     public HBox controlsBox;
@@ -31,7 +34,7 @@ public class MainViewController {
     public ClickableBitcoinAddress addressControl;
 
     // Called by FXMLLoader.
-    public void initialize() {
+    public void initialize(URL location, ResourceBundle resources) {
         syncProgress.setProgress(-1);
         addressControl.setOpacity(0.0);
     }

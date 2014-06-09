@@ -111,12 +111,11 @@ public class MainView extends Application {
 
         // Create the app kit. It won't do any heavyweight initialization until after we start it.
         bitcoin = new WalletAppKit(params, new File("."), APP_NAME);
-        System.out.println("DEBUGING:");
+
         if (params == RegTestParams.get()) {
-            System.out.println("DEBUGING2:");
-            bitcoin.connectToLocalHost();   // You should run a regtest mode bitcoind locally.
+            // You should run a regtest mode bitcoind locally.
+            bitcoin.connectToLocalHost();
         } else if (params == MainNetParams.get()) {
-            System.out.println("DEBUGING3:");
             // Checkpoints are block headers that ship inside our app: for a new user,
             // we pick the last header
             // in the checkpoints file and then download the rest from the network.
@@ -126,7 +125,6 @@ public class MainView extends Application {
             // As an example!
             //bitcoin.useTor();
         }
-        System.out.println("DEBUGING:");
 
         // Now configure and start the appkit. This will take a second or two
         // - we could show a temporary splash screen
@@ -136,14 +134,13 @@ public class MainView extends Application {
                .setUserAgent(APP_NAME, "1.0");
         bitcoin.startAsync();
         bitcoin.awaitRunning();
-        System.out.println("DEBUGING:");
+
         // Don't make the user wait for confirmations for now, as the intention
         // is they're sending it their own money!
         bitcoin.wallet().allowSpendingUnconfirmedTransactions();
         bitcoin.peerGroup().setMaxConnections(11);
-        System.out.println(bitcoin.wallet());
+        log.debug(bitcoin.wallet().toString());
         controller.onBitcoinSetup();
-        System.out.println("DEBUGING:");
         mainWindow.show();
     }
 
