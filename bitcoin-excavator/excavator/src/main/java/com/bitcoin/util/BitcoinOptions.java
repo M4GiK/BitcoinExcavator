@@ -1,7 +1,17 @@
+/**
+ * Project BitcoinExcavator.
+ * Copyright Michał Szczygieł & Aleksander Śmierciak
+ * Created at June 9, 2014.
+ */
+
 package com.bitcoin.util;
 
 /**
- * Created by m4gik on 6/9/14.
+ * Container for Bitcoin options.
+ * 
+ * @author m4gik <michal.szczygiel@wp.pl>
+ * 
  */
 public class BitcoinOptions {
+
 }
