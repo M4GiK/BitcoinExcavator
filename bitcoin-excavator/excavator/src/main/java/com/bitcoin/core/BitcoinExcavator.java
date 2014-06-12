@@ -54,6 +54,12 @@ public class BitcoinExcavator implements Excavator {
 
     private AtomicLong rejects = new AtomicLong(0);
 
+    private BitcoinOptions bitcoinOptions = null;
+
+    public BitcoinExcavator(BitcoinOptions bitcoinOptions) {
+        this.bitcoinOptions = bitcoinOptions;
+    }
+
     /**
      * List of threads.
      */
@@ -151,6 +157,10 @@ public class BitcoinExcavator implements Excavator {
         return threads;
     }
 
+    public BitcoinOptions getBitcoinOptions() {
+        return bitcoinOptions;
+    }
+
     public void setRejects(AtomicLong rejects) {
         this.rejects = rejects;
     }
@@ -173,5 +183,9 @@ public class BitcoinExcavator implements Excavator {
 
     public void setHwErrors(AtomicLong hwErrors) {
         this.hwErrors = hwErrors;
+    }
+
+    public void setBitcoinOptions(BitcoinOptions bitcoinOptions) {
+        this.bitcoinOptions = bitcoinOptions;
     }
 }

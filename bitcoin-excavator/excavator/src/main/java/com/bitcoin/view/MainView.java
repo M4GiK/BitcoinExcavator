@@ -10,6 +10,8 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 import com.bitcoin.controller.MainViewController;
+import com.bitcoin.core.BitcoinExcavator;
+import com.bitcoin.util.BitcoinOptions;
 import com.bitcoin.util.GuiUtils;
 
 import com.bitcoin.util.TextFieldValidator;
@@ -22,11 +24,11 @@ import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 
-import java.io.IOException;
-import java.net.URL;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.net.URL;
 
 
 /**
@@ -34,11 +36,12 @@ import org.slf4j.LoggerFactory;
  * Also this class initialize view for proper display.
  *
  * @author m4gik <michal.szczygiel@wp.pl>
- *
  */
 public class MainView extends Application {
 
-    /** Application name **/
+    /**
+     * Application name *
+     */
     public static String APP_NAME = "bitcoin-excavator";
 
     /** **/
@@ -70,19 +73,24 @@ public class MainView extends Application {
         try {
             init(mainWindow);
         } catch (Throwable t) {
-            if (Throwables.getRootCause(t) instanceof MissingResourceException) {
+            if (Throwables
+                    .getRootCause(t) instanceof MissingResourceException) {
                 // Nicer message for the case where the block store file is locked.
-                GuiUtils.informationalAlert("Wrong properties", "Something goes wrong: \n" + t.toString());
+                GuiUtils.informationalAlert("Wrong properties",
+                        "Something goes wrong: \n" + t.toString());
                 throw t;
             } else {
-                GuiUtils.informationalAlert("Already running", "This application is already running and cannot be started twice."
-                        + "\nOr something goes wrong: \n" + t.toString());
+                GuiUtils.informationalAlert("Already running",
+                        "This application is already running and cannot be started twice."
+                                + "\nOr something goes wrong: \n" + t
+                                .toString());
                 throw t;
             }
         }
     }
 
     /**
+     * Inits stage for application.
      *
      * @param mainWindow
      * @throws IOException
@@ -115,8 +123,22 @@ public class MainView extends Application {
         mainWindow.show();
     }
 
+    /**
+     * Main method for all application.
+     * If args are putted terminal mode starts, if doesn't GUI mode.
+     *
+     * @param args
+     * @throws Exception
+     */
     public static void main(String[] args) throws Exception {
-        launch(args);
+        if (args.length > 0) {
+            log.info("Terminal mode is running.");
+            BitcoinExcavator bitcoinExcavator = new BitcoinExcavator(
+                    BitcoinOptions.terminalOptions(args));
+        } else {
+            launch(null);
+        }
+
     }
 
 }

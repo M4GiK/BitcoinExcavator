@@ -1,3 +1,9 @@
+/**
+ * Project BitcoinExcavator.
+ * Copyright Michał Szczygieł & Aleksander Śmierciak
+ * Created at May 21, 2014.
+ */
+
 package com.bitcoin.util;
 
 import javafx.scene.Scene;
@@ -6,7 +12,7 @@ import javafx.scene.control.TextField;
 import java.util.function.Predicate;
 
 /**
- * TODO COMMENTS MISSING!
+ * This class is responsible for validating text filed and applies styles.
  *
  * @author m4gik <michal.szczygiel@wp.pl>
  *
