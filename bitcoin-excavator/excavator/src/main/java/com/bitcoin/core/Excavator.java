@@ -82,6 +82,7 @@ public interface Excavator {
     Long incrementRejects();
 
     /**
+     * Gets information about current process.
      * 
      * @param information
      */

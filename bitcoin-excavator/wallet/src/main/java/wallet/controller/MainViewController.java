@@ -41,7 +41,9 @@ public class MainViewController implements Initializable {
 
     public void onBitcoinSetup() {
         bitcoin.wallet().addEventListener(new BalanceUpdater());
-        addressControl.setAddress(bitcoin.wallet().currentReceiveKey().toAddress(MainView.params).toString());
+        addressControl.setAddress(
+                bitcoin.wallet().currentReceiveKey().toAddress(MainView.params)
+                        .toString());
         refreshBalanceLabel();
     }
 
@@ -66,12 +68,15 @@ public class MainViewController implements Initializable {
 
     public void readyToGoAnimation() {
         // Sync progress bar slides out ...
-        TranslateTransition leave = new TranslateTransition(Duration.millis(600), syncBox);
+        TranslateTransition leave = new TranslateTransition(
+                Duration.millis(600), syncBox);
         leave.setByY(80.0);
         // Buttons slide in and clickable address appears simultaneously.
-        TranslateTransition arrive = new TranslateTransition(Duration.millis(600), controlsBox);
+        TranslateTransition arrive = new TranslateTransition(
+                Duration.millis(600), controlsBox);
         arrive.setToY(0.0);
-        FadeTransition reveal = new FadeTransition(Duration.millis(500), addressControl);
+        FadeTransition reveal = new FadeTransition(Duration.millis(500),
+                addressControl);
         reveal.setToValue(1.0);
         ParallelTransition group = new ParallelTransition(arrive, reveal);
         // Slide out happens then slide in/fade happens.
@@ -94,7 +99,8 @@ public class MainViewController implements Initializable {
     }
 
     public void refreshBalanceLabel() {
-        final Coin amount = bitcoin.wallet().getBalance(Wallet.BalanceType.ESTIMATED);
+        final Coin amount = bitcoin.wallet()
+                .getBalance(Wallet.BalanceType.ESTIMATED);
         balance.setText(amount.toString());
     }
 }

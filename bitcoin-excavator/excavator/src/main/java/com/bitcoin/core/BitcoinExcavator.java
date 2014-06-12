@@ -20,9 +20,8 @@ import com.bitcoin.util.BitcoinOptions;
 /**
  * Main core class for dig bitcoins. Responsible for start devices to found
  * collision for bitcoins hash.
- * 
+ *
  * @author m4gik <michal.szczygiel@wp.pl>
- * 
  */
 public class BitcoinExcavator implements Excavator {
 
@@ -34,26 +33,26 @@ public class BitcoinExcavator implements Excavator {
 
     /**
      * Returns actual time.
-     * 
+     *
      * @return the actual time.
      */
     public static String dateTime() {
         return "["
                 + DateFormat.getDateTimeInstance(DateFormat.SHORT,
-                        DateFormat.MEDIUM).format(new Date()) + "]";
+                DateFormat.MEDIUM).format(new Date()) + "]";
     }
 
-    AtomicLong attempts = new AtomicLong(0);
+    private AtomicLong attempts = new AtomicLong(0);
 
-    AtomicLong blocks = new AtomicLong(0);
+    private AtomicLong blocks = new AtomicLong(0);
 
-    Set<String> enabledDevices = null;
+    private Set<String> enabledDevices = null;
 
-    AtomicLong hashCount = new AtomicLong(0);
+    private AtomicLong hashCount = new AtomicLong(0);
 
-    AtomicLong hwErrors = new AtomicLong(0);
+    private AtomicLong hwErrors = new AtomicLong(0);
 
-    AtomicLong rejects = new AtomicLong(0);
+    private AtomicLong rejects = new AtomicLong(0);
 
     /**
      * List of threads.
@@ -65,6 +64,12 @@ public class BitcoinExcavator implements Excavator {
         return null;
     }
 
+    /**
+     * This method adds thread on running process.
+     *
+     * @param thread
+     *            The thread to add.
+     */
     public void addThread(Thread thread) {
         // TODO Auto-generated method stub
 
@@ -72,9 +77,8 @@ public class BitcoinExcavator implements Excavator {
 
     /**
      * Display error message what happen and interrupt the action.
-     * 
-     * @param reason
-     *            Message with error.
+     *
+     * @param reason Message with error.
      * @return Formatted error to display.
      */
     public String error(String reason) {
@@ -117,5 +121,57 @@ public class BitcoinExcavator implements Excavator {
     public void info(String information) {
         // TODO Auto-generated method stub
 
+    }
+
+    public AtomicLong getAttempts() {
+        return attempts;
+    }
+
+    public AtomicLong getBlocks() {
+        return blocks;
+    }
+
+    public Set<String> getEnabledDevices() {
+        return enabledDevices;
+    }
+
+    public AtomicLong getHashCount() {
+        return hashCount;
+    }
+
+    public AtomicLong getHwErrors() {
+        return hwErrors;
+    }
+
+    public AtomicLong getRejects() {
+        return rejects;
+    }
+
+    public List<Thread> getThreads() {
+        return threads;
+    }
+
+    public void setRejects(AtomicLong rejects) {
+        this.rejects = rejects;
+    }
+
+    public void setAttempts(AtomicLong attempts) {
+        this.attempts = attempts;
+    }
+
+    public void setBlocks(AtomicLong blocks) {
+        this.blocks = blocks;
+    }
+
+    public void setEnabledDevices(Set<String> enabledDevices) {
+        this.enabledDevices = enabledDevices;
+    }
+
+    public void setHashCount(AtomicLong hashCount) {
+        this.hashCount = hashCount;
+    }
+
+    public void setHwErrors(AtomicLong hwErrors) {
+        this.hwErrors = hwErrors;
     }
 }
