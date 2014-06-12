@@ -46,81 +46,66 @@
                 <version>1.2.1</version>
                 <inherited>false</inherited>
                 <executions>
+
                     <execution>
                         <id>install-bitcoin-wallet-jar</id>
                         <phase>validate</phase>
                         <goals>
                             <goal>exec</goal>
                         </goals>
+                        <configuration>
+                            <executable>mvn</executable>
+                            <arguments>
+                                <argument>install:install-file</argument>
+                                <argument>-Dfile=${basedir}\lib\bitcoinj-tools-0.12-SNAPSHOT.jar</argument>
+                                <argument>-DgroupId=com.google</argument>
+                                <argument>-DartifactId=bitcoinj</argument>
+                                <argument>-Dversion=0.12</argument>
+                                <argument>-Dpackaging=jar</argument>
+                            </arguments>
+                        </configuration>
                     </execution>
-                </executions>
-                <configuration>
-                    <executable>mvn</executable>
-                    <arguments>
-                        <argument>install:install-file</argument>
-                        <argument>-Dfile=${basedir}\lib\bitcoinj-tools-0.12-SNAPSHOT.jar</argument>
-                        <argument>-DgroupId=com.google</argument>
-                        <argument>-DartifactId=bitcoinj</argument>
-                        <argument>-Dversion=0.12</argument>
-                        <argument>-Dpackaging=jar</argument>
-                    </arguments>
-                </configuration>
-            </plugin>
 
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>1.2.1</version>
-                <inherited>false</inherited>
-                <executions>
                     <execution>
                         <id>install-restfx-jar</id>
                         <phase>validate</phase>
                         <goals>
                             <goal>exec</goal>
                         </goals>
+                        <configuration>
+                            <executable>mvn</executable>
+                            <arguments>
+                                <argument>install:install-file</argument>
+                                <argument>-Dfile=${basedir}\lib\restfx-1.0.jar</argument>
+                                <argument>-DgroupId=com.restfx</argument>
+                                <argument>-DartifactId=restfx</argument>
+                                <argument>-Dversion=1.0</argument>
+                                <argument>-Dpackaging=jar</argument>
+                            </arguments>
+                        </configuration>
                     </execution>
-                </executions>
-                <configuration>
-                    <executable>mvn</executable>
-                    <arguments>
-                        <argument>install:install-file</argument>
-                        <argument>-Dfile=${basedir}\lib\restfx-1.0.jar</argument>
-                        <argument>-DgroupId=com.restfx</argument>
-                        <argument>-DartifactId=restfx</argument>
-                        <argument>-Dversion=1.0</argument>
-                        <argument>-Dpackaging=jar</argument>
-                    </arguments>
-                </configuration>
-            </plugin>
 
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>1.2.1</version>
-                <inherited>false</inherited>
-                <executions>
                     <execution>
-                        <id>install-restfx-jar</id>
+                        <id>install-restfx-server-jar</id>
                         <phase>validate</phase>
                         <goals>
                             <goal>exec</goal>
                         </goals>
+                        <configuration>
+                            <executable>mvn</executable>
+                            <arguments>
+                                <argument>install:install-file</argument>
+                                <argument>-Dfile=${basedir}\lib\restfx-server-1.0.jar</argument>
+                                <argument>-DgroupId=com.restfx</argument>
+                                <argument>-DartifactId=restfx-server</argument>
+                                <argument>-Dversion=1.0</argument>
+                                <argument>-Dpackaging=jar</argument>
+                            </arguments>
+                        </configuration>
                     </execution>
-                </executions>
-                <configuration>
-                    <executable>mvn</executable>
-                    <arguments>
-                        <argument>install:install-file</argument>
-                        <argument>-Dfile=${basedir}\lib\restfx-server-1.0.jar</argument>
-                        <argument>-DgroupId=com.restfx</argument>
-                        <argument>-DartifactId=restfx-server</argument>
-                        <argument>-Dversion=1.0</argument>
-                        <argument>-Dpackaging=jar</argument>
-                    </arguments>
-                </configuration>
-            </plugin>
 
+                </executions>
+            </plugin>
         </plugins>
 
         <pluginManagement>
