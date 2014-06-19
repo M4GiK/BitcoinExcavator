@@ -8,16 +8,20 @@ package com.bitcoin.core.device;
 
 import com.bitcoin.core.network.WorkState;
 
+import java.util.concurrent.LinkedBlockingDeque;
+
 /**
  * This class is responsible for getting information about execution state on device.
  *
  * @author m4gik <michal.szczygiel@wp.pl>
  */
-public abstract class ExecutionState {
+public abstract class ExecutionState implements Runnable {
 
     private String executionName;
 
     private WorkState workState;
+
+    private LinkedBlockingDeque<WorkState> incomingQueue = new LinkedBlockingDeque<WorkState>();
 
     /**
      * The constructor for {@link com.bitcoin.core.device.ExecutionState} class.
@@ -27,6 +31,12 @@ public abstract class ExecutionState {
     public ExecutionState(String executionName) {
         setExecutionName(executionName);
         setWorkState(null);
+    }
+
+    public abstract void run();
+
+    public void addIncomingQueue(WorkState workState) {
+        incomingQueue.add(workState);
     }
 
     public String getExecutionName() {
