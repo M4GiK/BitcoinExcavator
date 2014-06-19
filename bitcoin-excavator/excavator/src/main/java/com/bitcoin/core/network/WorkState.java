@@ -6,7 +6,7 @@
 package com.bitcoin.core.network;
 
 /**
- * TODO COMMENTS MISSING!
+ * This class represents state for working connetions.
  *
  * @author m4gik <michal.szczygiel@wp.pl>
  *

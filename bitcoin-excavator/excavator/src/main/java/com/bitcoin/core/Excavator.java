@@ -49,6 +49,13 @@ public interface Excavator {
     void execute(BitcoinOptions bitcoinOptions);
 
     /**
+     * Gets current time from system.
+     *
+     * @return The time in millisecnonds.
+     */
+    Long getCurrentTime();
+
+    /**
      * Method stops digging, and close all running process.
      */
     void halt();

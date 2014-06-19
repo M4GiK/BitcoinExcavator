@@ -102,6 +102,15 @@ public class BitcoinExcavator implements Excavator {
 
     }
 
+    /**
+     * Gets current time from system.
+     *
+     * @return The time in millisecnonds.
+     */
+    public Long getCurrentTime() {
+        return System.nanoTime() / 1000000L;
+    }
+
     public void halt() {
         // TODO Auto-generated method stub
 
