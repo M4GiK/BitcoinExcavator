@@ -173,8 +173,8 @@ public abstract class NetworkState {
         this.password = password;
     }
 
-    public AtomicLong getRefreshTimestamp() {
-        return refreshTimestamp;
+    public Long getRefreshTimestamp() {
+        return refreshTimestamp.get();
     }
 
     public void setRefreshTimestamp(AtomicLong refreshTimestamp) {

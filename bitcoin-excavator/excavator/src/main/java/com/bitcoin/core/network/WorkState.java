@@ -7,6 +7,8 @@ package com.bitcoin.core.network;
 
 import com.bitcoin.core.Excavator;
 import com.bitcoin.core.device.ExecutionState;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class represents state for working connections.
@@ -14,6 +16,12 @@ import com.bitcoin.core.device.ExecutionState;
  * @author m4gik <michal.szczygiel@wp.pl>
  */
 public class WorkState {
+
+    /**
+     * Logger for monitoring runtime.
+     */
+    private static final Logger log = LoggerFactory
+            .getLogger(WorkState.class);
 
     private final Integer[] data = new Integer[32];
 
@@ -43,11 +51,54 @@ public class WorkState {
     public WorkState(NetworkState networkState) {
         setNetworkState(networkState);
         setExcavator(networkState.getExcavator());
-        setTimestamp(networkState.getExcavator().getCurrentTime());
+        setTimestamp(getExcavator().getCurrentTime());
         setBase(0L);
         setRolledNTime(0);
     }
 
+    /**
+     * This method updates status.
+     *
+     * @param delta The additional value added to base.
+     * @return True status is updated, false if is not.
+     */
+    public Boolean update(Long delta) {
+        Boolean isWorking = false;
+
+        if ((getExcavator().getCurrentTime() - getTimestamp()) + 1000L
+                >= getNetworkState().getWorkLifetime()) {
+            log.debug(getExecutionState().getExecutionName()
+                    + ": Refresh work: work expired");
+            isWorking = true;
+        } else if (getNetworkState().getRefreshTimestamp() > getTimestamp()) {
+            log.debug(getExecutionState().getExecutionName()
+                    + ": Refresh work: longpoll");
+            isWorking = true;
+        } else if (getBase() + delta > Excavator.TWO32) {
+            if (getNetworkState().getRollNTime()) {
+                log.debug(getExecutionState().getExecutionName()
+                        + ": Rolled NTime");
+                setBase(0L);
+                getData()[17] = Integer
+                        .reverseBytes(Integer.reverseBytes(getData()[17]) + 1);
+                setRolledNTime(getRolledNTime() + 1);
+                isWorking = false;
+            } else {
+                log.debug(getExecutionState().getExecutionName()
+                        + ": Refresh work: range expired");
+                isWorking = true;
+            }
+        } else {
+            setBase(getBase() + delta);
+            isWorking = false;
+        }
+
+        if (isWorking) {
+            getNetworkState().addGetQueue(getExecutionState());
+        }
+
+        return isWorking;
+    }
 
     public Integer[] getData() {
         return data;
