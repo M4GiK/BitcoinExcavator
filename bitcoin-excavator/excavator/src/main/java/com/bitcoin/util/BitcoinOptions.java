@@ -6,9 +6,14 @@
 
 package com.bitcoin.util;
 
+import com.bitcoin.core.network.NetworkState;
 import org.apache.commons.cli.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
 
 /**
  * Container for Bitcoin options.
@@ -28,6 +33,10 @@ public class BitcoinOptions {
     private String[] port;
 
     private Integer networkStatesAmount;
+
+    private NetworkState networkStateHead;
+
+    private NetworkState networkStateTail;
 
     /**
      * This method returns the instance of {@link BitcoinOptions} class from properties file.
@@ -161,6 +170,46 @@ public class BitcoinOptions {
         }
 
         return bitcoinOptions;
+    }
+
+    /**
+     * @param bitcoinOptions
+     * @return
+     */
+    public static ArrayList<NetworkState> networkConfiguration(
+            BitcoinOptions bitcoinOptions) {
+        ArrayList<NetworkState> networkStatesList = new ArrayList<NetworkState>(
+                bitcoinOptions.getNetworkStatesAmount());
+
+        for (int i = 0; i < bitcoinOptions.getNetworkStatesAmount(); i++) {
+            NetworkState networkState = new JSONRPCNetworkState();
+            if (bitcoinOptions.getUrl().length > i) {
+                try {
+                    URL url = new URL(bitcoinOptions.getUrl()[i]);
+
+                    if (url.getProtocol() != null
+                            && url.getProtocol().length() > 1) {
+                        networkState.setProtocol(url.getProtocol());
+                    }
+
+                    if(url.getHost() != null && url.getHost().length() > 1) {
+
+                    }
+
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @return
+     */
+    public ArrayList<NetworkState> networkConfiguration() {
+        return null;
     }
 
     public String[] getUrl() {
