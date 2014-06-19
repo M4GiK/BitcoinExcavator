@@ -6,6 +6,7 @@
 
 package com.bitcoin.util;
 
+import com.bitcoin.core.network.JSONRPCNetworkState;
 import com.bitcoin.core.network.NetworkState;
 import org.apache.commons.cli.*;
 import org.slf4j.Logger;
@@ -189,7 +190,7 @@ public class BitcoinOptions {
 
                     if (url.getProtocol() != null
                             && url.getProtocol().length() > 1) {
-                        networkState.setProtocol(url.getProtocol());
+                        //networkState.setProtocol(url.getProtocol());
                     }
 
                     if(url.getHost() != null && url.getHost().length() > 1) {
