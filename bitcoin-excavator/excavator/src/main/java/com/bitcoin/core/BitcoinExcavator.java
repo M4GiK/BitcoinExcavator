@@ -73,8 +73,7 @@ public class BitcoinExcavator implements Excavator {
     /**
      * This method adds thread on running process.
      *
-     * @param thread
-     *            The thread to add.
+     * @param thread The thread to add.
      */
     public void addThread(Thread thread) {
         // TODO Auto-generated method stub
@@ -94,8 +93,12 @@ public class BitcoinExcavator implements Excavator {
         return dateTime() + " error: " + reason;
     }
 
+    /**
+     * This method runs process for dig coins.
+     *
+     * @param bitcoinOptions The options to run execute process.
+     */
     public void execute(BitcoinOptions bitcoinOptions) {
-        // TODO Auto-generated method stub
 
     }
 
