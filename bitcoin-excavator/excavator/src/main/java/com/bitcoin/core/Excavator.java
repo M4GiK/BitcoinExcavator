@@ -66,6 +66,13 @@ public interface Excavator {
     Long getCurrentTime();
 
     /**
+     * Gets information about running status.
+     *
+     * @return True if process is running, false if is not.
+     */
+    Boolean getRunning();
+
+    /**
      * Method stops digging, and close all running process.
      */
     void halt();

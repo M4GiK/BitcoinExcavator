@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.slf4j.Logger;
@@ -53,6 +54,8 @@ public class BitcoinExcavator implements Excavator {
     private AtomicLong hwErrors = new AtomicLong(0);
 
     private AtomicLong rejects = new AtomicLong(0);
+
+    private AtomicBoolean running = new AtomicBoolean(true);
 
     private BitcoinOptions bitcoinOptions = null;
 
@@ -109,6 +112,15 @@ public class BitcoinExcavator implements Excavator {
      */
     public Long getCurrentTime() {
         return System.nanoTime() / 1000000L;
+    }
+
+    /**
+     * Gets information about running status.
+     *
+     * @return True if process is running, false if is not.
+     */
+    public Boolean getRunning() {
+        return running.get();
     }
 
     public void halt() {
