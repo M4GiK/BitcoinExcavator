@@ -16,6 +16,16 @@ import com.bitcoin.util.BitcoinOptions;
 public interface Excavator {
 
     /**
+     * The value represents two 32 bits.
+     */
+    public final static Long TWO32 = 4294967295L;
+
+    /**
+     * Time offset for Excavator.
+     */
+    public final static Long TIME_OFFSET = 7500L;
+
+    /**
      * Adds and gets hash count.
      * 
      * @param delta
