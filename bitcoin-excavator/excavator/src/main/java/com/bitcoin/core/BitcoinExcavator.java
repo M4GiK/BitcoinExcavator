@@ -5,6 +5,7 @@
  */
 package com.bitcoin.core;
 
+import java.net.Proxy;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -59,6 +60,8 @@ public class BitcoinExcavator implements Excavator {
 
     private BitcoinOptions bitcoinOptions = null;
 
+    private Proxy proxy = null;
+
     public BitcoinExcavator(BitcoinOptions bitcoinOptions) {
         this.bitcoinOptions = bitcoinOptions;
     }
@@ -112,6 +115,16 @@ public class BitcoinExcavator implements Excavator {
      */
     public Long getCurrentTime() {
         return System.nanoTime() / 1000000L;
+    }
+
+
+    /**
+     * Gets proxy information.
+     *
+     * @return The {@link java.net.Proxy} instance.
+     */
+    public Proxy getProxy() {
+        return proxy;
     }
 
     /**
