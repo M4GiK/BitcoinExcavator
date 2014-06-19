@@ -40,7 +40,7 @@ import java.net.URL;
 public class MainView extends Application {
 
     /**
-     * Application name *
+     * Application name
      */
     public static String APP_NAME = "bitcoin-excavator";
 
