@@ -6,7 +6,11 @@
 
 package com.bitcoin.core.network;
 
+import com.bitcoin.core.Excavator;
+import com.bitcoin.core.device.ExecutionState;
+
 import java.net.URL;
+import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -15,6 +19,18 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author m4gik <michal.szczygiel@wp.pl>
  */
 public abstract class NetworkState {
+
+    public static final byte PROTOCOL_JSONRPC = 0;
+
+    public static final byte PROTOCOL_STRATUM = 1;
+
+    public static final byte CHAIN_BITCOIN = 0;
+
+    public static final byte CHAIN_LITECOIN = 1;
+
+    public static final String STRATUM = "stratum";
+
+    private Excavator excavator;
 
     private Byte hostChain;
 
@@ -32,15 +48,11 @@ public abstract class NetworkState {
 
     private AtomicLong refreshTimestamp;
 
-    public static final byte PROTOCOL_JSONRPC = 0;
+    private NetworkState networkStateNext;
 
-    public static final byte PROTOCOL_STRATUM = 1;
+    private LinkedBlockingDeque<ExecutionState> getQueue = new LinkedBlockingDeque<ExecutionState>();
 
-    public static final byte CHAIN_BITCOIN = 0;
-
-    public static final byte CHAIN_LITECOIN = 1;
-
-    public static final String STRATUM = "stratum";
+    private LinkedBlockingDeque<WorkState> sendQueue = new LinkedBlockingDeque<WorkState>();
 
     /**
      * Constructor for {@link com.bitcoin.core.network.NetworkState} class.
@@ -49,16 +61,23 @@ public abstract class NetworkState {
         setRefreshTimestamp(new AtomicLong(0));
     }
 
+    public void setNetworkStateNext(NetworkState networkStateNext) {
+        this.networkStateNext = networkStateNext;
+    }
+
     /**
      * Constructor for {@link com.bitcoin.core.network.NetworkState} class.
      *
+     * @param excavator The instance of excavator.
      * @param hostChain The chain of hosts.
-     * @param queryUrl The url query.
-     * @param user The username for mine
-     * @param password The password
+     * @param queryUrl  The url query.
+     * @param user      The username for mine
+     * @param password  The password
      */
-    public NetworkState(URL queryUrl, Byte hostChain, String user,
+    public NetworkState(Excavator excavator, URL queryUrl, Byte hostChain,
+            String user,
             String password) {
+        setExcavator(excavator);
         setQueryUrl(queryUrl);
         setHostChain(hostChain);
         setUser(user);
@@ -68,6 +87,34 @@ public abstract class NetworkState {
         if (getQueryUrl().getProtocol().equals(STRATUM)) {
             setHostProtocol(PROTOCOL_STRATUM);
         }
+    }
+
+    /**
+     * This method adds {@link com.bitcoin.core.device.ExecutionState} instance
+     * to {@link java.util.concurrent.LinkedBlockingDeque}.
+     *
+     * @param executionState The executionState to add.
+     */
+    public void addGetQueue(ExecutionState executionState) {
+        this.getQueue.add(executionState);
+    }
+
+    /**
+     * This method adds {} ins@link WorkState} instance
+     * to {@link java.util.concurrent.LinkedBlockingDeque}.
+     *
+     * @param workState Th workState to add.
+     */
+    public void addSendQueue(WorkState workState) {
+        this.sendQueue.add(workState);
+    }
+
+    public Excavator getExcavator() {
+        return excavator;
+    }
+
+    public void setExcavator(Excavator excavator) {
+        this.excavator = excavator;
     }
 
     public Byte getHostChain() {
@@ -132,5 +179,9 @@ public abstract class NetworkState {
 
     public void setRefreshTimestamp(AtomicLong refreshTimestamp) {
         this.refreshTimestamp = refreshTimestamp;
+    }
+
+    public NetworkState getNetworkStateNext() {
+        return networkStateNext;
     }
 }
