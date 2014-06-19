@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicLong;
  *
  * @author m4gik <michal.szczygiel@wp.pl>
  */
-public class NetworkState {
+public abstract class NetworkState {
 
     private Byte hostChain;
 
