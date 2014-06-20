@@ -46,23 +46,21 @@ public abstract class NetworkState {
 
     private String password;
 
-    private AtomicLong refreshTimestamp;
+    protected AtomicLong refreshTimestamp;
 
     private NetworkState networkStateNext;
 
-    private LinkedBlockingDeque<ExecutionState> getQueue = new LinkedBlockingDeque<ExecutionState>();
+    protected LinkedBlockingDeque<ExecutionState> getQueue;
 
-    private LinkedBlockingDeque<WorkState> sendQueue = new LinkedBlockingDeque<WorkState>();
+    protected LinkedBlockingDeque<WorkState> sendQueue;
 
     /**
      * Constructor for {@link com.bitcoin.core.network.NetworkState} class.
      */
     public NetworkState() {
         setRefreshTimestamp(new AtomicLong(0));
-    }
-
-    public void setNetworkStateNext(NetworkState networkStateNext) {
-        this.networkStateNext = networkStateNext;
+        this.sendQueue = new LinkedBlockingDeque<WorkState>();
+        this.getQueue = new LinkedBlockingDeque<ExecutionState>();
     }
 
     /**
@@ -87,6 +85,9 @@ public abstract class NetworkState {
         if (getQueryUrl().getProtocol().equals(STRATUM)) {
             setHostProtocol(PROTOCOL_STRATUM);
         }
+
+        this.sendQueue = new LinkedBlockingDeque<WorkState>();
+        this.getQueue = new LinkedBlockingDeque<ExecutionState>();
     }
 
     /**
@@ -184,4 +185,9 @@ public abstract class NetworkState {
     public NetworkState getNetworkStateNext() {
         return networkStateNext;
     }
+
+    public void setNetworkStateNext(NetworkState networkStateNext) {
+        this.networkStateNext = networkStateNext;
+    }
+
 }

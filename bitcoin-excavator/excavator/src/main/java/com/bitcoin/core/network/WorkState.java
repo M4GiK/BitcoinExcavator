@@ -104,12 +104,24 @@ public class WorkState {
         return data;
     }
 
+    public void setData(Integer index, Integer value) {
+        data[index] = value;
+    }
+
     public Integer[] getMidstate() {
         return midstate;
     }
 
+    public void setMidstate(Integer index, Integer value) {
+        midstate[index] = value;
+    }
+
     public Long[] getTarget() {
         return target;
+    }
+
+    public void setTarget(Integer index, Long value) {
+        target[index] = value;
     }
 
     public Long getTimestamp() {
