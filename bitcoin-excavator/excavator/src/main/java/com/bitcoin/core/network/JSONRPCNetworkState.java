@@ -6,6 +6,7 @@
 
 package com.bitcoin.core.network;
 
+import com.bitcoin.core.Excavator;
 import com.bitcoin.core.device.ExecutionState;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.JsonProcessingException;
@@ -24,6 +25,8 @@ import java.util.Formatter;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
+
+import org.apache.commons.codec.binary.Base64;
 
 /**
  * This class is responsible for JSON RPC network state.
@@ -243,6 +246,33 @@ public class JSONRPCNetworkState extends NetworkState {
     private LinkedBlockingDeque<WorkState> incomingQueue;
 
     private ObjectMapper mapper;
+
+    /**
+     * Constructor for {@link com.bitcoin.core.network.JSONRPCNetworkState} class.
+     *
+     * @param excavator
+     * @param queryUrl
+     * @param user
+     * @param password
+     * @param hostChain
+     */
+    public JSONRPCNetworkState(Excavator excavator, URL queryUrl, String user,
+            String password, Byte hostChain) {
+        super(excavator, queryUrl, hostChain, user, password);
+        setUserPassword("Basic " + Base64
+                .encodeBase64String((user + ":" + password).getBytes()).trim()
+                .replace("\r\n", ""));
+
+        Thread thread = new Thread(getWorkAsync,
+                "DiabloMiner JSONRPC GetWorkAsync for " + queryUrl.getHost());
+        thread.start();
+        getExcavator().addThread(thread);
+
+        thread = new Thread(sendWorkAsync,
+                "DiabloMiner JSONRPC SendWorkAsync for " + queryUrl.getHost());
+        thread.start();
+        getExcavator().addThread(thread);
+    }
 
     /**
      * @param longPoll
@@ -661,5 +691,13 @@ public class JSONRPCNetworkState extends NetworkState {
 
             throw e;
         }
+    }
+
+    public String getUserPassword() {
+        return userPassword;
+    }
+
+    public void setUserPassword(String userPassword) {
+        this.userPassword = userPassword;
     }
 }
