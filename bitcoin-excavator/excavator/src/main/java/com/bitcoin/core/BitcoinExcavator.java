@@ -62,6 +62,8 @@ public class BitcoinExcavator implements Excavator {
 
     private Proxy proxy = null;
 
+    private Integer workLifetime = 5000;
+
     public BitcoinExcavator(BitcoinOptions bitcoinOptions) {
         this.bitcoinOptions = bitcoinOptions;
     }
@@ -117,7 +119,6 @@ public class BitcoinExcavator implements Excavator {
         return System.nanoTime() / 1000000L;
     }
 
-
     /**
      * Gets proxy information.
      *
@@ -134,6 +135,15 @@ public class BitcoinExcavator implements Excavator {
      */
     public Boolean getRunning() {
         return running.get();
+    }
+
+    /**
+     * Gets lifetime for current work.
+     *
+     * @return The lifetime for work.
+     */
+    public Integer getWorkLifetime() {
+        return workLifetime;
     }
 
     public void halt() {

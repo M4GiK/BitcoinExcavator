@@ -78,6 +78,13 @@ public interface Excavator {
     Boolean getRunning();
 
     /**
+     * Gets lifetime for current work.
+     *
+     * @return The lifetime for work.
+     */
+    Integer getWorkLifetime();
+
+    /**
      * Method stops digging, and close all running process.
      */
     void halt();
