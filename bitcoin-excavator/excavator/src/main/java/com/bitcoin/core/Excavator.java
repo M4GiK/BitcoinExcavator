@@ -51,10 +51,8 @@ public interface Excavator {
 
     /**
      * This method runs process for dig coins.
-     *
-     * @param bitcoinOptions The options to run execute process.
      */
-    void execute(BitcoinOptions bitcoinOptions);
+    void execute();
 
     /**
      * Gets current time from system.
