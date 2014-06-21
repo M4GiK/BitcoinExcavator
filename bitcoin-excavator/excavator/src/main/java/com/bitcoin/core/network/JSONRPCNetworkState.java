@@ -34,14 +34,14 @@ import com.bitcoin.core.device.ExecutionState;
 
 /**
  * This class is responsible for JSON RPC network state.
- * 
+ *
  * @author m4gik <michal.szczygiel@wp.pl>
  */
 public class JSONRPCNetworkState extends NetworkState {
 
     /**
      * This class is responsible for get work asynchronously.
-     * 
+     *
      * @author m4gik <michal.szczygiel@wp.pl>
      */
     public class GetWorkAsync implements Runnable {
@@ -54,7 +54,7 @@ public class JSONRPCNetworkState extends NetworkState {
          * <p/>
          * The general contract of the method <code>run</code> is that it may
          * take any action whatsoever.
-         * 
+         *
          * @see Thread#run()
          */
         public void run() {
@@ -97,7 +97,7 @@ public class JSONRPCNetworkState extends NetworkState {
 
     /**
      * This class is responsible for long poll asynchronously.
-     * 
+     *
      * @author m4gik <michal.szczygiel@wp.pl>
      */
     public class LongPollAsync implements Runnable {
@@ -110,7 +110,7 @@ public class JSONRPCNetworkState extends NetworkState {
          * <p/>
          * The general contract of the method <code>run</code> is that it may
          * take any action whatsoever.
-         * 
+         *
          * @see Thread#run()
          */
         public void run() {
@@ -119,7 +119,8 @@ public class JSONRPCNetworkState extends NetworkState {
                     WorkState workState = doGetWorkMessage(true);
                     incomingQueue.add(workState);
                     refreshTimestamp.set(workState.getTimestamp());
-                    log.debug((getQueryUrl().getHost() + ": Long poll returned"));
+                    log.debug(
+                            (getQueryUrl().getHost() + ": Long poll returned"));
                 } catch (IOException e) {
                     log.error("Cannot connect to " + getQueryUrl().getHost()
                             + ": " + e.getLocalizedMessage());
@@ -138,7 +139,7 @@ public class JSONRPCNetworkState extends NetworkState {
 
     /**
      * This class is responsible for send work asynchronously.
-     * 
+     *
      * @author m4gik <michal.szczygiel@wp.pl>
      */
     public class SendWorkAsync implements Runnable {
@@ -151,7 +152,7 @@ public class JSONRPCNetworkState extends NetworkState {
          * <p/>
          * The general contract of the method <code>run</code> is that it may
          * take any action whatsoever.
-         * 
+         *
          * @see Thread#run()
          */
         public void run() {
@@ -190,16 +191,17 @@ public class JSONRPCNetworkState extends NetworkState {
                                 + getExcavator().incrementBlocks()
                                 + " from "
                                 + workState.getExecutionState()
-                                        .getExecutionName());
+                                .getExecutionName());
                     } else {
                         log.info(getQueryUrl().getHost()
                                 + " rejected block "
                                 + getExcavator().incrementRejects()
                                 + " from "
                                 + workState.getExecutionState()
-                                        .getExecutionName());
+                                .getExecutionName());
                         log.debug("Rejected block "
-                                + (float) ((getExcavator().getCurrentTime() - workState
+                                + (float) (
+                                (getExcavator().getCurrentTime() - workState
                                         .getTimestamp()) / 1000L)
                                 + " seconds old, roll ntime set to "
                                 + workState.getNetworkState().getRollNTime()
@@ -255,7 +257,7 @@ public class JSONRPCNetworkState extends NetworkState {
     /**
      * Constructor for {@link com.bitcoin.core.network.JSONRPCNetworkState}
      * class.
-     * 
+     *
      * @param excavator
      * @param queryUrl
      * @param user
@@ -267,7 +269,7 @@ public class JSONRPCNetworkState extends NetworkState {
         super(excavator, queryUrl, hostChain, user, password);
         setUserPassword("Basic "
                 + Base64.encodeBase64String((user + ":" + password).getBytes())
-                        .trim().replace("\r\n", ""));
+                .trim().replace("\r\n", ""));
 
         Thread thread = new Thread(getWorkAsync,
                 "DiabloMiner JSONRPC GetWorkAsync for " + queryUrl.getHost());
@@ -326,7 +328,8 @@ public class JSONRPCNetworkState extends NetworkState {
             workState
                     .setTarget(
                             i,
-                            (Long.reverseBytes(Long.parseLong(parse, 16) << 16)) >>> 16);
+                            (Long.reverseBytes(Long.parseLong(parse, 16) << 16))
+                                    >>> 16);
         }
 
         return workState;
@@ -345,7 +348,7 @@ public class JSONRPCNetworkState extends NetworkState {
                 url = getQueryUrl();
             }
 
-            Proxy proxy = getExcavator().getProxy();
+            Proxy proxy = getExcavator().getBitcoinOptions().getProxy();
 
             if (proxy == null) {
                 connection = (HttpURLConnection) url.openConnection();
@@ -392,11 +395,11 @@ public class JSONRPCNetworkState extends NetworkState {
                     } else if (xLongPolling.startsWith("/")) {
                         longPollUrl = new URL(getQueryUrl().getProtocol(),
                                 getQueryUrl().getHost(), getQueryUrl()
-                                        .getPort(), xLongPolling);
+                                .getPort(), xLongPolling);
                     } else {
                         longPollUrl = new URL(getQueryUrl().getProtocol(),
                                 getQueryUrl().getHost(), getQueryUrl()
-                                        .getPort(),
+                                .getPort(),
                                 (url.getFile() + "/" + xLongPolling).replace(
                                         "//", "/"));
                     }
@@ -417,7 +420,8 @@ public class JSONRPCNetworkState extends NetworkState {
                 String xRollNTime = connection.getHeaderField("X-Roll-NTime");
 
                 if (xRollNTime != null && !"".equals(xRollNTime)) {
-                    if (!"n".equalsIgnoreCase(xRollNTime) && rollNTime == false) {
+                    if (!"n".equalsIgnoreCase(xRollNTime)
+                            && rollNTime == false) {
                         rollNTime = true;
 
                         if (xRollNTime.startsWith("expire=")) {
@@ -440,8 +444,9 @@ public class JSONRPCNetworkState extends NetworkState {
                         if (longPoll) {
                             setWorkLifetime(60000L);
                         } else {
-                            setWorkLifetime(Long.valueOf(getExcavator()
-                                    .getWorkLifetime()));
+                            setWorkLifetime(Long.valueOf(
+                                    getExcavator().getBitcoinOptions()
+                                            .getWorklifetime()));
                         }
 
                         log.debug(getQueryUrl().getHost()
@@ -462,7 +467,7 @@ public class JSONRPCNetworkState extends NetworkState {
                     if (longPollUrl != null) {
                         longPollUrl = new URL(longPollUrl.getProtocol(),
                                 newHost.get("host").asText(), newHost.get(
-                                        "port").getIntValue(),
+                                "port").getIntValue(),
                                 longPollUrl.getPath());
                     }
 
@@ -580,19 +585,22 @@ public class JSONRPCNetworkState extends NetworkState {
                         }
 
                         if (responseMessage.get("error") != null) {
-                            if (responseMessage.get("error").get("message") != null
+                            if (responseMessage.get("error").get("message")
+                                    != null
                                     && responseMessage.get("error")
-                                            .get("message").asText() != null) {
+                                    .get("message").asText() != null) {
                                 error = responseMessage.get("error")
                                         .get("message").asText().trim();
                                 e2 = new IOException(
                                         "Bitcoin returned error message: "
                                                 + error);
-                            } else if (responseMessage.get("error").asText() != null) {
+                            } else if (responseMessage.get("error").asText()
+                                    != null) {
                                 error = responseMessage.get("error").asText()
                                         .trim();
 
-                                if (!"null".equals(error) && !"".equals(error)) {
+                                if (!"null".equals(error) && !""
+                                        .equals(error)) {
                                     e2 = new IOException(
                                             "Bitcoin returned an error message: "
                                                     + error);
@@ -600,7 +608,8 @@ public class JSONRPCNetworkState extends NetworkState {
                             }
                         }
                     } catch (JsonProcessingException f) {
-                        e2 = new IOException("Bitcoin returned unparsable JSON");
+                        e2 = new IOException(
+                                "Bitcoin returned unparsable JSON");
                     }
                 } else {
                     e2 = new IOException("Bitcoin returned an error message: "
@@ -623,7 +632,8 @@ public class JSONRPCNetworkState extends NetworkState {
 
             if (responseMessage.get("error") != null) {
                 if (responseMessage.get("error").get("message") != null
-                        && responseMessage.get("error").get("message").asText() != null) {
+                        && responseMessage.get("error").get("message").asText()
+                        != null) {
                     String error = responseMessage.get("error").get("message")
                             .asText().trim();
                     throw new IOException("Bitcoin returned error message: "
@@ -667,7 +677,7 @@ public class JSONRPCNetworkState extends NetworkState {
 
         dataFormatter
                 .format("%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x"
-                        + "%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x",
+                                + "%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x%08x",
                         Integer.reverseBytes(data[0]),
                         Integer.reverseBytes(data[1]),
                         Integer.reverseBytes(data[2]),
