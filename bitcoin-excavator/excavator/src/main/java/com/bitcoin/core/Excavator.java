@@ -62,6 +62,13 @@ public interface Excavator {
     Long getCurrentTime();
 
     /**
+     * Gets options for {@link com.bitcoin.core.Excavator} class.
+     *
+     * @return The instance of {@link com.bitcoin.util.BitcoinOptions}.
+     */
+    BitcoinOptions getBitcoinOptions();
+
+    /**
      * Gets information about running status.
      *
      * @return True if process is running, false if is not.

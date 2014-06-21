@@ -184,6 +184,11 @@ public class BitcoinExcavator implements Excavator {
         return threads;
     }
 
+    /**
+     * Gets options for {@link com.bitcoin.core.Excavator} class.
+     *
+     * @return The instance of {@link com.bitcoin.util.BitcoinOptions}.
+     */
     public BitcoinOptions getBitcoinOptions() {
         return bitcoinOptions;
     }
