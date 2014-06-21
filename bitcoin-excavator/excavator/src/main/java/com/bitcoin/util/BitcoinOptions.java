@@ -64,6 +64,7 @@ public class BitcoinOptions {
     /**
      * This method returns the instance of {@link BitcoinOptions} class
      * from terminal arguments.
+     * (example string  -l http://m4gik24119m4gik:qetuo1357@api.polmine.pl:8347)
      *
      * @param args The list of arguments given from terminal.
      * @return The instance of {@link BitcoinOptions} class.
