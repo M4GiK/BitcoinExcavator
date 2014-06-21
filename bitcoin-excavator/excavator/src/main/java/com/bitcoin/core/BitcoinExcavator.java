@@ -14,6 +14,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
+import com.bitcoin.core.network.NetworkState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -103,11 +104,12 @@ public class BitcoinExcavator implements Excavator {
 
     /**
      * This method runs process for dig coins.
-     *
-     * @param bitcoinOptions The options to run execute process.
      */
-    public void execute(BitcoinOptions bitcoinOptions) {
-
+    public void execute() {
+        for (NetworkState networkState : BitcoinOptions
+                .networkConfiguration(bitcoinOptions, this)) {
+            log.info(networkState.getUser() + networkState.getPassword());
+        }
     }
 
     /**
