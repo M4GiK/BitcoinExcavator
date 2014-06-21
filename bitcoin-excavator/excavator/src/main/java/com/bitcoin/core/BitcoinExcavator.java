@@ -61,10 +61,6 @@ public class BitcoinExcavator implements Excavator {
 
     private BitcoinOptions bitcoinOptions = null;
 
-    private Proxy proxy = null;
-
-    private Integer workLifetime = 5000;
-
     public BitcoinExcavator(BitcoinOptions bitcoinOptions) {
         this.bitcoinOptions = bitcoinOptions;
     }
@@ -122,30 +118,12 @@ public class BitcoinExcavator implements Excavator {
     }
 
     /**
-     * Gets proxy information.
-     *
-     * @return The {@link java.net.Proxy} instance.
-     */
-    public Proxy getProxy() {
-        return proxy;
-    }
-
-    /**
      * Gets information about running status.
      *
      * @return True if process is running, false if is not.
      */
     public Boolean getRunning() {
         return running.get();
-    }
-
-    /**
-     * Gets lifetime for current work.
-     *
-     * @return The lifetime for work.
-     */
-    public Integer getWorkLifetime() {
-        return workLifetime;
     }
 
     public void halt() {

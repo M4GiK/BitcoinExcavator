@@ -62,25 +62,11 @@ public interface Excavator {
     Long getCurrentTime();
 
     /**
-     * Gets proxy information.
-     *
-     * @return The {@link java.net.Proxy} instance.
-     */
-    Proxy getProxy();
-
-    /**
      * Gets information about running status.
      *
      * @return True if process is running, false if is not.
      */
     Boolean getRunning();
-
-    /**
-     * Gets lifetime for current work.
-     *
-     * @return The lifetime for work.
-     */
-    Integer getWorkLifetime();
 
     /**
      * Method stops digging, and close all running process.

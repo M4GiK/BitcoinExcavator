@@ -15,8 +15,7 @@ import org.apache.commons.cli.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.*;
 import java.util.ArrayList;
 
 /**
@@ -38,11 +37,11 @@ public class BitcoinOptions {
 
     private String[] port;
 
+    private Proxy proxy;
+
+    private Integer worklifetime = 5000;
+
     private Integer networkStatesAmount;
-
-    private NetworkState networkStateHead = null;
-
-    private NetworkState networkStateTail = null;
 
     /**
      * This method returns the instance of {@link BitcoinOptions} class from properties file.
@@ -114,6 +113,17 @@ public class BitcoinOptions {
                             + "before starting bitcoind or bitcoin --daemon");
         }
 
+        return validOptions(getOptionsFromCommanLine(commandLine));
+    }
+
+    /**
+     * This method get infomration from command line and put it to {@link com.bitcoin.util.BitcoinOptions}
+     *
+     * @param commandLine The instance of {@link org.apache.commons.cli.CommandLine} with command line parameters.
+     * @return The instance of {@link com.bitcoin.util.BitcoinOptions} with options.
+     */
+    public static BitcoinOptions getOptionsFromCommanLine(
+            CommandLine commandLine) {
         BitcoinOptions bitcoinOptions = new BitcoinOptions();
 
         if (commandLine.hasOption("url")) {
@@ -136,7 +146,39 @@ public class BitcoinOptions {
             bitcoinOptions.setPort(commandLine.getOptionValues("port"));
         }
 
-        return validOptions(bitcoinOptions);
+        if (commandLine.hasOption("proxy")) {
+            final String[] proxySettings = commandLine.getOptionValue("proxy")
+                    .split(
+                            ":");
+
+            if (proxySettings.length >= 2) {
+                bitcoinOptions.setProxy(new Proxy(Proxy.Type.HTTP,
+                        new InetSocketAddress(proxySettings[0],
+                                Integer.valueOf(proxySettings[2]))));
+            }
+
+            if (proxySettings.length >= 3) {
+                Authenticator.setDefault(new Authenticator() {
+
+                    /**
+                     * Called when password authorization is needed.  Subclasses should
+                     * override the default implementation, which returns null.
+                     *
+                     * @return The PasswordAuthentication collected from the
+                     * user, or null if none is provided.
+                     */
+                    protected PasswordAuthentication getPasswordAuthentication() {
+                        return new PasswordAuthentication(proxySettings[2], proxySettings[3].toCharArray());
+                    }
+                });
+            }
+
+            if(commandLine.hasOption("worklifetime")) {
+                bitcoinOptions.setWorklifetime(Integer.parseInt(commandLine.getOptionValue("worklifetime")) * 1000);
+            }
+        }
+
+        return bitcoinOptions;
     }
 
     /**
@@ -184,7 +226,7 @@ public class BitcoinOptions {
      *
      * @param bitcoinOptions The instance of {@link com.bitcoin.util.BitcoinOptions}
      *                       with options.
-     * @param excavator      instance of  {@link com.bitcoin.core.Excavator} to bind the Threads.
+     * @param excavator      The instance of  {@link com.bitcoin.core.Excavator} to bind the Threads.
      * @return List of networks states.
      */
     public static ArrayList<NetworkState> networkConfiguration(
@@ -292,10 +334,138 @@ public class BitcoinOptions {
     }
 
     /**
-     * @return
+     * This method makes configuration for network connections.
+     *
+     * @param excavator The instance of  {@link com.bitcoin.core.Excavator} to bind the Threads.
+     * @return List of networks states.
      */
-    public ArrayList<NetworkState> networkConfiguration() {
-        return null;
+    public ArrayList<NetworkState> networkConfiguration(Excavator excavator) {
+        ArrayList<NetworkState> networkStatesList = new ArrayList<NetworkState>(
+                getNetworkStatesAmount());
+
+        for (int i = 0; i < getNetworkStatesAmount(); i++) {
+
+            String protocol = "http";
+            String host = "localhost";
+            Integer port = 8332;
+            String path = "/";
+            String user = "excavatorer";
+            String password = "excavatorer";
+            Byte hostChain = 0;
+
+            if (getUrl().length > i) {
+
+                try {
+                    // TODO Need refactor
+                    String[] usernameFix = getUrl()[i]
+                            .split("@", 3);
+                    if (usernameFix.length > 2) {
+                        getUrl()[i] =
+                                usernameFix[0] + URL_SEPARATOR + usernameFix[1]
+                                        + "@"
+                                        + usernameFix[2];
+                    }
+
+                    URL url = new URL(getUrl()[i]);
+
+                    if (url.getProtocol() != null
+                            && url.getProtocol().length() > 1) {
+                        protocol = url.getProtocol();
+                    }
+
+                    if (url.getHost() != null && url.getHost().length() > 1) {
+                        host = url.getHost();
+                    }
+
+                    if (url.getPort() != -1) {
+                        port = url.getPort();
+                    }
+
+                    if (url.getPath() != null && url.getPath().length() > 1) {
+                        path = url.getPath();
+                    }
+
+                    if (url.getUserInfo() != null
+                            && url.getUserInfo().length() > 1) {
+                        String[] userPassSplit = url.getUserInfo().split(":");
+
+                        user = userPassSplit[0].replace(URL_SEPARATOR, "@");
+
+                        if (userPassSplit.length > 1
+                                && userPassSplit[1].length() > 1)
+                            password = userPassSplit[1];
+                    }
+
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                }
+
+                if (getUser() != null
+                        && getUser().length > i) {
+                    user = getUser()[i];
+                }
+
+                if (getPassword() != null
+                        && getPassword().length > i) {
+                    password = getPassword()[i];
+                }
+
+                if (getHost() != null
+                        && getHost().length > i) {
+                    host = getHost()[i];
+                }
+
+                if (getPort() != null
+                        && getPort().length > i) {
+                    port = Integer.parseInt(getPort()[i]);
+                }
+
+                NetworkState networkState = null;
+
+                try {
+                    networkState = new JSONRPCNetworkState(excavator,
+                            new URL(protocol, host, port, path), user, password,
+                            hostChain);
+                } catch (MalformedURLException e) {
+                    try {
+                        throw new ExcavatorFatalException(excavator,
+                                "Malformed connection paramaters");
+                    } catch (ExcavatorFatalException ex) {
+                        log.error(ex.getLocalizedMessage());
+                    }
+                }
+
+                networkStatesList.add(i, networkState);
+            }
+        }
+
+        return networkStatesList;
+    }
+
+    /**
+     * Gets proxy information.
+     *
+     * @return The {@link java.net.Proxy} instance.
+     */
+    public Proxy getProxy() {
+        return proxy;
+    }
+
+    public void setProxy(Proxy proxy) {
+        this.proxy = proxy;
+    }
+
+    /**
+     * Gets lifetime for current work.
+     *
+     * @return The lifetime for work.
+     */
+    public Integer getWorkLifetime() {
+        return worklifetime;
+    }
+
+    public void setWorklifetime(Integer worklifetime) {
+        this.worklifetime = worklifetime;
     }
 
     public String[] getUrl() {
