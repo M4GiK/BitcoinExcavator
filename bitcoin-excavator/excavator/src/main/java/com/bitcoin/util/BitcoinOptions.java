@@ -43,6 +43,10 @@ public class BitcoinOptions {
 
     private Integer networkStatesAmount;
 
+    private Boolean debug = false;
+
+    private Boolean debugtimer = false;
+
     /**
      * This method returns the instance of {@link BitcoinOptions} class from properties file.
      *
@@ -179,6 +183,14 @@ public class BitcoinOptions {
         if (commandLine.hasOption("worklifetime")) {
             bitcoinOptions.setWorklifetime(Integer.parseInt(
                     commandLine.getOptionValue("worklifetime")) * 1000);
+        }
+
+        if (commandLine.hasOption("debug")) {
+            bitcoinOptions.setDebug(true);
+        }
+
+        if (commandLine.hasOption("debugtimer")) {
+            bitcoinOptions.setDebugtimer(true);
         }
 
         return bitcoinOptions;
@@ -464,7 +476,7 @@ public class BitcoinOptions {
      *
      * @return The lifetime for work.
      */
-    public Integer getWorkLifetime() {
+    public Integer getWorklifetime() {
         return worklifetime;
     }
 
@@ -518,5 +530,21 @@ public class BitcoinOptions {
 
     public void setNetworkStatesAmount(Integer networkStatesAmount) {
         this.networkStatesAmount = networkStatesAmount;
+    }
+
+    public Boolean getDebug() {
+        return debug;
+    }
+
+    public void setDebug(Boolean debug) {
+        this.debug = debug;
+    }
+
+    public Boolean getDebugtimer() {
+        return debugtimer;
+    }
+
+    public void setDebugtimer(Boolean debugtimer) {
+        this.debugtimer = debugtimer;
     }
 }
