@@ -168,14 +168,17 @@ public class BitcoinOptions {
                      * user, or null if none is provided.
                      */
                     protected PasswordAuthentication getPasswordAuthentication() {
-                        return new PasswordAuthentication(proxySettings[2], proxySettings[3].toCharArray());
+                        return new PasswordAuthentication(proxySettings[2],
+                                proxySettings[3].toCharArray());
                     }
                 });
-            }
 
-            if(commandLine.hasOption("worklifetime")) {
-                bitcoinOptions.setWorklifetime(Integer.parseInt(commandLine.getOptionValue("worklifetime")) * 1000);
             }
+        }
+
+        if (commandLine.hasOption("worklifetime")) {
+            bitcoinOptions.setWorklifetime(Integer.parseInt(
+                    commandLine.getOptionValue("worklifetime")) * 1000);
         }
 
         return bitcoinOptions;
@@ -188,6 +191,7 @@ public class BitcoinOptions {
      * @param bitcoinOptions The instance with options.
      * @return The instance of {@link BitcoinOptions} class with validated options.
      */
+
     public static BitcoinOptions validOptions(BitcoinOptions bitcoinOptions) {
         try {
             Integer networkOptions = 0;
