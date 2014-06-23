@@ -135,6 +135,7 @@ public class MainView extends Application {
             log.info("Terminal mode is running.");
             BitcoinExcavator bitcoinExcavator = new BitcoinExcavator(
                     BitcoinOptions.terminalOptions(args));
+            bitcoinExcavator.execute();
         } else {
             launch(null);
         }

@@ -281,7 +281,6 @@ public class BitcoinOptions {
      * @param bitcoinOptions The instance with options.
      * @return The instance of {@link BitcoinOptions} class with validated options.
      */
-
     public static BitcoinOptions validOptions(BitcoinOptions bitcoinOptions) {
         try {
             Integer networkOptions = 0;

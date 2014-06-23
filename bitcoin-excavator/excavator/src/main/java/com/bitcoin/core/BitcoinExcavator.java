@@ -7,10 +7,7 @@ package com.bitcoin.core;
 
 import java.net.Proxy;
 import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -102,10 +99,28 @@ public class BitcoinExcavator implements Excavator {
      * This method runs process for dig coins.
      */
     public void execute() {
-        for (NetworkState networkState : BitcoinOptions
-                .networkConfiguration(bitcoinOptions, this)) {
-            log.info(networkState.getUser() + networkState.getPassword());
+        log.info("Bitcoin Excavator process started");
+
+        ArrayList<NetworkState> networkStates = BitcoinOptions
+                .networkConfiguration(bitcoinOptions, this);
+        StringBuilder list = new StringBuilder();
+
+        for (int i = 0; i < networkStates.size(); i++) {
+            log.info("user: " + networkStates.get(i).getUser() + " url: "
+                    + networkStates.get(i)
+                    .getQueryUrl());
+
+            list.append(networkStates.get(i).getQueryUrl().toString());
+
+            if (i >= 1 && i < networkStates.size() - 1) {
+                list.append(", ");
+            }
         }
+
+        log.info("Connecting to: " + list);
+
+        //TODO make implementation for GPU
+
     }
 
     /**
@@ -126,9 +141,19 @@ public class BitcoinExcavator implements Excavator {
         return running.get();
     }
 
+    /**
+     * Method stops digging, and close all running process.
+     */
     public void halt() {
-        // TODO Auto-generated method stub
+        running.set(false);
 
+        for(int i = 0; i <getThreads().size(); i++) {
+            Thread thread = getThreads().get(i);
+
+            if(thread != Thread.currentThread()) {
+                thread.interrupt();
+            }
+        }
     }
 
     public Long incrementAttempts() {
