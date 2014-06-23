@@ -16,9 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Container for Bitcoin options.
@@ -50,6 +48,18 @@ public class BitcoinOptions {
     private Boolean debugtimer = false;
 
     private Set<String> enabledDevices;
+
+    private Double GPUTargetFPS = 30.0;
+
+    private Double GPUTargetFPSBasis;
+
+    private Integer GPUForceWorkSize = 0;
+
+    private Integer GPUVectors[];
+
+    private Boolean GPUNoArray = false;
+
+    private Boolean GPUDebugSource = false;
 
     /**
      * This method returns the instance of {@link BitcoinOptions} class from properties file.
@@ -197,17 +207,68 @@ public class BitcoinOptions {
             bitcoinOptions.setDebugtimer(true);
         }
 
-        if(commandLine.hasOption("devices")) {
+        if (commandLine.hasOption("devices")) {
             String devices[] = commandLine.getOptionValues("devices");
             bitcoinOptions.setEnabledDevices(new HashSet<String>());
 
-            for(String device : devices) {
+            for (String device : devices) {
                 bitcoinOptions.getEnabledDevices().add(device);
 
-                if(Integer.parseInt(device) == 0) {
+                if (Integer.parseInt(device) == 0) {
                     log.error("Do not use 0 with -D, devices start at 1");
                 }
             }
+        }
+
+        if (commandLine.hasOption("fps")) {
+            bitcoinOptions.setGPUTargetFPS(Double.parseDouble(commandLine
+                    .getOptionValue("fps")));
+
+            if (bitcoinOptions.getGPUTargetFPS() < 0.1) {
+                log.error("--fps argument is too low, adjusting to 0.1");
+                bitcoinOptions.setGPUTargetFPS(0.1);
+            }
+        }
+
+        if (commandLine.hasOption("noarray")) {
+            bitcoinOptions.setGPUNoArray(true);
+        }
+
+        if (commandLine.hasOption("worksize")) {
+            bitcoinOptions.setGPUForceWorkSize(
+                    Integer.parseInt(commandLine.getOptionValue("worksize")));
+        }
+
+        if (commandLine.hasOption("vectors")) {
+            String tempVectors[] = commandLine.getOptionValue("vectors")
+                    .split(",");
+            bitcoinOptions.setGPUVectors(new Integer[tempVectors.length]);
+
+            for (int i = 0; i < bitcoinOptions.getGPUVectors().length; i++) {
+                bitcoinOptions.getGPUVectors()[i] = Integer
+                        .parseInt(tempVectors[i]);
+
+                if (bitcoinOptions.getGPUVectors()[i] > 16) {
+                    log.error("Use comma-seperated vector layouts");
+                } else if (bitcoinOptions.getGPUVectors()[i] != 1
+                        && bitcoinOptions.getGPUVectors()[i] != 2
+                        && bitcoinOptions.getGPUVectors()[i] != 3
+                        && bitcoinOptions.getGPUVectors()[i] != 4
+                        && bitcoinOptions.getGPUVectors()[i] != 8
+                        && bitcoinOptions.getGPUVectors()[i] != 16) {
+                    log.error(bitcoinOptions.getGPUVectors()[i]
+                            + "is not a vector length of 1, 2, 3, 4, 8, or 16");
+                }
+            }
+            Arrays.sort(bitcoinOptions.getGPUVectors(),
+                    Collections.reverseOrder());
+        } else {
+            bitcoinOptions.setGPUVectors(new Integer[1]);
+            bitcoinOptions.getGPUVectors()[0] = 1;
+        }
+
+        if(commandLine.hasOption("ds")) {
+            bitcoinOptions.setGPUDebugSource(true);
         }
 
         return bitcoinOptions;
@@ -571,5 +632,53 @@ public class BitcoinOptions {
 
     public void setEnabledDevices(Set<String> enabledDevices) {
         this.enabledDevices = enabledDevices;
+    }
+
+    public Double getGPUTargetFPS() {
+        return GPUTargetFPS;
+    }
+
+    public void setGPUTargetFPS(Double GPUTargetFPS) {
+        this.GPUTargetFPS = GPUTargetFPS;
+    }
+
+    public Double getGPUTargetFPSBasis() {
+        return GPUTargetFPSBasis;
+    }
+
+    public void setGPUTargetFPSBasis(Double GPUTargetFPSBasis) {
+        this.GPUTargetFPSBasis = GPUTargetFPSBasis;
+    }
+
+    public Integer getGPUForceWorkSize() {
+        return GPUForceWorkSize;
+    }
+
+    public void setGPUForceWorkSize(Integer GPUForceWorkSize) {
+        this.GPUForceWorkSize = GPUForceWorkSize;
+    }
+
+    public Integer[] getGPUVectors() {
+        return GPUVectors;
+    }
+
+    public void setGPUVectors(Integer[] GPUVectors) {
+        this.GPUVectors = GPUVectors;
+    }
+
+    public Boolean getGPUNoArray() {
+        return GPUNoArray;
+    }
+
+    public void setGPUNoArray(Boolean GPUNoArray) {
+        this.GPUNoArray = GPUNoArray;
+    }
+
+    public Boolean getGPUDebugSource() {
+        return GPUDebugSource;
+    }
+
+    public void setGPUDebugSource(Boolean GPUDebugSource) {
+        this.GPUDebugSource = GPUDebugSource;
     }
 }
