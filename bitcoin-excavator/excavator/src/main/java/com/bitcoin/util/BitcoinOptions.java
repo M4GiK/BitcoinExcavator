@@ -17,6 +17,8 @@ import org.slf4j.LoggerFactory;
 
 import java.net.*;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Container for Bitcoin options.
@@ -46,6 +48,8 @@ public class BitcoinOptions {
     private Boolean debug = false;
 
     private Boolean debugtimer = false;
+
+    private Set<String> enabledDevices;
 
     /**
      * This method returns the instance of {@link BitcoinOptions} class from properties file.
@@ -191,6 +195,19 @@ public class BitcoinOptions {
 
         if (commandLine.hasOption("debugtimer")) {
             bitcoinOptions.setDebugtimer(true);
+        }
+
+        if(commandLine.hasOption("devices")) {
+            String devices[] = commandLine.getOptionValues("devices");
+            bitcoinOptions.setEnabledDevices(new HashSet<String>());
+
+            for(String device : devices) {
+                bitcoinOptions.getEnabledDevices().add(device);
+
+                if(Integer.parseInt(device) == 0) {
+                    log.error("Do not use 0 with -D, devices start at 1");
+                }
+            }
         }
 
         return bitcoinOptions;
@@ -546,5 +563,13 @@ public class BitcoinOptions {
 
     public void setDebugtimer(Boolean debugtimer) {
         this.debugtimer = debugtimer;
+    }
+
+    public Set<String> getEnabledDevices() {
+        return enabledDevices;
+    }
+
+    public void setEnabledDevices(Set<String> enabledDevices) {
+        this.enabledDevices = enabledDevices;
     }
 }
