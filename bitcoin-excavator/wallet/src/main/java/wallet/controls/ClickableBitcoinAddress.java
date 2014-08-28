@@ -45,10 +45,16 @@ import java.net.URI;
  * that shows a QRcode.
  */
 public class ClickableBitcoinAddress extends AnchorPane {
-    @FXML protected Label addressLabel;
-    @FXML protected ContextMenu addressMenu;
-    @FXML protected Label copyWidget;
-    @FXML protected Label qrCode;
+    @FXML
+    protected Label addressLabel;
+    @FXML
+    protected ContextMenu addressMenu;
+    @FXML
+    protected Label copyWidget;
+    @FXML
+    protected Label qrCode;
+    @FXML
+    protected Label removeWallet;
 
     public ClickableBitcoinAddress() {
         try {
@@ -64,6 +70,9 @@ public class ClickableBitcoinAddress extends AnchorPane {
 
             AwesomeDude.setIcon(qrCode, AwesomeIcon.QRCODE);
             Tooltip.install(qrCode, new Tooltip("Show a barcode scannable with a mobile phone for this address"));
+
+            AwesomeDude.setIcon(removeWallet, AwesomeIcon.BAN_CIRCLE);
+            Tooltip.install(removeWallet, new Tooltip("Remove a wallet from list"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -93,6 +102,11 @@ public class ClickableBitcoinAddress extends AnchorPane {
         content.putString(getAddress());
         content.putHtml(String.format("<a href='%s'>%s</a>", uri(), getAddress()));
         clipboard.setContent(content);
+    }
+
+    @FXML
+    protected void deleteWallet(MouseEvent event) {
+        System.out.print("DELETEE!");
     }
 
     @FXML

@@ -101,6 +101,7 @@ public class MainViewController implements Initializable {
     public void refreshBalanceLabel() {
         final Coin amount = bitcoin.wallet()
                 .getBalance(Wallet.BalanceType.ESTIMATED);
-        balance.setText(amount.toString());
+        balance.setText(Double.toString(amount.longValue()/100000000.0));
+
     }
 }

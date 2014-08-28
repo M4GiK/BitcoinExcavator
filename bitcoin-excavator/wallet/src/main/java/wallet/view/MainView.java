@@ -6,13 +6,16 @@
 package wallet.view;
 
 import com.aquafx_project.AquaFx;
+import com.google.bitcoin.core.Address;
 import com.google.bitcoin.core.NetworkParameters;
 import com.google.bitcoin.kits.WalletAppKit;
 import com.google.bitcoin.params.MainNetParams;
 import com.google.bitcoin.params.RegTestParams;
+import com.google.bitcoin.params.TestNet3Params;
 import com.google.bitcoin.store.BlockStoreException;
 import com.google.bitcoin.utils.BriefLogFormatter;
 import com.google.bitcoin.utils.Threading;
+import com.google.bitcoin.wallet.KeyChain;
 import com.google.common.base.Throwables;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -39,7 +42,6 @@ import static wallet.utils.GuiUtils.*;
  * Also this class initialize view for proper display. This class is based on bitcoinj example.
  *
  * @author m4gik <michal.szczygiel@wp.pl>
- *
  */
 public class MainView extends Application {
 
@@ -48,10 +50,12 @@ public class MainView extends Application {
      */
     private static final Logger log = LoggerFactory.getLogger(MainView.class);
 
-    /** Application name **/
+    /**
+     * Application name *
+     */
     public static String APP_NAME = "bitcoin-excavator-wallet";
 
-    public static NetworkParameters params = MainNetParams.get();
+    public static NetworkParameters params = MainNetParams.get(); // TestNet3Params.testNet3();
     public static WalletAppKit bitcoin;
     public static MainView instance;
 
@@ -130,8 +134,8 @@ public class MainView extends Application {
         // - we could show a temporary splash screen
         // or progress widget to keep the user engaged whilst we initialise, but we don't.
         bitcoin.setDownloadListener(controller.progressBarUpdater())
-               .setBlockingStartup(false)
-               .setUserAgent(APP_NAME, "1.0");
+                .setBlockingStartup(false)
+                .setUserAgent(APP_NAME, "1.0");
         bitcoin.startAsync();
         bitcoin.awaitRunning();
 
@@ -139,7 +143,7 @@ public class MainView extends Application {
         // is they're sending it their own money!
         bitcoin.wallet().allowSpendingUnconfirmedTransactions();
         bitcoin.peerGroup().setMaxConnections(11);
-        log.debug(bitcoin.wallet().toString());
+        log.info("Address wallet: " + bitcoin.wallet().currentReceiveAddress().toString());
         controller.onBitcoinSetup();
         mainWindow.show();
     }
@@ -180,7 +184,9 @@ public class MainView extends Application {
         return pair;
     }
 
-    /** Loads the FXML file with the given name, blurs out the main UI and puts this one on top. */
+    /**
+     * Loads the FXML file with the given name, blurs out the main UI and puts this one on top.
+     */
     public <T> OverlayUI<T> overlayUI(String name) {
         try {
             checkGuiThread();
