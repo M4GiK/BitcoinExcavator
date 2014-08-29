@@ -37,7 +37,7 @@ public class SendMoneyController {
         try {
             Address destination = new Address(MainView.params, address.getText());
             Wallet.SendRequest req = Wallet.SendRequest.emptyWallet(destination);
-            sendResult = MainView.bitcoin.wallet().sendCoins(req);
+            sendResult = MainView.bitcoinWallets.get(0).wallet().sendCoins(req); //TODO
             Futures.addCallback(sendResult.broadcastComplete, new FutureCallback<Transaction>() {
                 @Override
                 public void onSuccess(Transaction result) {

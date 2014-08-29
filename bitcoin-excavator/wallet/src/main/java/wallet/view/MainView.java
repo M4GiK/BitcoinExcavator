@@ -6,16 +6,13 @@
 package wallet.view;
 
 import com.aquafx_project.AquaFx;
-import com.google.bitcoin.core.Address;
 import com.google.bitcoin.core.NetworkParameters;
 import com.google.bitcoin.kits.WalletAppKit;
 import com.google.bitcoin.params.MainNetParams;
 import com.google.bitcoin.params.RegTestParams;
-import com.google.bitcoin.params.TestNet3Params;
 import com.google.bitcoin.store.BlockStoreException;
 import com.google.bitcoin.utils.BriefLogFormatter;
 import com.google.bitcoin.utils.Threading;
-import com.google.bitcoin.wallet.KeyChain;
 import com.google.common.base.Throwables;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -28,12 +25,14 @@ import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import wallet.controller.MainViewController;
+import wallet.utils.FileOperations;
 import wallet.utils.GuiUtils;
 import wallet.utils.TextFieldValidator;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
 
 import static wallet.utils.GuiUtils.*;
 
@@ -56,7 +55,7 @@ public class MainView extends Application {
     public static String APP_NAME = "bitcoin-excavator-wallet";
 
     public static NetworkParameters params = MainNetParams.get(); // TestNet3Params.testNet3();
-    public static WalletAppKit bitcoin;
+    public static List<WalletAppKit> bitcoinWallets;
     public static MainView instance;
 
     private StackPane uiStack;
@@ -114,18 +113,31 @@ public class MainView extends Application {
         Threading.USER_THREAD = Platform::runLater;
 
         // Create the app kit. It won't do any heavyweight initialization until after we start it.
-        bitcoin = new WalletAppKit(params, new File("."), APP_NAME);
+        if (!FileOperations.isPropertiesExisting(FileOperations.PROPERTIES)) {
+            FileOperations.saveProperties(FileOperations.collectWallets("/"), FileOperations.PROPERTIES);
+        }
+
+        bitcoinWallets = FileOperations.readProperties(FileOperations.PROPERTIES);//new WalletAppKit(params, new File("."), APP_NAME);
+
+        if(bitcoinWallets.size() == 0) {
+            bitcoinWallets.add(new WalletAppKit(params, new File(FileOperations.APP_PATH + "/wallets/."), APP_NAME));
+            FileOperations.updateProperty(APP_NAME);
+        }
 
         if (params == RegTestParams.get()) {
             // You should run a regtest mode bitcoind locally.
-            bitcoin.connectToLocalHost();
+            for (WalletAppKit wallet : bitcoinWallets) {
+                wallet.connectToLocalHost();
+            }
         } else if (params == MainNetParams.get()) {
             // Checkpoints are block headers that ship inside our app: for a new user,
             // we pick the last header
             // in the checkpoints file and then download the rest from the network.
             // It makes things much faster. Checkpoint files are made using the BuildCheckpoints
             // tool and usually we have to download the last months worth or more (takes a few seconds).
-            bitcoin.setCheckpoints(getClass().getResourceAsStream("/wallet/checkpoints"));
+            for (WalletAppKit wallet : bitcoinWallets) {
+                wallet.setCheckpoints(getClass().getResourceAsStream("/wallet/checkpoints"));
+            }
             // As an example!
             //bitcoin.useTor();
         }
@@ -133,17 +145,19 @@ public class MainView extends Application {
         // Now configure and start the appkit. This will take a second or two
         // - we could show a temporary splash screen
         // or progress widget to keep the user engaged whilst we initialise, but we don't.
-        bitcoin.setDownloadListener(controller.progressBarUpdater())
-                .setBlockingStartup(false)
-                .setUserAgent(APP_NAME, "1.0");
-        bitcoin.startAsync();
-        bitcoin.awaitRunning();
+        for (WalletAppKit wallet : bitcoinWallets) {
+            wallet.setDownloadListener(controller.progressBarUpdater())
+                    .setBlockingStartup(false)
+                    .setUserAgent(APP_NAME, "1.0");
+            wallet.startAsync();
+            wallet.awaitRunning();
 
-        // Don't make the user wait for confirmations for now, as the intention
-        // is they're sending it their own money!
-        bitcoin.wallet().allowSpendingUnconfirmedTransactions();
-        bitcoin.peerGroup().setMaxConnections(11);
-        log.info("Address wallet: " + bitcoin.wallet().currentReceiveAddress().toString());
+            // Don't make the user wait for confirmations for now, as the intention
+            // is they're sending it their own money!
+            wallet.wallet().allowSpendingUnconfirmedTransactions();
+            wallet.peerGroup().setMaxConnections(11);
+            log.info("Address wallet: " + wallet.wallet().currentReceiveAddress().toString());
+        }
         controller.onBitcoinSetup();
         mainWindow.show();
     }
@@ -210,8 +224,10 @@ public class MainView extends Application {
 
     @Override
     public void stop() throws Exception {
-        bitcoin.stopAsync();
-        bitcoin.awaitTerminated();
+        for (WalletAppKit wallet : bitcoinWallets) {
+            wallet.stopAsync();
+            wallet.awaitTerminated();
+        }
         // Forcibly terminate the JVM because Orchid likes to spew non-daemon threads everywhere.
         Runtime.getRuntime().exit(0);
     }

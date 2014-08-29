@@ -1,15 +1,19 @@
+/**
+ * Project BitcoinExcavator.
+ * Copyright Michał Szczygieł & Aleksander Śmierciak
+ * Created at Aug 29, 2014.
+ */
 package wallet.controller;
 
 import com.google.bitcoin.core.*;
+import com.google.bitcoin.kits.WalletAppKit;
 import javafx.animation.*;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -21,7 +25,7 @@ import java.net.URL;
 import java.util.Date;
 import java.util.ResourceBundle;
 
-import static wallet.view.MainView.bitcoin;
+import static wallet.view.MainView.bitcoinWallets;
 import static wallet.utils.GuiUtils.checkGuiThread;
 
 /**
@@ -45,16 +49,29 @@ public class MainViewController implements Initializable {
     }
 
     public void onBitcoinSetup() {
-        bitcoin.wallet().addEventListener(new BalanceUpdater());
-        addressControl.setAddress(
-                bitcoin.wallet().currentReceiveKey().toAddress(MainView.params)
-                        .toString());
+        for (int i = 0; i < bitcoinWallets.size(); i++) {
+            bitcoinWallets.get(i).wallet().addEventListener(new BalanceUpdater());
+
+            if (i == 0) {
+                addressControl.setAddress(
+                        bitcoinWallets.get(i).wallet().currentReceiveKey().toAddress(MainView.params)
+                                .toString());
+            } else {
+                ClickableBitcoinAddress node = new ClickableBitcoinAddress();
+                node.setAddress(bitcoinWallets.get(i).wallet().currentReceiveKey().toAddress(MainView.params).toString());
+                connectionsListView.getChildren().add(node);
+            }
+        }
+
         refreshBalanceLabel();
     }
 
     public void newWallet(MouseEvent event) {
+        // Hide this UI and show the add wallet UI.
+        MainView.instance.overlayUI("/wallet/add-wallet.fxml");
+
         ClickableBitcoinAddress node = new ClickableBitcoinAddress();
-        node.setAddress( bitcoin.wallet().currentReceiveKey().toAddress(MainView.params)
+        node.setAddress(bitcoinWallets.get(bitcoinWallets.size() - 1).wallet().currentReceiveKey().toAddress(MainView.params)
                 .toString());
         connectionsListView.getChildren().add(node);
     }
@@ -111,9 +128,12 @@ public class MainViewController implements Initializable {
     }
 
     public void refreshBalanceLabel() {
-        final Coin amount = bitcoin.wallet()
-                .getBalance(Wallet.BalanceType.ESTIMATED);
-        balance.setText(Double.toString(amount.longValue()/100000000.0));
+        Coin amount = Coin.ZERO;
+        for (WalletAppKit bitcoinWallet : bitcoinWallets) {
+            amount.add(bitcoinWallet.wallet().getBalance(Wallet.BalanceType.ESTIMATED));
+        }
+
+        balance.setText(Double.toString(amount.longValue() / 100000000.0));
 
     }
 }
