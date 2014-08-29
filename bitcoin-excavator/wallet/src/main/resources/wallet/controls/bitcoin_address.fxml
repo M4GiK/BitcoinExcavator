@@ -28,6 +28,7 @@
         </Label>
         <Label fx:id="copyWidget" onMouseClicked="#copyWidgetClicked" text="&lt;COPY&gt;" />
         <Label fx:id="qrCode" onMouseClicked="#showQRCode" text="&lt;QR&gt;" />
+        <Label fx:id="sendMoney" onMouseClicked="#sendSomeMoney" text="&lt;SEND&gt;" />
         <Label fx:id="removeWallet" onMouseClicked="#deleteWallet" text="&lt;DELETE&gt;" />
       </children>
     </HBox>

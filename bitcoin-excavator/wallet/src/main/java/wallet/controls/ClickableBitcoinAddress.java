@@ -54,6 +54,8 @@ public class ClickableBitcoinAddress extends AnchorPane {
     @FXML
     protected Label qrCode;
     @FXML
+    protected Label sendMoney;
+    @FXML
     protected Label removeWallet;
 
     public ClickableBitcoinAddress() {
@@ -70,6 +72,9 @@ public class ClickableBitcoinAddress extends AnchorPane {
 
             AwesomeDude.setIcon(qrCode, AwesomeIcon.QRCODE);
             Tooltip.install(qrCode, new Tooltip("Show a barcode scannable with a mobile phone for this address"));
+
+            AwesomeDude.setIcon(sendMoney, AwesomeIcon.BITCOIN);
+            Tooltip.install(sendMoney, new Tooltip("Send some money to someone"));
 
             AwesomeDude.setIcon(removeWallet, AwesomeIcon.BAN_CIRCLE);
             Tooltip.install(removeWallet, new Tooltip("Remove a wallet from list"));
@@ -107,6 +112,12 @@ public class ClickableBitcoinAddress extends AnchorPane {
     @FXML
     protected void deleteWallet(MouseEvent event) {
         System.out.print("DELETEE!");
+    }
+
+    @FXML
+    protected  void sendSomeMoney(MouseEvent event) {
+        // Hide this UI and show the send money UI. This UI won't be clickable until the user dismisses send_money.
+        MainView.instance.overlayUI("/wallet/send-money.fxml");
     }
 
     @FXML

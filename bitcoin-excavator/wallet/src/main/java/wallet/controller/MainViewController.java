@@ -5,9 +5,12 @@ import javafx.animation.*;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
@@ -32,6 +35,8 @@ public class MainViewController implements Initializable {
     public Label balance;
     public Button sendMoneyOutBtn;
     public ClickableBitcoinAddress addressControl;
+    public Button addWallet;
+    public VBox connectionsListView;
 
     // Called by FXMLLoader.
     public void initialize(URL location, ResourceBundle resources) {
@@ -45,6 +50,13 @@ public class MainViewController implements Initializable {
                 bitcoin.wallet().currentReceiveKey().toAddress(MainView.params)
                         .toString());
         refreshBalanceLabel();
+    }
+
+    public void newWallet(MouseEvent event) {
+        ClickableBitcoinAddress node = new ClickableBitcoinAddress();
+        node.setAddress( bitcoin.wallet().currentReceiveKey().toAddress(MainView.params)
+                .toString());
+        connectionsListView.getChildren().add(node);
     }
 
     public void sendMoneyOut(ActionEvent event) {
