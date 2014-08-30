@@ -73,9 +73,8 @@ public class SendMoneyController {
     public void send(ActionEvent event) {
         try {
             Address destination = new Address(MainView.params, address.getText());
-            System.out.println("LLLLLLLLLLOOLLLL " + String.valueOf(Long.getLong(satoshi.getText()) / 100000000.0));
             Wallet.SendRequest req = Wallet.SendRequest.to(destination,
-                    Coin.parseCoin(String.valueOf(Long.getLong(satoshi.getText()) / 100000000.0)));
+                    Coin.parseCoin(String.valueOf(Long.parseLong(satoshi.getText()) / 100000000.0)));
             sendResult = bitcoinWallet.wallet().sendCoins(req);
             Futures.addCallback(sendResult.broadcastComplete, new FutureCallback<Transaction>() {
                 @Override

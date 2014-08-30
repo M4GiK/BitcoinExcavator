@@ -40,7 +40,6 @@ public class MainViewController implements Initializable {
     public VBox syncBox;
     public HBox controlsBox;
     public Label balance;
-    public ClickableBitcoinAddress addressControl;
     public Button addWallet;
     public VBox connectionsListView;
     private List<ClickableBitcoinAddress> clickableBitcoinAddressList;
@@ -48,7 +47,6 @@ public class MainViewController implements Initializable {
     // Called by FXMLLoader.
     public void initialize(URL location, ResourceBundle resources) {
         syncProgress.setProgress(-1);
-        addressControl.setOpacity(0.0);
         connectionsListView.setOpacity(0.0);
     }
 
@@ -98,7 +96,6 @@ public class MainViewController implements Initializable {
         FadeTransition reveal = new FadeTransition(Duration.millis(500),
                 connectionsListView);
         reveal.setToValue(1.0);
-        addressControl.setOpacity(1.0);
         ParallelTransition group = new ParallelTransition(arrive, reveal);
         // Slide out happens then slide in/fade happens.
         SequentialTransition both = new SequentialTransition(leave, group);
