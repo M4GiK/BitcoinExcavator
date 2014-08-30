@@ -6,7 +6,6 @@
 package wallet.controller;
 
 import com.google.bitcoin.core.*;
-import com.google.bitcoin.kits.WalletAppKit;
 import com.google.bitcoin.params.MainNetParams;
 import com.google.bitcoin.params.RegTestParams;
 import javafx.application.Platform;
@@ -15,10 +14,12 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.VBox;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import wallet.controls.BitcoinNameWalletValidator;
 import wallet.controls.ClickableBitcoinAddress;
+import wallet.utils.BitcoinWallet;
 import wallet.utils.FileOperations;
 import wallet.view.MainView;
 
@@ -34,6 +35,9 @@ import static wallet.view.MainView.bitcoinWallets;
  * @author m4gik <michal.szczygiel@wp.pl>
  */
 public class AddWalletController {
+
+    private VBox connectionsListView;
+
     public Button addBtn;
     public Button cancelBtn;
     public TextField name;
@@ -54,6 +58,10 @@ public class AddWalletController {
         new BitcoinNameWalletValidator(name, addBtn);
     }
 
+    public void initData(VBox connectionsListView) {
+        this.connectionsListView = connectionsListView;
+    }
+
     public void cancel(ActionEvent event) {
         overlayUi.done();
     }
@@ -62,7 +70,8 @@ public class AddWalletController {
         hideItems();
         progress.setVisible(true);
 
-        WalletAppKit bitcoinWallet = new WalletAppKit(MainView.params, new File(FileOperations.APP_PATH + "/wallets/."), FileOperations.removeFileExtension(name.getText()));
+        BitcoinWallet bitcoinWallet = new BitcoinWallet(MainView.params, new File(FileOperations.APP_PATH + "/wallets/."),
+                FileOperations.removeFileExtension(name.getText()));
         bitcoinWallets.add(bitcoinWallet);
 
         if (MainView.params == RegTestParams.get()) {
@@ -76,7 +85,7 @@ public class AddWalletController {
             // tool and usually we have to download the last months worth or more (takes a few seconds).
             bitcoinWallet.setCheckpoints(getClass().getResourceAsStream("/wallet/checkpoints"));
         }
-        //Platform.runLater(overlayUi::done);
+
         bitcoinWallet.setDownloadListener(progressBarUpdater())
                 .setBlockingStartup(false)
                 .setUserAgent(MainView.APP_NAME, "1.0");
@@ -89,6 +98,11 @@ public class AddWalletController {
         bitcoinWallet.peerGroup().setMaxConnections(11);
         log.info("Address wallet: " + bitcoinWallet.wallet().currentReceiveAddress().toString());
         FileOperations.updateProperty(name.getText());
+
+        ClickableBitcoinAddress node = new ClickableBitcoinAddress();
+        node.setAddress(bitcoinWallet.wallet().currentReceiveKey().toAddress(MainView.params)
+                .toString(), bitcoinWallet, connectionsListView);
+        connectionsListView.getChildren().add(node);
     }
 
     private void hideItems() {
@@ -118,6 +132,6 @@ public class AddWalletController {
     }
 
     private void readyToGoAnimation() {
-        overlayUi.done();
+        Platform.runLater(overlayUi::done);
     }
 }

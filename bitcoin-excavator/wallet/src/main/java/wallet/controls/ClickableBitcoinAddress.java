@@ -1,5 +1,6 @@
 package wallet.controls;
 
+import com.google.bitcoin.core.Wallet;
 import com.google.bitcoin.uri.BitcoinURI;
 import de.jensd.fx.fontawesome.AwesomeDude;
 import de.jensd.fx.fontawesome.AwesomeIcon;
@@ -20,8 +21,10 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import net.glxn.qrgen.QRCode;
 import net.glxn.qrgen.image.ImageType;
+import wallet.utils.BitcoinWallet;
 import wallet.view.MainView;
 import wallet.utils.GuiUtils;
 
@@ -58,6 +61,9 @@ public class ClickableBitcoinAddress extends AnchorPane {
     @FXML
     protected Label removeWallet;
 
+    private BitcoinWallet bitcoinWallet;
+    private VBox connectionsListView;
+
     public ClickableBitcoinAddress() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("bitcoin_address.fxml"));
@@ -91,8 +97,12 @@ public class ClickableBitcoinAddress extends AnchorPane {
         return addressLabel.getText();
     }
 
-    public void setAddress(String address) {
+    public void setAddress(String address, BitcoinWallet bitcoinWallet, VBox connectionsListView) {
         addressLabel.setText(address);
+        this.bitcoinWallet = bitcoinWallet;
+        Tooltip.install(addressLabel, new Tooltip(bitcoinWallet.getFilePrefix() + "\nsatoshi: "
+                + bitcoinWallet.wallet().getBalance(Wallet.BalanceType.ESTIMATED).longValue()));
+        this.connectionsListView = connectionsListView;
     }
 
     public StringProperty addressProperty() {
@@ -111,13 +121,13 @@ public class ClickableBitcoinAddress extends AnchorPane {
 
     @FXML
     protected void deleteWallet(MouseEvent event) {
-        System.out.print("DELETEE!");
+        MainView.instance.overlayUIDeleteWallet("/wallet/delete-wallet.fxml", bitcoinWallet, connectionsListView, this);
     }
 
     @FXML
     protected  void sendSomeMoney(MouseEvent event) {
         // Hide this UI and show the send money UI. This UI won't be clickable until the user dismisses send_money.
-        MainView.instance.overlayUI("/wallet/send-money.fxml");
+        MainView.instance.overlayUISendMoney("/wallet/send-money.fxml", bitcoinWallet);
     }
 
     @FXML
@@ -165,5 +175,13 @@ public class ClickableBitcoinAddress extends AnchorPane {
                 overlay.done();
             }
         });
+    }
+
+    /**
+     * Refresh balance for wallet.
+     */
+    public void refreshBalance() {
+        Tooltip.install(addressLabel, new Tooltip(bitcoinWallet.getFilePrefix() + "\nsatoshi: "
+                + bitcoinWallet.wallet().getBalance(Wallet.BalanceType.ESTIMATED).longValue()));
     }
 }

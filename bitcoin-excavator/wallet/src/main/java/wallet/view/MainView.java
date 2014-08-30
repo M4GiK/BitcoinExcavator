@@ -10,6 +10,7 @@ import com.google.bitcoin.core.NetworkParameters;
 import com.google.bitcoin.kits.WalletAppKit;
 import com.google.bitcoin.params.MainNetParams;
 import com.google.bitcoin.params.RegTestParams;
+import com.google.bitcoin.params.TestNet3Params;
 import com.google.bitcoin.store.BlockStoreException;
 import com.google.bitcoin.utils.BriefLogFormatter;
 import com.google.bitcoin.utils.Threading;
@@ -21,10 +22,16 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import wallet.controller.AddWalletController;
+import wallet.controller.DeleteWalletController;
 import wallet.controller.MainViewController;
+import wallet.controller.SendMoneyController;
+import wallet.controls.ClickableBitcoinAddress;
+import wallet.utils.BitcoinWallet;
 import wallet.utils.FileOperations;
 import wallet.utils.GuiUtils;
 import wallet.utils.TextFieldValidator;
@@ -54,8 +61,8 @@ public class MainView extends Application {
      */
     public static String APP_NAME = "bitcoin-excavator-wallet";
 
-    public static NetworkParameters params = MainNetParams.get(); // TestNet3Params.testNet3();
-    public static List<WalletAppKit> bitcoinWallets;
+    public static NetworkParameters params = TestNet3Params.testNet3();//MainNetParams.get(); // TestNet3Params.testNet3();
+    public static List<BitcoinWallet> bitcoinWallets;
     public static MainView instance;
 
     private StackPane uiStack;
@@ -120,7 +127,7 @@ public class MainView extends Application {
         bitcoinWallets = FileOperations.readProperties(FileOperations.PROPERTIES);//new WalletAppKit(params, new File("."), APP_NAME);
 
         if(bitcoinWallets.size() == 0) {
-            bitcoinWallets.add(new WalletAppKit(params, new File(FileOperations.APP_PATH + "/wallets/."), APP_NAME));
+            bitcoinWallets.add(new BitcoinWallet(params, new File(FileOperations.APP_PATH + "/wallets/."), APP_NAME));
             FileOperations.updateProperty(APP_NAME);
         }
 
@@ -160,6 +167,97 @@ public class MainView extends Application {
         }
         controller.onBitcoinSetup();
         mainWindow.show();
+    }
+
+    /**
+     * Loads the FXML file with the given name, blurs out the main UI and puts this one on top.
+     *
+     * @param name Controler name.
+     * @param bitcoinWallet wallet with data.
+     * @param connectionsListView
+     * @param clickableBitcoinAddress
+     * @return pair.
+     */
+    public <T> OverlayUI<T> overlayUIDeleteWallet(String name, BitcoinWallet bitcoinWallet, VBox connectionsListView, ClickableBitcoinAddress clickableBitcoinAddress) {
+        try {
+            checkGuiThread();
+            // Load the UI from disk.
+            URL location = getClass().getResource(name);
+            FXMLLoader loader = new FXMLLoader(location);
+            Pane ui = loader.load();
+            DeleteWalletController controller = loader.getController();
+            controller.initData(bitcoinWallet, connectionsListView, clickableBitcoinAddress);
+            OverlayUI<T> pair = new OverlayUI<T>(ui, (T) controller);
+            // Auto-magically set the overlayUi member, if it's there.
+            try {
+                controller.getClass().getDeclaredField("overlayUi").set(controller, pair);
+            } catch (IllegalAccessException | NoSuchFieldException ignored) {
+            }
+            pair.show();
+            return pair;
+        } catch (IOException e) {
+            throw new RuntimeException(e);  // Can't happen.
+        }
+    }
+
+    /**
+     * Loads the FXML file with the given name, blurs out the main UI and puts this one on top.
+     *
+     * @param name Controler name.
+     * @param bitcoinWallet wallet with data.
+     * @param <T>
+     * @return pair.
+     */
+    public <T> OverlayUI<T> overlayUISendMoney(String name, BitcoinWallet bitcoinWallet) {
+        try {
+            checkGuiThread();
+            // Load the UI from disk.
+            URL location = getClass().getResource(name);
+            FXMLLoader loader = new FXMLLoader(location);
+            Pane ui = loader.load();
+            SendMoneyController controller = loader.getController();
+            controller.initData(bitcoinWallet);
+            OverlayUI<T> pair = new OverlayUI<T>(ui, (T) controller);
+            // Auto-magically set the overlayUi member, if it's there.
+            try {
+                controller.getClass().getDeclaredField("overlayUi").set(controller, pair);
+            } catch (IllegalAccessException | NoSuchFieldException ignored) {
+            }
+            pair.show();
+            return pair;
+        } catch (IOException e) {
+            throw new RuntimeException(e);  // Can't happen.
+        }
+    }
+
+    /**
+     * Loads the FXML file with the given name, blurs out the main UI and puts this one on top.
+     *
+     * @param name Controler name.
+     * @param connectionsListView node with list view.
+     * @param <T>
+     * @return pair.
+     */
+    public <T> OverlayUI<T> overlayUIAddWallet(String name, VBox connectionsListView) {
+        try {
+            checkGuiThread();
+            // Load the UI from disk.
+            URL location = getClass().getResource(name);
+            FXMLLoader loader = new FXMLLoader(location);
+            Pane ui = loader.load();
+            AddWalletController controller = loader.getController();
+            controller.initData(connectionsListView);
+            OverlayUI<T> pair = new OverlayUI<T>(ui, (T) controller);
+            // Auto-magically set the overlayUi member, if it's there.
+            try {
+                controller.getClass().getDeclaredField("overlayUi").set(controller, pair);
+            } catch (IllegalAccessException | NoSuchFieldException ignored) {
+            }
+            pair.show();
+            return pair;
+        } catch (IOException e) {
+            throw new RuntimeException(e);  // Can't happen.
+        }
     }
 
     public class OverlayUI<T> {

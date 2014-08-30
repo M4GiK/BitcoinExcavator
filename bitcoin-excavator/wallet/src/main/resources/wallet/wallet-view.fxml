@@ -40,7 +40,7 @@
     </VBox>
     <HBox fx:id="controlsBox" alignment="TOP_LEFT" fillHeight="true" layoutX="14.0" minHeight="16.0" prefHeight="16.0" prefWidth="205.0" spacing="10.0" translateY="60.0" visible="true" AnchorPane.bottomAnchor="29.0">
       <children>
-        <Button id="addWallet" defaultButton="true" mnemonicParsing="false" onMouseClicked="#newWallet" text="Add new wallet">
+        <Button fx:id="addWallet" defaultButton="true" mnemonicParsing="false" onMouseClicked="#newWallet" text="Add new wallet">
           <HBox.margin>
             <Insets />
           </HBox.margin>
@@ -65,13 +65,12 @@
               <content>
                   <VBox fx:id="connectionsListView" style="-icons-color: black; -fx-text-fill: gray; -fx-background-color: transparent; -fx-effect: innershadow( three-pass-box , rgba(0,0,0,0.4) , 6, 0.0 , 0 , 2 );">
                       <children>
-                          <ClickableBitcoinAddress fx:id="addressControl" layoutY="8.0" prefHeight="21.0" AnchorPane.leftAnchor="8.0" />
+                          <!--<ClickableBitcoinAddress fx:id="addressControl" layoutY="8.0" prefHeight="21.0" AnchorPane.leftAnchor="8.0" />-->
                       </children>
                   </VBox>
               </content>
             </ScrollPane>
       </children>
     </StackPane>
-    <Button id="sendMoneyOut" fx:id="sendMoneyOutBtn" alignment="CENTER" mnemonicParsing="false" onAction="#sendMoneyOut" text="Send money out" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="17.0" />
   </children>
 </AnchorPane>

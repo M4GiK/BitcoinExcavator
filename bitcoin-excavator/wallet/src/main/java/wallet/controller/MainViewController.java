@@ -11,6 +11,7 @@ import javafx.animation.*;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
@@ -22,7 +23,9 @@ import wallet.controls.ClickableBitcoinAddress;
 import wallet.view.MainView;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import static wallet.view.MainView.bitcoinWallets;
@@ -37,30 +40,28 @@ public class MainViewController implements Initializable {
     public VBox syncBox;
     public HBox controlsBox;
     public Label balance;
-    public Button sendMoneyOutBtn;
     public ClickableBitcoinAddress addressControl;
     public Button addWallet;
     public VBox connectionsListView;
+    private List<ClickableBitcoinAddress> clickableBitcoinAddressList;
 
     // Called by FXMLLoader.
     public void initialize(URL location, ResourceBundle resources) {
         syncProgress.setProgress(-1);
         addressControl.setOpacity(0.0);
+        connectionsListView.setOpacity(0.0);
     }
 
     public void onBitcoinSetup() {
+        clickableBitcoinAddressList = new ArrayList<ClickableBitcoinAddress>();
+
         for (int i = 0; i < bitcoinWallets.size(); i++) {
             bitcoinWallets.get(i).wallet().addEventListener(new BalanceUpdater());
-
-            if (i == 0) {
-                addressControl.setAddress(
-                        bitcoinWallets.get(i).wallet().currentReceiveKey().toAddress(MainView.params)
-                                .toString());
-            } else {
-                ClickableBitcoinAddress node = new ClickableBitcoinAddress();
-                node.setAddress(bitcoinWallets.get(i).wallet().currentReceiveKey().toAddress(MainView.params).toString());
-                connectionsListView.getChildren().add(node);
-            }
+            ClickableBitcoinAddress node = new ClickableBitcoinAddress();
+            node.setAddress(bitcoinWallets.get(i).wallet().currentReceiveKey().toAddress(MainView.params).toString(),
+                    bitcoinWallets.get(i), connectionsListView);
+            connectionsListView.getChildren().add(node);
+            clickableBitcoinAddressList.add(node);
         }
 
         refreshBalanceLabel();
@@ -68,17 +69,7 @@ public class MainViewController implements Initializable {
 
     public void newWallet(MouseEvent event) {
         // Hide this UI and show the add wallet UI.
-        MainView.instance.overlayUI("/wallet/add-wallet.fxml");
-
-        ClickableBitcoinAddress node = new ClickableBitcoinAddress();
-        node.setAddress(bitcoinWallets.get(bitcoinWallets.size() - 1).wallet().currentReceiveKey().toAddress(MainView.params)
-                .toString());
-        connectionsListView.getChildren().add(node);
-    }
-
-    public void sendMoneyOut(ActionEvent event) {
-        // Hide this UI and show the send money UI. This UI won't be clickable until the user dismisses send_money.
-        MainView.instance.overlayUI("/wallet/send-money.fxml");
+        MainView.instance.overlayUIAddWallet("/wallet/add-wallet.fxml", connectionsListView);
     }
 
     public class ProgressBarUpdater extends DownloadListener {
@@ -105,8 +96,9 @@ public class MainViewController implements Initializable {
                 Duration.millis(600), controlsBox);
         arrive.setToY(0.0);
         FadeTransition reveal = new FadeTransition(Duration.millis(500),
-                addressControl);
+                connectionsListView);
         reveal.setToValue(1.0);
+        addressControl.setOpacity(1.0);
         ParallelTransition group = new ParallelTransition(arrive, reveal);
         // Slide out happens then slide in/fade happens.
         SequentialTransition both = new SequentialTransition(leave, group);
@@ -128,12 +120,14 @@ public class MainViewController implements Initializable {
     }
 
     public void refreshBalanceLabel() {
-        Coin amount = Coin.ZERO;
+        Long amount = 0L;
         for (WalletAppKit bitcoinWallet : bitcoinWallets) {
-            amount.add(bitcoinWallet.wallet().getBalance(Wallet.BalanceType.ESTIMATED));
+            amount += bitcoinWallet.wallet().getBalance(Wallet.BalanceType.ESTIMATED).longValue();
         }
+        balance.setText(Double.toString(amount / 100000000.0));
 
-        balance.setText(Double.toString(amount.longValue() / 100000000.0));
-
+        for(ClickableBitcoinAddress node : clickableBitcoinAddressList) {
+            node.refreshBalance();
+        }
     }
 }

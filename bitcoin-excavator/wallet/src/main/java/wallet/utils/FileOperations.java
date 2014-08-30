@@ -5,7 +5,7 @@
  */
 package wallet.utils;
 
-import com.google.bitcoin.kits.WalletAppKit;
+import org.apache.commons.io.FileDeleteStrategy;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -98,15 +98,15 @@ public class FileOperations {
      * Reads properties file for wallet application from given directory.
      *
      * @param filePath The location of file relative to the application.
-     * @return the filled {@link java.util.List} of {@link com.google.bitcoin.kits.WalletAppKit}.
+     * @return the filled {@link java.util.List} of {@link wallet.utils.BitcoinWallet}.
      */
-    public static List<WalletAppKit> readProperties(String filePath) {
+    public static List<BitcoinWallet> readProperties(String filePath) {
 
         if (filePath == null || filePath == "") {
             throw new IllegalArgumentException("File path mustn't be null or empty");
         }
 
-        List<WalletAppKit> walletAppKits = new ArrayList<WalletAppKit>();
+        List<BitcoinWallet> bitcoinWallets = new ArrayList<BitcoinWallet>();
         JSONParser parser = new JSONParser();
 
         try {
@@ -115,7 +115,8 @@ public class FileOperations {
             Iterator<String> iterator = wallets.iterator();
 
             while (iterator.hasNext()) {
-                walletAppKits.add(new WalletAppKit(MainView.params, new File(APP_PATH + "/wallets/."), removeFileExtension(iterator.next())));
+                bitcoinWallets.add(new BitcoinWallet(MainView.params, new File(APP_PATH + "/wallets/."),
+                        removeFileExtension(iterator.next())));
             }
 
         } catch (ParseException e) {
@@ -126,7 +127,7 @@ public class FileOperations {
             e.printStackTrace();
         }
 
-        return walletAppKits;
+        return bitcoinWallets;
     }
 
     /**
@@ -224,5 +225,49 @@ public class FileOperations {
         Calendar cal = Calendar.getInstance();
 
         return dateFormat.format(cal.getTime()).toString();
+    }
+
+    /**
+     * Deletes wallet from disk and from properties.
+     *
+     * @param walletName The wallet to delete.
+     */
+    public static void deleteWallet(String walletName) {
+        if (walletName == null) {
+            throw new IllegalArgumentException();
+        }
+
+        if (isPropertiesExisting(PROPERTIES)) {
+            JSONParser parser = new JSONParser();
+            JSONObject jsonObject = null;
+            try {
+
+
+                File fileWallet = new File(APP_PATH + "/wallets/" + walletName + ".wallet");
+                File fileSpvchain = new File(APP_PATH + "/wallets/" + walletName + ".spvchain");
+
+                if(FileDeleteStrategy.FORCE.deleteQuietly(fileWallet)
+                        && FileDeleteStrategy.FORCE.deleteQuietly(fileSpvchain)) {
+                    jsonObject = (JSONObject) parser.parse(new FileReader(APP_PATH + PROPERTIES));
+                    JSONArray wallets = (JSONArray) jsonObject.get("wallets");
+                    wallets.remove(walletName);
+
+                    FileWriter file = new FileWriter(APP_PATH + PROPERTIES);
+                    file.write(buildProperties(wallets).toJSONString());
+                    file.flush();
+                    file.close();
+
+                    LOGGER.info("Wallet " + walletName + " is deleted.");
+                } else {
+                    LOGGER.warning("Delete operation for delete wallet " + walletName + " is failed.");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        } else {
+            throw new NullPointerException();
+        }
     }
 }

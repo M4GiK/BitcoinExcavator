@@ -9,7 +9,7 @@
 <?import javafx.scene.paint.*?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane id="AnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/2.2" fx:controller="wallet.controller.SendMoneyController">
+<AnchorPane id="AnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="wallet.controller.SendMoneyController">
   <children>
     <VBox alignment="CENTER" layoutY="100.0" prefHeight="200.0" prefWidth="600.0" spacing="20.0" style="-fx-background-color: white;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
       <children>
@@ -17,17 +17,37 @@
           <font>
             <Font size="25.0" />
           </font>
+               <padding>
+                  <Insets top="10.0" />
+               </padding>
         </Label>
         <TextField fx:id="address" prefWidth="354.0" promptText="1EZEqFBd8yuc9ir2761987q7k3VcALC8YQ">
           <VBox.margin>
             <Insets left="40.0" right="40.0" />
           </VBox.margin>
         </TextField>
+            <Slider fx:id="slider" maxWidth="400.0" prefHeight="16.0" prefWidth="283.0" />
+            <HBox maxWidth="400.0" minWidth="100.0" prefHeight="15.0" prefWidth="160.0">
+               <children>
+                  <Label fx:id="satoshi" alignment="CENTER" text="0" />
+                  <Label text="satoshi" textAlignment="RIGHT">
+                     <HBox.margin>
+                        <Insets left="10.0" />
+                     </HBox.margin>
+                  </Label>
+               </children>
+               <VBox.margin>
+                  <Insets left="260.0" />
+               </VBox.margin>
+            </HBox>
         <HBox alignment="CENTER" fillHeight="true" prefHeight="30.0" prefWidth="600.0" spacing="50.0" VBox.vgrow="NEVER">
           <children>
             <Button fx:id="cancelBtn" cancelButton="true" mnemonicParsing="false" onAction="#cancel" prefWidth="79.0" text="Cancel" />
             <Button fx:id="sendBtn" defaultButton="true" mnemonicParsing="false" onAction="#send" prefWidth="79.0" text="Send" />
           </children>
+               <padding>
+                  <Insets bottom="15.0" />
+               </padding>
         </HBox>
       </children>
       <effect>
