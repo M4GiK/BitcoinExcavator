@@ -12,6 +12,8 @@ import java.util.ResourceBundle;
 import javafx.animation.*;
 import javafx.application.Platform;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Label;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
@@ -33,14 +35,17 @@ public class MainViewController implements Initializable {
     private static final Logger log = LoggerFactory.getLogger(MainViewController.class);
 
     public HBox controlsBox;
-
     public VBox progressBox;
+    public ProgressIndicator progress;
+    public Label loadingLabel;
 
     private ResourceBundle resources = null;
 
     public void initialize(URL location, ResourceBundle resources) {
         this.resources = resources;
         log.debug(resources.toString());
+        progress.setProgress(ProgressIndicator.INDETERMINATE_PROGRESS);
+        progress.setVisible(true);
 
         // Initialize something ..
         Platform.runLater(MainViewController.this::readyToGoAnimation);
@@ -51,16 +56,17 @@ public class MainViewController implements Initializable {
 //    }
 
     public void readyToGoAnimation() {
+
         // Sync progress bar slides out ...
-        TranslateTransition leave = new TranslateTransition(Duration.millis(600), progressBox);
-        leave.setByX(-180.0);
+        FadeTransition reveal = new FadeTransition(Duration.millis(500), progressBox);
+        reveal.setToValue(0.0);
 
         // Buttons slide in a appears simultaneously.
         TranslateTransition arrive = new TranslateTransition(Duration.millis(600), controlsBox);
         arrive.setToY(0.0);
 
         // Slide out happens then slide in/fade happens.
-        SequentialTransition both = new SequentialTransition(leave, arrive);
+        SequentialTransition both = new SequentialTransition(reveal, arrive);
         both.setCycleCount(1);
         both.setInterpolator(Interpolator.EASE_BOTH);
         both.play();

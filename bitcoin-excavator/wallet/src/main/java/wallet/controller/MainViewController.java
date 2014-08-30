@@ -34,6 +34,8 @@ import static wallet.utils.GuiUtils.checkGuiThread;
 /**
  * Gets created auto-magically by FXMLLoader via reflection. The widget fields are set to the GUI controls they're named
  * after. This class handles all the updates and event handling for the main UI.
+ *
+ * @author m4gik <michal.szczygiel@wp.pl>
  */
 public class MainViewController implements Initializable {
     public ProgressBar syncProgress;
