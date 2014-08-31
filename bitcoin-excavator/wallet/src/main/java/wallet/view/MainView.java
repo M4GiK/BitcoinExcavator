@@ -67,6 +67,7 @@ public class MainView extends Application {
 
     private StackPane uiStack;
     private Pane mainUI;
+    private boolean isRunning = false;
 
     /**
      * This method starts and initialize instance of the window which present wallet view.
@@ -167,6 +168,7 @@ public class MainView extends Application {
         }
         controller.onBitcoinSetup();
         mainWindow.show();
+        isRunning = true;
     }
 
     /**
@@ -260,6 +262,14 @@ public class MainView extends Application {
         }
     }
 
+    /**
+     * Checks if the instance of view is running
+     * @return true if application is running, false if application is not.
+     */
+    public boolean isRunning() {
+        return this.isRunning;
+    }
+
     public class OverlayUI<T> {
         public Node ui;
         public T controller;
@@ -326,6 +336,9 @@ public class MainView extends Application {
             wallet.stopAsync();
             wallet.awaitTerminated();
         }
+
+        isRunning = false;
+
         // Forcibly terminate the JVM because Orchid likes to spew non-daemon threads everywhere.
         Runtime.getRuntime().exit(0);
     }

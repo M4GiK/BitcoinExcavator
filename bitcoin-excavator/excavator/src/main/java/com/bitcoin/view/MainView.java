@@ -44,7 +44,10 @@ public class MainView extends Application {
      */
     public static String APP_NAME = "bitcoin-excavator";
 
-    /** **/
+    /** Instance of wallet view. **/
+    public  static wallet.view.MainView walletView = new wallet.view.MainView();
+
+    /** Instance of main view what mean the bitcoin-excavator view **/
     public static MainView instance;
 
     /** **/
@@ -86,6 +89,13 @@ public class MainView extends Application {
                                 .toString());
                 throw t;
             }
+        }
+    }
+
+    @Override
+    public void stop() throws Exception {
+        if(walletView.isRunning()) {
+            walletView.stop();
         }
     }
 

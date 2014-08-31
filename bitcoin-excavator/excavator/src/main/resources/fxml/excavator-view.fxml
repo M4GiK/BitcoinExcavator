@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.effect.*?>
@@ -30,12 +29,12 @@
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
                         <Separator layoutX="297.0" layoutY="7.0" orientation="VERTICAL" prefHeight="260.0" prefWidth="6.0" />
-                        <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="40.0" layoutY="54.0" pickOnBounds="true" preserveRatio="true">
+                        <ImageView fx:id="bitcoinExcavator" fitHeight="150.0" fitWidth="200.0" layoutX="40.0" layoutY="54.0" pickOnBounds="true" preserveRatio="true">
                            <image>
                               <Image url="@../images/bitcoin_excavator.png" />
                            </image>
                         </ImageView>
-                        <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="390.0" layoutY="64.0" pickOnBounds="true" preserveRatio="true">
+                        <ImageView fx:id="bitcoinWallet" fitHeight="150.0" fitWidth="200.0" layoutX="390.0" layoutY="64.0" pickOnBounds="true" preserveRatio="true">
                            <image>
                               <Image url="@../images/bitcoin_wallet.png" />
                            </image>
