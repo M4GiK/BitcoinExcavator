@@ -17,10 +17,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.control.ProgressIndicator;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
+import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -101,6 +98,9 @@ public class MainViewController implements Initializable {
                 fadeTransition.play();
             }
         });
+
+        Tooltip.install(bitcoinExcavator, new Tooltip("Dig Bitcoins!"));
+        Tooltip.install(bitcoinWallet, new Tooltip("Open wallet for your BitCoins"));
 
         // Initialize something ..
         Platform.runLater(MainViewController.this::readyToGoAnimation);
