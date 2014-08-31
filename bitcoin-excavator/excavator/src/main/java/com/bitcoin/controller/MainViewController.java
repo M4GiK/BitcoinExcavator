@@ -68,6 +68,8 @@ public class MainViewController implements Initializable {
         progress.setProgress(ProgressIndicator.INDETERMINATE_PROGRESS);
         progress.setVisible(true);
         container.setOpacity(0.0);
+        setupPage.setOpacity(0.0);
+        aboutPage.setOpacity(0.0);
         bitcoinExcavator.setOnMouseEntered(mouseOverForExcavator);
         bitcoinExcavator.setOnMouseExited(mouseExitFromExcavator);
         bitcoinExcavator.setOnMouseClicked(mouseClickedOnExcavator);
