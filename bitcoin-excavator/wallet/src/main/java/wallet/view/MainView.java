@@ -61,7 +61,8 @@ public class MainView extends Application {
      */
     public static String APP_NAME = "bitcoin-excavator-wallet";
 
-    public static NetworkParameters params = TestNet3Params.testNet3();//MainNetParams.get(); // TestNet3Params.testNet3();
+    // Page for testNet3 with virtual BitCoins -> http://faucet.xeno-genesis.com
+    public static NetworkParameters params = TestNet3Params.testNet3(); // MainNetParams.get();
     public static List<BitcoinWallet> bitcoinWallets;
     public static MainView instance;
 
