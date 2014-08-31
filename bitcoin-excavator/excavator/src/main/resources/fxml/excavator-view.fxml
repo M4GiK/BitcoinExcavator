@@ -7,82 +7,97 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane id="AnchorPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="200.0" minWidth="300.0" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.bitcoin.controller.MainViewController">
+<AnchorPane id="AnchorPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="200.0"
+            minWidth="300.0" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.bitcoin.controller.MainViewController">
 
     <children>
-        <ImageView fitHeight="243.0" fitWidth="243.0" opacity="0.28" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="-36.0" AnchorPane.rightAnchor="-34.0">
+        <ImageView fitHeight="243.0" fitWidth="243.0" opacity="0.28" pickOnBounds="true" preserveRatio="true"
+                   AnchorPane.bottomAnchor="-36.0" AnchorPane.rightAnchor="-34.0">
             <effect>
                 <ColorAdjust>
                     <input>
-                        <BoxBlur height="20.0" width="20.0" />
+                        <BoxBlur height="20.0" width="20.0"/>
                     </input>
                 </ColorAdjust>
             </effect>
             <image>
-                <Image url="@../images/bitcoin_logo_plain.png" />
+                <Image url="@../images/bitcoin_logo_plain.png"/>
             </image>
         </ImageView>
-      <TabPane layoutY="57.0" prefHeight="343.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE">
-        <tabs>
-          <Tab text="Main Page">
-            <content>
-              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                     <children>
-                        <Separator layoutX="297.0" layoutY="7.0" orientation="VERTICAL" prefHeight="260.0" prefWidth="6.0" />
-                        <ImageView fx:id="bitcoinExcavator" fitHeight="150.0" fitWidth="200.0" layoutX="40.0" layoutY="54.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../images/bitcoin_excavator.png" />
-                           </image>
-                        </ImageView>
-                        <ImageView fx:id="bitcoinWallet" fitHeight="150.0" fitWidth="200.0" layoutX="390.0" layoutY="64.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../images/bitcoin_wallet.png" />
-                           </image>
-                        </ImageView>
-                     </children></AnchorPane>
-            </content>
-          </Tab>
-          <Tab text="Setup">
-            <content>
-              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-            </content>
-          </Tab>
-            <Tab text="About">
-              <content>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-              </content>
-            </Tab>
-        </tabs>
-      </TabPane>
+        <TabPane fx:id="container" layoutY="57.0" prefHeight="343.0" prefWidth="600.0" tabClosingPolicy="UNAVAILABLE">
+            <tabs>
+                <Tab fx:id="mainTab" text="Main Page">
+                    <content>
+                        <AnchorPane fx:id="mainPage" minHeight="0.0" minWidth="0.0" prefHeight="180.0"
+                                    prefWidth="200.0">
+                            <children>
+                                <Separator layoutX="297.0" layoutY="7.0" orientation="VERTICAL" prefHeight="260.0"
+                                           prefWidth="6.0"/>
+                                <ImageView fx:id="bitcoinExcavator" fitHeight="150.0" fitWidth="200.0" layoutX="40.0"
+                                           layoutY="54.0" pickOnBounds="true" preserveRatio="true">
+                                    <image>
+                                        <Image url="@../images/bitcoin_excavator.png"/>
+                                    </image>
+                                </ImageView>
+                                <ImageView fx:id="bitcoinWallet" fitHeight="150.0" fitWidth="200.0" layoutX="390.0"
+                                           layoutY="64.0" pickOnBounds="true" preserveRatio="true">
+                                    <image>
+                                        <Image url="@../images/bitcoin_wallet.png"/>
+                                    </image>
+                                </ImageView>
+                            </children>
+                        </AnchorPane>
+                    </content>
+                </Tab>
+                <Tab fx:id="setupTab" text="Setup">
+                    <content>
+                        <AnchorPane fx:id="setupPage" minHeight="0.0" minWidth="0.0" prefHeight="180.0"
+                                    prefWidth="200.0"/>
+                    </content>
+                </Tab>
+                <Tab fx:id="aboutTab" text="About">
+                    <content>
+                        <AnchorPane fx:id="aboutPage" minHeight="0.0" minWidth="0.0" prefHeight="180.0"
+                                    prefWidth="200.0"/>
+                    </content>
+                </Tab>
+            </tabs>
+        </TabPane>
         <Label layoutX="14.0" layoutY="13.0" text="BitCoin Ecavator">
             <font>
-                <Font name="Ubuntu" size="40.0" fx:id="x1" />
+                <Font name="Ubuntu" size="40.0" fx:id="x1"/>
             </font>
         </Label>
-        <VBox fx:id="progressBox" layoutX="100.0" layoutY="150.0" maxHeight="-1.0" prefHeight="100.0" prefWidth="400.0" spacing="10.0" translateY="0.0">
+        <VBox fx:id="progressBox" layoutX="100.0" layoutY="150.0" maxHeight="-1.0" prefHeight="100.0" prefWidth="400.0"
+              spacing="10.0" translateY="0.0">
             <children>
-                <ProgressIndicator fx:id="progress" prefHeight="100.0" prefWidth="150.0" progress="0.0" />
-                <Label fx:id="loadingLabel" alignment="CENTER" prefHeight="15.0" prefWidth="400.0" text="Application Loading..." textAlignment="CENTER" />
+                <ProgressIndicator fx:id="progress" prefHeight="100.0" prefWidth="150.0" progress="0.0"/>
+                <Label fx:id="loadingLabel" alignment="CENTER" prefHeight="15.0" prefWidth="400.0"
+                       text="Application Loading..." textAlignment="CENTER"/>
             </children>
         </VBox>
-        <HBox fx:id="controlsBox" alignment="TOP_LEFT" fillHeight="true" minHeight="25.0" prefHeight="25.0" prefWidth="600.0" style="-fx-background-color: gray;" translateY="60.0" visible="true" AnchorPane.bottomAnchor="0.0">
-         <children>
-            <Pane prefHeight="200.0" prefWidth="200.0">
-               <children>
-                  <Label contentDisplay="RIGHT" text="© Michał Szczygieł &amp; Aleksander Śmierciak">
-                     <padding>
-                        <Insets left="300.0" top="4.0" />
-                     </padding>
-                  </Label>
-               </children>
-            </Pane>
-         </children>
+        <HBox fx:id="controlsBox" alignment="TOP_LEFT" fillHeight="true" minHeight="25.0" prefHeight="25.0"
+              prefWidth="600.0" style="-fx-background-color: gray;" translateY="60.0" visible="true"
+              AnchorPane.bottomAnchor="0.0">
+            <children>
+                <Pane prefHeight="200.0" prefWidth="200.0">
+                    <children>
+                        <Label contentDisplay="RIGHT" text="© Michał Szczygieł &amp; Aleksander Śmierciak">
+                            <padding>
+                                <Insets left="300.0" top="4.0"/>
+                            </padding>
+                        </Label>
+                    </children>
+                </Pane>
+            </children>
         </HBox>
-      <ImageView fitHeight="48.0" fitWidth="72.0" layoutX="334.0" layoutY="5.0" opacity="0.8" pickOnBounds="true" preserveRatio="true" rotate="-12.5">
-         <image>
-            <Image url="@../images/bitcoin_logo_plain.png" />
-         </image>
-      </ImageView>
+        <ImageView fitHeight="48.0" fitWidth="72.0" layoutX="334.0" layoutY="5.0" opacity="0.8" pickOnBounds="true"
+                   preserveRatio="true" rotate="-12.5">
+            <image>
+                <Image url="@../images/bitcoin_logo_plain.png"/>
+            </image>
+        </ImageView>
     </children>
 
 </AnchorPane>

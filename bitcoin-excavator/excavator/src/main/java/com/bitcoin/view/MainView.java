@@ -141,7 +141,7 @@ public class MainView extends Application {
      * @throws Exception
      */
     public static void main(String[] args) throws Exception {
-        if (args.length == 0) {
+        if (args.length == 0) { // TODO  don't forget replace "==" to ">"
             log.info("Terminal mode is running.");
             BitcoinExcavator bitcoinExcavator = new BitcoinExcavator(
                     BitcoinOptions.terminalOptions(args));
