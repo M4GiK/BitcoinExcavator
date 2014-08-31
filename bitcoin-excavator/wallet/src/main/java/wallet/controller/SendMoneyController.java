@@ -71,37 +71,41 @@ public class SendMoneyController {
     }
 
     public void send(ActionEvent event) {
-        try {
-            Address destination = new Address(MainView.params, address.getText());
-            Wallet.SendRequest req = Wallet.SendRequest.to(destination,
-                    Coin.parseCoin(String.valueOf(Long.parseLong(satoshi.getText()) / 100000000.0)));
-            sendResult = bitcoinWallet.wallet().sendCoins(req);
-            Futures.addCallback(sendResult.broadcastComplete, new FutureCallback<Transaction>() {
-                @Override
-                public void onSuccess(Transaction result) {
-                    Platform.runLater(overlayUi::done);
-                }
-
-                @Override
-                public void onFailure(Throwable t) {
-                    // We died trying to empty the wallet.
-                    crashAlert(t);
-                }
-            });
-            sendResult.tx.getConfidence().addEventListener((tx, reason) -> {
-                if (reason == TransactionConfidence.Listener.ChangeReason.SEEN_PEERS)
-                    updateTitleForBroadcast();
-            });
-            sendBtn.setDisable(true);
-            address.setDisable(true);
-            updateTitleForBroadcast();
-        } catch (AddressFormatException e) {
-            // Cannot happen because we already validated it when the text field changed.
-            throw new RuntimeException(e);
-        } catch (InsufficientMoneyException e) {
-            informationalAlert("Could not empty the wallet",
-                    "You may have too little money left in the wallet to make a transaction.");
+        if (Long.parseLong(satoshi.getText()) <= 0) {
             overlayUi.done();
+        } else {
+            try {
+                Address destination = new Address(MainView.params, address.getText());
+                Wallet.SendRequest req = Wallet.SendRequest.to(destination,
+                        Coin.parseCoin(String.valueOf(Long.parseLong(satoshi.getText()) / 100000000.0)));
+                sendResult = bitcoinWallet.wallet().sendCoins(req);
+                Futures.addCallback(sendResult.broadcastComplete, new FutureCallback<Transaction>() {
+                    @Override
+                    public void onSuccess(Transaction result) {
+                        Platform.runLater(overlayUi::done);
+                    }
+
+                    @Override
+                    public void onFailure(Throwable t) {
+                        // We died trying to empty the wallet.
+                        crashAlert(t);
+                    }
+                });
+                sendResult.tx.getConfidence().addEventListener((tx, reason) -> {
+                    if (reason == TransactionConfidence.Listener.ChangeReason.SEEN_PEERS)
+                        updateTitleForBroadcast();
+                });
+                sendBtn.setDisable(true);
+                address.setDisable(true);
+                updateTitleForBroadcast();
+            } catch (AddressFormatException e) {
+                // Cannot happen because we already validated it when the text field changed.
+                throw new RuntimeException(e);
+            } catch (InsufficientMoneyException e) {
+                informationalAlert("Could not empty the wallet",
+                        "You may have too little money left in the wallet to make a transaction.");
+                overlayUi.done();
+            }
         }
     }
 

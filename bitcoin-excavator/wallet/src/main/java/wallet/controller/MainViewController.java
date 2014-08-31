@@ -125,7 +125,7 @@ public class MainViewController implements Initializable {
         }
         balance.setText(Double.toString(amount / 100000000.0));
 
-        for(ClickableBitcoinAddress node : clickableBitcoinAddressList) {
+        for (ClickableBitcoinAddress node : clickableBitcoinAddressList) {
             node.refreshBalance();
         }
     }
