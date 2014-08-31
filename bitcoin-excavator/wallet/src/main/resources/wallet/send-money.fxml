@@ -13,7 +13,7 @@
   <children>
     <VBox alignment="CENTER" layoutY="100.0" prefHeight="200.0" prefWidth="600.0" spacing="20.0" style="-fx-background-color: white;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
       <children>
-        <Label fx:id="titleLabel" text="Send all money to ...">
+        <Label fx:id="titleLabel" text="Send some money to ...">
           <font>
             <Font size="25.0" />
           </font>
