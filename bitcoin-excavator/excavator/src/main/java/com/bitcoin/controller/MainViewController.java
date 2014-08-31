@@ -76,32 +76,29 @@ public class MainViewController implements Initializable {
         bitcoinWallet.setOnMouseEntered(mouseOverForBitcoinWallet);
         bitcoinWallet.setOnMouseExited(mouseExitFromBitcoinWallet);
         bitcoinWallet.setOnMouseClicked(mouseClickedOnBitcoinWallet);
-        container.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Tab>() {
-            @Override
-            public void changed(ObservableValue<? extends Tab> observable, Tab oldValue, Tab recenltySelectedTab) {
-                if (recenltySelectedTab.equals(mainTab)) {
-                    setupPage.setOpacity(0.0);
-                    aboutPage.setOpacity(0.0);
-                    FadeTransition fadeTransition = new FadeTransition(Duration.millis(500), mainPage);
-                    fadeTransition.setToValue(1.0);
-                    fadeTransition.play();
-                }
+        container.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, recenltySelectedTab) -> {
+            if (recenltySelectedTab.equals(mainTab)) {
+                setupPage.setOpacity(0.0);
+                aboutPage.setOpacity(0.0);
+                FadeTransition fadeTransition = new FadeTransition(Duration.millis(500), mainPage);
+                fadeTransition.setToValue(1.0);
+                fadeTransition.play();
+            }
 
-                if (recenltySelectedTab.equals(setupTab)) {
-                    mainPage.setOpacity(0.0);
-                    aboutPage.setOpacity(0.0);
-                    FadeTransition fadeTransition = new FadeTransition(Duration.millis(500), setupPage);
-                    fadeTransition.setToValue(1.0);
-                    fadeTransition.play();
-                }
+            if (recenltySelectedTab.equals(setupTab)) {
+                mainPage.setOpacity(0.0);
+                aboutPage.setOpacity(0.0);
+                FadeTransition fadeTransition = new FadeTransition(Duration.millis(500), setupPage);
+                fadeTransition.setToValue(1.0);
+                fadeTransition.play();
+            }
 
-                if (recenltySelectedTab.equals(aboutTab)) {
-                    setupPage.setOpacity(0.0);
-                    mainPage.setOpacity(0.0);
-                    FadeTransition fadeTransition = new FadeTransition(Duration.millis(500), aboutPage);
-                    fadeTransition.setToValue(1.0);
-                    fadeTransition.play();
-                }
+            if (recenltySelectedTab.equals(aboutTab)) {
+                setupPage.setOpacity(0.0);
+                mainPage.setOpacity(0.0);
+                FadeTransition fadeTransition = new FadeTransition(Duration.millis(500), aboutPage);
+                fadeTransition.setToValue(1.0);
+                fadeTransition.play();
             }
         });
 
@@ -119,11 +116,15 @@ public class MainViewController implements Initializable {
         FadeTransition arrive = new FadeTransition(Duration.millis(600), container);
         arrive.setToValue(1.0);
 
+        // Buttons slide in a appears simultaneously.
+        TranslateTransition transit = new TranslateTransition(Duration.millis(600), controlsBox);
+        transit.setToY(0.0);
+
         // Slide out happens then slide in/fade happens.
-        SequentialTransition both = new SequentialTransition(reveal, arrive);
-        both.setCycleCount(1);
-        both.setInterpolator(Interpolator.EASE_BOTH);
-        both.play();
+        SequentialTransition sequentialTransition = new SequentialTransition(reveal, arrive, transit);
+        sequentialTransition.setCycleCount(1);
+        sequentialTransition.setInterpolator(Interpolator.EASE_BOTH);
+        sequentialTransition.play();
         progressBox.setDisable(true);
     }
 
@@ -148,12 +149,7 @@ public class MainViewController implements Initializable {
         }
     };
 
-    private EventHandler<MouseEvent> mouseClickedOnExcavator = new EventHandler<MouseEvent>() {
-        @Override
-        public void handle(MouseEvent mouseEvent) {
-            System.out.println("lol");
-        }
-    };
+    private EventHandler<MouseEvent> mouseClickedOnExcavator = mouseEvent -> System.out.println("lol");
 
     private EventHandler<MouseEvent> mouseOverForBitcoinWallet = new EventHandler<MouseEvent>() {
         @Override
