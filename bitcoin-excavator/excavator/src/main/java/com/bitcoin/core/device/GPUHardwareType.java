@@ -44,14 +44,11 @@ public class GPUHardwareType extends HardwareType {
      * @return {@link java.lang.String} with loaded kernel.
      */
     private String loadKernel(String kernelPath) throws ExcavatorFatalException {
-        byte[] data= null;
+        byte[] data = null;
 
-        try (InputStream stream = new FileInputStream(kernelPath)){
+        try (InputStream stream = new FileInputStream(kernelPath)) {
             data = new byte[64 * 1024];
-
-            while ((stream.read(data)) != -1) {
-            }
-
+            stream.read(data);
             stream.close();
         } catch (IOException e) {
             throw new ExcavatorFatalException(getExcavator(), "Unable to read Kernel.cl");
