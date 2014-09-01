@@ -15,7 +15,6 @@ import java.util.function.Predicate;
  * This class is responsible for validating text filed and applies styles.
  *
  * @author m4gik <michal.szczygiel@wp.pl>
- *
  */
 public class TextFieldValidator {
     private boolean valid;

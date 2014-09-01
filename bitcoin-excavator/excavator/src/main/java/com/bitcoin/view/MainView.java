@@ -5,6 +5,7 @@
  */
 package com.bitcoin.view;
 
+import java.text.SimpleDateFormat;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
@@ -15,6 +16,7 @@ import com.bitcoin.util.BitcoinOptions;
 import com.bitcoin.util.GuiUtils;
 
 import com.bitcoin.util.TextFieldValidator;
+import com.bitcoin.util.UTF8Control;
 import com.google.common.base.Throwables;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -111,7 +113,7 @@ public class MainView extends Application {
         }
 
         String fxmlFile = "excavator-view.fxml";
-        Locale locale = Locale.getDefault();
+        UTF8Control locale = new UTF8Control(); //Locale.getDefault();
 
         // Load the GUI. The Controller class will be automagically created and wired up.
         URL location = getClass().getResource("/fxml/" + fxmlFile);

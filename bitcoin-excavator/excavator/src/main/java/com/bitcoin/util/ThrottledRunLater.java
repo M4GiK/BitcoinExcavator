@@ -29,12 +29,16 @@ public class ThrottledRunLater implements Runnable {
     private final Runnable runnable;
     private final AtomicBoolean pending = new AtomicBoolean();
 
-    /** Created this way, the no-args runLater will execute this classes run method. */
+    /**
+     * Created this way, the no-args runLater will execute this classes run method.
+     */
     public ThrottledRunLater() {
         this.runnable = null;
     }
 
-    /** Created this way, the no-args runLater will execute the given runnable. */
+    /**
+     * Created this way, the no-args runLater will execute the given runnable.
+     */
     public ThrottledRunLater(Runnable runnable) {
         this.runnable = runnable;
     }

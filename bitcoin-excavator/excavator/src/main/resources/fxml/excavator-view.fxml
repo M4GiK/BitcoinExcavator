@@ -70,7 +70,7 @@
                 </Tab>
             </tabs>
         </TabPane>
-        <Label layoutX="14.0" layoutY="13.0" text="BitCoin Ecavator">
+        <Label layoutX="14.0" layoutY="13.0" text="%appTitle">
             <font>
                 <Font name="Ubuntu" size="40.0" fx:id="x1" />
             </font>
@@ -94,7 +94,7 @@
                 </Pane>
             </children>
         </HBox>
-        <ImageView fitHeight="48.0" fitWidth="72.0" layoutX="334.0" layoutY="5.0" opacity="0.8" pickOnBounds="true" preserveRatio="true" rotate="-12.5">
+        <ImageView fitHeight="48.0" fitWidth="72.0" layoutX="354.0" layoutY="5.0" opacity="0.8" pickOnBounds="true" preserveRatio="true" rotate="-12.5">
             <image>
                 <Image url="@../images/bitcoin_logo_plain.png" />
             </image>

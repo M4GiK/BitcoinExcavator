@@ -267,7 +267,7 @@ public class BitcoinOptions {
             bitcoinOptions.getGPUVectors()[0] = 1;
         }
 
-        if(commandLine.hasOption("ds")) {
+        if (commandLine.hasOption("ds")) {
             bitcoinOptions.setGPUDebugSource(true);
         }
 
