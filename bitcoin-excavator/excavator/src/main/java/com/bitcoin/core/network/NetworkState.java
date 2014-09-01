@@ -16,7 +16,7 @@ import com.bitcoin.core.device.ExecutionState;
 /**
  * This class is responsible for provide gathering information about network
  * state.
- * 
+ *
  * @author m4gik <michal.szczygiel@wp.pl>
  */
 public abstract class NetworkState {
@@ -66,20 +66,15 @@ public abstract class NetworkState {
 
     /**
      * Constructor for {@link com.bitcoin.core.network.NetworkState} class.
-     * 
-     * @param excavator
-     *            The instance of excavator.
-     * @param hostChain
-     *            The chain of hosts.
-     * @param queryUrl
-     *            The url query.
-     * @param user
-     *            The username for mine
-     * @param password
-     *            The password
+     *
+     * @param excavator The instance of excavator.
+     * @param hostChain The chain of hosts.
+     * @param queryUrl  The url query.
+     * @param user      The username for mine
+     * @param password  The password
      */
     public NetworkState(Excavator excavator, URL queryUrl, Byte hostChain,
-            String user, String password) {
+                        String user, String password) {
         setExcavator(excavator);
         setQueryUrl(queryUrl);
         setHostChain(hostChain);
@@ -98,9 +93,8 @@ public abstract class NetworkState {
     /**
      * This method adds {@link com.bitcoin.core.device.ExecutionState} instance
      * to {@link java.util.concurrent.LinkedBlockingDeque}.
-     * 
-     * @param executionState
-     *            The executionState to add.
+     *
+     * @param executionState The executionState to add.
      */
     public void addGetQueue(ExecutionState executionState) {
         this.getQueue.add(executionState);
@@ -109,9 +103,8 @@ public abstract class NetworkState {
     /**
      * This method adds {} ins@link WorkState} instance to
      * {@link java.util.concurrent.LinkedBlockingDeque}.
-     * 
-     * @param workState
-     *            Th workState to add.
+     *
+     * @param workState Th workState to add.
      */
     public void addSendQueue(WorkState workState) {
         this.sendQueue.add(workState);
@@ -188,80 +181,70 @@ public abstract class NetworkState {
     }
 
     /**
-     * @param excavator
-     *            the excavator to set
+     * @param excavator the excavator to set
      */
     public void setExcavator(Excavator excavator) {
         this.excavator = excavator;
     }
 
     /**
-     * @param hostChain
-     *            the hostChain to set
+     * @param hostChain the hostChain to set
      */
     public void setHostChain(Byte hostChain) {
         this.hostChain = hostChain;
     }
 
     /**
-     * @param hostProtocol
-     *            the hostProtocol to set
+     * @param hostProtocol the hostProtocol to set
      */
     public void setHostProtocol(Byte hostProtocol) {
         this.hostProtocol = hostProtocol;
     }
 
     /**
-     * @param networkStateNext
-     *            the networkStateNext to set
+     * @param networkStateNext the networkStateNext to set
      */
     public void setNetworkStateNext(NetworkState networkStateNext) {
         this.networkStateNext = networkStateNext;
     }
 
     /**
-     * @param password
-     *            the password to set
+     * @param password the password to set
      */
     public void setPassword(String password) {
         this.password = password;
     }
 
     /**
-     * @param queryUrl
-     *            the queryUrl to set
+     * @param queryUrl the queryUrl to set
      */
     public void setQueryUrl(URL queryUrl) {
         this.queryUrl = queryUrl;
     }
 
     /**
-     * @param refreshTimestamp
-     *            the refreshTimestamp to set
+     * @param refreshTimestamp the refreshTimestamp to set
      */
     public void setRefreshTimestamp(AtomicLong refreshTimestamp) {
         this.refreshTimestamp = refreshTimestamp;
     }
 
     /**
-     * @param rollNTime
-     *            the rollNTime to set
+     * @param rollNTime the rollNTime to set
      */
     public void setRollNTime(Boolean rollNTime) {
         this.rollNTime = rollNTime;
     }
 
     /**
-     * @param user
-     *            the user to set
+     * @param user the user to set
      */
     public void setUser(String user) {
         this.user = user;
     }
 
     /**
-     * @param workLifetime
-     *            the workLifetime to set
+     * @param workLifetime the workLifetime to set
      */
     public void setWorkLifetime(Long workLifetime) {
         this.workLifetime = workLifetime;

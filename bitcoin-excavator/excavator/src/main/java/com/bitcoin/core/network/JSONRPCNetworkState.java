@@ -265,7 +265,7 @@ public class JSONRPCNetworkState extends NetworkState {
      * @param hostChain
      */
     public JSONRPCNetworkState(Excavator excavator, URL queryUrl, String user,
-            String password, Byte hostChain) {
+                               String password, Byte hostChain) {
         super(excavator, queryUrl, hostChain, user, password);
         setUserPassword("Basic "
                 + Base64.encodeBase64String((user + ":" + password).getBytes())

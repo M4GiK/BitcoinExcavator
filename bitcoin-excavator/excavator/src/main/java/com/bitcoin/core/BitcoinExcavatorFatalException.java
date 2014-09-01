@@ -7,9 +7,8 @@ package com.bitcoin.core;
 
 /**
  * Class for gathering exception information, based on {@link Exception} class.
- * 
+ *
  * @author m4gik <michal.szczygiel@wp.pl>
- * 
  */
 public class BitcoinExcavatorFatalException extends Exception {
 
@@ -20,11 +19,9 @@ public class BitcoinExcavatorFatalException extends Exception {
 
     /**
      * Constructor for {@link BitcoinExcavatorFatalException} class.
-     * 
-     * @param bitcoinExcavator
-     *            Instance of {@link BitcoinExcavator} class.
-     * @param reason
-     *            Message with error.
+     *
+     * @param bitcoinExcavator Instance of {@link BitcoinExcavator} class.
+     * @param reason           Message with error.
      */
     public BitcoinExcavatorFatalException(BitcoinExcavator bitcoinExcavator, String reason) {
         super(reason);

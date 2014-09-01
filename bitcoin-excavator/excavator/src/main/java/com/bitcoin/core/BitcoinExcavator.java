@@ -5,12 +5,14 @@
  */
 package com.bitcoin.core;
 
-import java.net.Proxy;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
+import com.bitcoin.core.device.DeviceState;
+import com.bitcoin.core.device.GPUHardwareType;
 import com.bitcoin.core.network.NetworkState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,6 +59,8 @@ public class BitcoinExcavator implements Excavator {
     private AtomicBoolean running = new AtomicBoolean(true);
 
     private BitcoinOptions bitcoinOptions = null;
+
+    private Long startTime;
 
     public BitcoinExcavator(BitcoinOptions bitcoinOptions) {
         this.bitcoinOptions = bitcoinOptions;
@@ -119,7 +123,28 @@ public class BitcoinExcavator implements Excavator {
 
         log.info("Connecting to: " + list);
 
+        try {
+            startGPU();
+        } catch (ExcavatorFatalException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Methods starts operations on GPU.
+     */
+    private void startGPU() throws ExcavatorFatalException {
         //TODO make implementation for GPU
+        Long previousHashCount = 0L;
+        Long previousAdjustedStartTime = this.startTime = (getCurrentTime() - 1);
+        Double previousAdjustedHashCount = 0.0;
+
+        StringBuilder hashMeter = new StringBuilder();
+        Formatter hashMeterFormatter = new Formatter(hashMeter);
+        Integer deviceCount = 0;
+
+        List<List<? extends DeviceState>> allDeviceStates = new ArrayList<List<? extends  DeviceState>>();
+        List<? extends  DeviceState> GPUDeviceStates = new GPUHardwareType(this).getDeviceStates();
 
     }
 
@@ -147,10 +172,10 @@ public class BitcoinExcavator implements Excavator {
     public void halt() {
         running.set(false);
 
-        for(int i = 0; i <getThreads().size(); i++) {
+        for (int i = 0; i < getThreads().size(); i++) {
             Thread thread = getThreads().get(i);
 
-            if(thread != Thread.currentThread()) {
+            if (thread != Thread.currentThread()) {
                 thread.interrupt();
             }
         }
