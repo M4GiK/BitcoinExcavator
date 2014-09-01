@@ -7,6 +7,8 @@ package com.bitcoin.core.device;
 
 import com.bitcoin.core.Excavator;
 import com.bitcoin.core.ExcavatorFatalException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -19,6 +21,12 @@ import java.util.List;
  * @author m4gik <michal.szczygiel@wp.pl>
  */
 public class GPUHardwareType extends HardwareType {
+
+    /**
+     * Logger for monitoring runtime.
+     */
+    private static final Logger log = LoggerFactory
+            .getLogger(GPUHardwareType.class);
 
     private final static Integer EXECUTION_TOTAL = 2;
 
@@ -42,7 +50,16 @@ public class GPUHardwareType extends HardwareType {
     public GPUHardwareType(Excavator excavator) throws ExcavatorFatalException {
         super(excavator);
         kernel = loadKernel(KERNEL_PATH);
-        System.out.println(kernel);
+        debugSource(excavator.getBitcoinOptions().getGPUDebugSource());
+    }
+
+    /**
+     * This method debug the source code of kernel. Shows the output of prepared kernel.
+     *
+     * @param debugMode
+     */
+    private void debugSource(Boolean debugMode) {
+        log.info(kernel);
     }
 
     /**
