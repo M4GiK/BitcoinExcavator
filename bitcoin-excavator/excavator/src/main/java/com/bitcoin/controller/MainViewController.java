@@ -61,7 +61,6 @@ public class MainViewController implements Initializable {
 
     public void initialize(URL location, ResourceBundle resources) {
         this.resources = resources;
-        log.debug(resources.toString());
         progress.setProgress(ProgressIndicator.INDETERMINATE_PROGRESS);
         progress.setVisible(true);
         container.setOpacity(0.0);
@@ -99,8 +98,8 @@ public class MainViewController implements Initializable {
             }
         });
 
-        Tooltip.install(bitcoinExcavator, new Tooltip("Dig Bitcoins!"));
-        Tooltip.install(bitcoinWallet, new Tooltip("Open wallet for your BitCoins"));
+        Tooltip.install(bitcoinExcavator, new Tooltip(resources.getString("toolTipExcavator")));
+        Tooltip.install(bitcoinWallet, new Tooltip(resources.getString("toolTipWallet")));
 
         // Initialize something ..
         Platform.runLater(MainViewController.this::readyToGoAnimation);
