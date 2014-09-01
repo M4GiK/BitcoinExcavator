@@ -1,6 +1,5 @@
 /*
- * DiabloMiner - OpenCL miner for BitCoin
- * Copyright (C) 2010, 2011, 2012 Patrick McFarland <diablod3@gmail.com>
+ * BitCoin Excavator - OpenCL miner for BitCoin
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

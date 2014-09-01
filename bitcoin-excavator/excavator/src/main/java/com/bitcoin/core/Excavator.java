@@ -114,4 +114,5 @@ public interface Excavator {
      * @param information
      */
     void info(String information);
+
 }
