@@ -1,0 +1,15 @@
+<launch4jConfig>
+	<headerType>console</headerType>
+	<outfile>BitCoinExcavator-Windows.exe</outfile>
+	<jar>target/excavator.jar</jar>
+	<errTitle>BitCoinExcavator</errTitle>
+	<chdir>%EXECDIR%</chdir>
+	<classPath>
+		<mainClass>com.bitcoin.view.MainView</mainClass>
+		<cp>%EXEDIR%\target\libs\*</cp>
+	</classPath>
+	<jre>
+		<minVersion>1.8.0</minVersion>
+	</jre>
+	<customProcName>true</customProcName>
+</launch4jConfig>

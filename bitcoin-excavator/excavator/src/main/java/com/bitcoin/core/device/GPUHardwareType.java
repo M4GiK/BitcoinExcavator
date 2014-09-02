@@ -7,13 +7,19 @@ package com.bitcoin.core.device;
 
 import com.bitcoin.core.Excavator;
 import com.bitcoin.core.ExcavatorFatalException;
+import org.lwjgl.opencl.CL;
+import org.lwjgl.opencl.CL10;
+import org.lwjgl.opencl.CLDevice;
+import org.lwjgl.opencl.CLPlatform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * This class represents GPU hardware.
@@ -38,6 +44,10 @@ public class GPUHardwareType extends HardwareType {
 
     private Integer totalVectors = 0;
 
+    private Double targetFPSBasis;
+
+    private List<GPUDeviceState> deviceStates;
+
     public static String KERNEL_PATH = System.getProperty("user.dir")
             + "/excavator/src/main/java/com/bitcoin/kernel/BitCoinExcavator.cl";
 
@@ -51,6 +61,83 @@ public class GPUHardwareType extends HardwareType {
         super(excavator);
         kernel = loadKernel(KERNEL_PATH);
         debugSource(excavator.getBitcoinOptions().getGPUDebugSource());
+        targetFPSBasis = 1000.0 / (getExcavator().getBitcoinOptions().getGPUTargetFPS());
+        deviceStates = preparePlatform();
+    }
+
+    /**
+     * Prepares platform to lunch GPU devices.
+     *
+     * @return the list of prepared GPU devices.
+     */
+    private List<GPUDeviceState> preparePlatform() throws ExcavatorFatalException {
+        List<GPUDeviceState> preparedDeviceStates = new ArrayList<GPUDeviceState>();
+        List<CLPlatform> platforms = null;
+
+        try {
+            CL.create();
+            platforms = CLPlatform.getPlatforms();
+        } catch (Exception e) {
+            throw new ExcavatorFatalException(getExcavator(),
+                    "Failed to initialize OpenCL, make sure your environment is setup correctly");
+        }
+
+        if (platforms == null || platforms.isEmpty()) {
+            throw new ExcavatorFatalException(getExcavator(), "No OpenCL platforms found");
+        }
+
+        Set<String> enabledDevices = getExcavator().getBitcoinOptions().getEnabledDevices();
+        Integer count = 1;
+        Integer platformCount = 0;
+
+        for (CLPlatform platform : platforms) {
+            PlatformVersion version;
+            log.info("Using " + platform.getInfoString(CL10.CL_PLATFORM_NAME).trim()
+                    + " " + platform.getInfoString(CL10.CL_PLATFORM_VERSION));
+            String versions = platform.getInfoString(CL10.CL_PLATFORM_VERSION);
+
+            if (versions.contains("OpenCL  1.0")) {
+                version = PlatformVersion.V1_0;
+            } else if (versions.contains("OpenCL 1.1")) {
+                version = PlatformVersion.V1_1;
+            } else {
+                version = PlatformVersion.V1_2;
+            }
+
+            if (version == PlatformVersion.V1_0) {
+                getExcavator().error("OpenCL platform " + platform.getInfoString(CL10.CL_PLATFORM_NAME).trim()
+                        + " is not OpenCL 1.1 or later");
+                continue;
+            }
+
+            List<CLDevice> devices = platform.getDevices(CL10.CL_DEVICE_TYPE_GPU | CL10.CL_DEVICE_TYPE_ACCELERATOR);
+
+            if(devices == null || devices.isEmpty()) {
+                getExcavator().error("OpenCL platform " + platform.getInfoString(CL10.CL_PLATFORM_NAME).trim()
+                        + " contains no devices");
+                continue;
+            }
+
+            if (devices != null) {
+                for(CLDevice device : devices) {
+                    if(enabledDevices == null || enabledDevices.contains(platformCount + "."
+                            + count) || enabledDevices.contains(Integer.toString(count))) {
+                        String deviceName = device.getInfoString(CL10.CL_DEVICE_NAME).trim() + " (#" + count + ")";
+                        preparedDeviceStates.add(new GPUDeviceState(this, deviceName, platform, version, device));
+                    }
+
+                    count++;
+                }
+            }
+
+            platformCount++;
+        }
+
+        if(preparedDeviceStates.size() == 0) {
+            throw new ExcavatorFatalException(getExcavator(), "No OpenCL devices found");
+        }
+
+        return preparedDeviceStates;
     }
 
     /**
@@ -59,7 +146,9 @@ public class GPUHardwareType extends HardwareType {
      * @param debugMode
      */
     private void debugSource(Boolean debugMode) {
-        log.info(kernel);
+        if (debugMode) {
+            log.info(kernel);
+        }
     }
 
     /**
@@ -145,7 +234,7 @@ public class GPUHardwareType extends HardwareType {
 
                 kernelLine = kernelLine.replace("Znonce", change);
 
-                if(totalVectors > 1) {
+                if (totalVectors > 1) {
                     kernelLine = kernelLine.replaceAll("zz", String.valueOf(totalVectorsPOT));
                 } else {
                     kernelLine = kernelLine.replaceAll("zz", "");
@@ -156,10 +245,10 @@ public class GPUHardwareType extends HardwareType {
                 for (int j = 0; j < vectors.length; j++) {
                     String replace = kernelLine;
 
-                    if(getExcavator().getBitcoinOptions().getGPUNoArray() && replace.contains("z ZA")) {
+                    if (getExcavator().getBitcoinOptions().getGPUNoArray() && replace.contains("z ZA")) {
                         replace = "";
 
-                        for(int k = 0; k < 930; k += 5) {
+                        for (int k = 0; k < 930; k += 5) {
                             replace += "		 ";
 
                             for (int m = 0; m < 5; m++) {
@@ -170,12 +259,12 @@ public class GPUHardwareType extends HardwareType {
                         }
                     }
 
-                    if(vectors[j] > 1 && replace.contains("typedef")) {
+                    if (vectors[j] > 1 && replace.contains("typedef")) {
                         replace = replace.replace("uint", "uint" + vectors[j]);
                     } else if (replace.contains("z Znonce")) {
                         String vectorGlobal;
 
-                        if(vectors[j] > 1) {
+                        if (vectors[j] > 1) {
                             vectorGlobal = " + (uint" + vectors[j] + ")(";
                         } else {
                             vectorGlobal = " + (uint)(";
@@ -184,7 +273,7 @@ public class GPUHardwareType extends HardwareType {
                         for (int k = 0; k < vectors[j]; k++) {
                             vectorGlobal += Long.toString(vectorBase + k);
 
-                            if(k != vectors[j] - 1) {
+                            if (k != vectors[j] - 1) {
                                 vectorGlobal += ", ";
                             }
                         }
@@ -196,16 +285,16 @@ public class GPUHardwareType extends HardwareType {
                         vectorBase += vectors[j];
                     }
 
-                    if(vectors[j] == 1 && replace.contains("bool Zio")) {
+                    if (vectors[j] == 1 && replace.contains("bool Zio")) {
                         replace = replace.replace("any(", "(");
                     }
 
                     preparedKernel += replace.replaceAll("Z", UPPER[j]).replaceAll("z", LOWER[j]) + "\n";
                 }
-            } else if(totalVectors == 1 && kernelLine.contains("any(nonce")) {
+            } else if (totalVectors == 1 && kernelLine.contains("any(nonce")) {
                 preparedKernel += kernelLine.replace("any", "") + "\n";
             } else if (kernelLine.contains("__global")) {
-                if(totalVectors > 1) {
+                if (totalVectors > 1) {
                     preparedKernel += kernelLine.replaceAll("uint", "uint" + totalVectorsPOT) + "\n";
                 } else {
                     preparedKernel += kernelLine + "\n";
@@ -218,6 +307,19 @@ public class GPUHardwareType extends HardwareType {
         return preparedKernel;
     }
 
+
+    public String getKernel() {
+        return kernel;
+    }
+
+    public double getTargetFPSBasis() {
+        return targetFPSBasis;
+    }
+
+    public int getTotalVectors() {
+        return totalVectors;
+    }
+
     /**
      * Gets list of {@link com.bitcoin.core.device.DeviceState}.
      *
@@ -225,6 +327,6 @@ public class GPUHardwareType extends HardwareType {
      */
     @Override
     public List<? extends DeviceState> getDeviceStates() {
-        return null;
+        return deviceStates;
     }
 }
