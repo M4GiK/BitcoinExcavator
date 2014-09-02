@@ -5,18 +5,18 @@
  */
 package com.bitcoin.core;
 
+import com.bitcoin.core.device.DeviceState;
+import com.bitcoin.core.device.GPUHardwareType;
+import com.bitcoin.core.network.NetworkState;
+import com.bitcoin.core.network.NetworkStateBuilder;
+import com.bitcoin.util.BitcoinOptions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.text.DateFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
-
-import com.bitcoin.core.device.DeviceState;
-import com.bitcoin.core.device.GPUHardwareType;
-import com.bitcoin.core.network.NetworkState;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.bitcoin.util.BitcoinOptions;
 
 /**
  * Main core class for dig bitcoins. Responsible for start devices to found
@@ -104,8 +104,8 @@ public class BitcoinExcavator implements Excavator {
     public void execute() {
         log.info("Bitcoin Excavator process started");
 
-        ArrayList<NetworkState> networkStates = BitcoinOptions
-                .networkConfiguration(bitcoinOptions, this);
+        NetworkStateBuilder builder = new NetworkStateBuilder();
+        ArrayList<NetworkState> networkStates = builder.networkConfiguration(bitcoinOptions, this);
         StringBuilder list = new StringBuilder();
 
         for (int i = 0; i < networkStates.size(); i++) {

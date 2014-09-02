@@ -5,32 +5,24 @@
  */
 package com.bitcoin.view;
 
-import java.text.SimpleDateFormat;
-import java.util.Locale;
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
-
+import com.aquafx_project.AquaFx;
 import com.bitcoin.controller.MainViewController;
 import com.bitcoin.core.BitcoinExcavator;
-import com.bitcoin.util.BitcoinOptions;
-import com.bitcoin.util.GuiUtils;
-
-import com.bitcoin.util.TextFieldValidator;
-import com.bitcoin.util.UTF8Control;
+import com.bitcoin.util.*;
 import com.google.common.base.Throwables;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
-import javafx.stage.Stage;
-import com.aquafx_project.AquaFx;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
-
+import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 
 
 /**
@@ -145,8 +137,10 @@ public class MainView extends Application {
     public static void main(String[] args) throws Exception {
         if (args.length > 0) { // TODO  don't forget replace "==" to ">"
             log.info("Terminal mode is running.");
+            BitcoinOptionsBuilder builder = new BitcoinOptionsBuilder(new ObjectJsonDeserializer<>());
+            builder.terminalOptions(args);
             BitcoinExcavator bitcoinExcavator = new BitcoinExcavator(
-                    BitcoinOptions.terminalOptions(args));
+                    builder.terminalOptions(args));
             bitcoinExcavator.execute();
         } else {
             launch(null);
