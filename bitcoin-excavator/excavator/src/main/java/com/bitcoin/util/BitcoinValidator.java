@@ -31,10 +31,7 @@ public class BitcoinValidator {
 
         if (bitcoinOptions.getUrl() != null) {
             networkOptions = bitcoinOptions.getUrl().length;
-        } else if (bitcoinOptions.getUser() != null
-                && bitcoinOptions.getPassword() != null
-                && bitcoinOptions.getHost() != null
-                && bitcoinOptions.getPort() != null) {
+        } else {
             networkOptions = Math
                     .max(bitcoinOptions.getUser().length, networkOptions);
             networkOptions = Math.max(bitcoinOptions.getPassword().length,

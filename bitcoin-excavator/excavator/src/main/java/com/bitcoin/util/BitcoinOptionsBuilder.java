@@ -59,8 +59,7 @@ public class BitcoinOptionsBuilder {
         options.addOption("na", "noarray", false, "turn GPU kernel array off");
         options.addOption("v", "vectors", true, "vector size in GPU kernel");
         options.addOption("w", "worksize", true, "override GPU worksize");
-        options.addOption("ds", "ksource", false,
-                "output GPU kernel source and quit");
+        options.addOption("ds", "ksource", false, "output GPU kernel source");
         options.addOption("h", "help", false, "this help");
 
         CommandLine commandLine = null;
