@@ -38,11 +38,23 @@ public abstract class DeviceState {
         return executionState;
     }
 
+    public Long getResetNetworkState() {
+        return resetNetworkState;
+    }
+
     public void setDeviceName(String deviceName) {
         this.deviceName = deviceName;
     }
 
     public void setExecutionState(ExecutionState executionState) {
         this.executionState = executionState;
+    }
+
+    public void setResetNetworkState(Long resetNetworkState) {
+        this.resetNetworkState = resetNetworkState;
+    }
+
+    public void setBasis(Double basis) {
+        this.basis = basis;
     }
 }

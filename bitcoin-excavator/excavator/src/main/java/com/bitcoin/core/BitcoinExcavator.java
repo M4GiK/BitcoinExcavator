@@ -72,7 +72,7 @@ public class BitcoinExcavator implements Excavator {
     /**
      * List of threads.
      */
-    List<Thread> threads = new ArrayList<Thread>();
+    List<Thread> threads = new ArrayList<>();
 
     public Long addAndGetHashCount(Long delta) {
         // TODO Auto-generated method stub
@@ -85,8 +85,7 @@ public class BitcoinExcavator implements Excavator {
      * @param thread The thread to add.
      */
     public void addThread(Thread thread) {
-        // TODO Auto-generated method stub
-
+        threads.add(thread);
     }
 
     /**
@@ -107,7 +106,7 @@ public class BitcoinExcavator implements Excavator {
      */
     public void execute() {
         log.info("Bitcoin Excavator process started");
-
+        threads.add(Thread.currentThread());
         ArrayList<NetworkState> networkStates = NetworkStateBuilder.networkConfiguration(bitcoinOptions, this);
         StringBuilder list = new StringBuilder();
 
@@ -203,9 +202,14 @@ public class BitcoinExcavator implements Excavator {
         return null;
     }
 
+    /**
+     * Gets information about current process.
+     *
+     * @param information
+     */
     public void info(String information) {
-        // TODO Auto-generated method stub
-
+        log.info(getCurrentTime() + " " + information);
+        threads.get(0).interrupt();
     }
 
     public AtomicLong getAttempts() {

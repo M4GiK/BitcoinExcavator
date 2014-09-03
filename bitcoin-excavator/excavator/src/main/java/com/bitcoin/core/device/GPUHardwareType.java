@@ -34,8 +34,6 @@ public class GPUHardwareType extends HardwareType {
     private static final Logger log = LoggerFactory
             .getLogger(GPUHardwareType.class);
 
-    private final static Integer EXECUTION_TOTAL = 2;
-
     private final static String UPPER[] = {"X", "Y", "Z", "W", "T", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "k"};
 
     private final static String LOWER[] = {"x", "y", "z", "w", "t", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k"};
@@ -47,6 +45,8 @@ public class GPUHardwareType extends HardwareType {
     private Double targetFPSBasis;
 
     private List<GPUDeviceState> deviceStates;
+
+    public final static Integer EXECUTION_TOTAL = 2;
 
     public static String KERNEL_PATH = System.getProperty("user.dir")
             + "/excavator/src/main/java/com/bitcoin/kernel/BitCoinExcavator.cl";
@@ -112,15 +112,15 @@ public class GPUHardwareType extends HardwareType {
 
             List<CLDevice> devices = platform.getDevices(CL10.CL_DEVICE_TYPE_GPU | CL10.CL_DEVICE_TYPE_ACCELERATOR);
 
-            if(devices == null || devices.isEmpty()) {
+            if (devices == null || devices.isEmpty()) {
                 getExcavator().error("OpenCL platform " + platform.getInfoString(CL10.CL_PLATFORM_NAME).trim()
                         + " contains no devices");
                 continue;
             }
 
             if (devices != null) {
-                for(CLDevice device : devices) {
-                    if(enabledDevices == null || enabledDevices.contains(platformCount + "."
+                for (CLDevice device : devices) {
+                    if (enabledDevices == null || enabledDevices.contains(platformCount + "."
                             + count) || enabledDevices.contains(Integer.toString(count))) {
                         String deviceName = device.getInfoString(CL10.CL_DEVICE_NAME).trim() + " (#" + count + ")";
                         preparedDeviceStates.add(new GPUDeviceState(this, deviceName, platform, version, device));
@@ -133,7 +133,7 @@ public class GPUHardwareType extends HardwareType {
             platformCount++;
         }
 
-        if(preparedDeviceStates.size() == 0) {
+        if (preparedDeviceStates.size() == 0) {
             throw new ExcavatorFatalException(getExcavator(), "No OpenCL devices found");
         }
 
@@ -218,7 +218,7 @@ public class GPUHardwareType extends HardwareType {
                 String change = "(uintzz)(";
 
                 for (int j = 0; j < vectors.length; j++) {
-                    change += UPPER + "nonce";
+                    change += UPPER[j] + "nonce";
                     count += vectors[j];
 
                     if (j != vectors.length - 1) {
