@@ -86,26 +86,34 @@ public class GPUDeviceState extends DeviceState {
             CLMem blank = null;
             IntBuffer blankInit = BufferUtils.createIntBuffer(OUTPUTS * 4);
 
-            for (int i = 0; i < OUTPUTS; i++)
+            for (int i = 0; i < OUTPUTS; i++) {
                 blankInit.put(0);
+            }
 
             blankInit.rewind();
 
-            if (platformVersion == PlatformVersion.V1_1)
-                blank = CL10.clCreateBuffer(context, CL10.CL_MEM_COPY_HOST_PTR | CL10.CL_MEM_READ_ONLY, blankInit, errBuffer);
-            else
-                blank = CL10.clCreateBuffer(context, CL10.CL_MEM_COPY_HOST_PTR | CL10.CL_MEM_READ_ONLY | CL12.CL_MEM_HOST_NO_ACCESS, blankInit, errBuffer);
+            if (platformVersion == PlatformVersion.V1_1) {
+                blank = CL10.clCreateBuffer(context, CL10.CL_MEM_COPY_HOST_PTR
+                        | CL10.CL_MEM_READ_ONLY, blankInit, errBuffer);
+            } else {
+                blank = CL10.clCreateBuffer(context, CL10.CL_MEM_COPY_HOST_PTR
+                        | CL10.CL_MEM_READ_ONLY | CL12.CL_MEM_HOST_NO_ACCESS, blankInit, errBuffer);
+            }
 
-            if (blank == null || errBuffer.get(0) != CL10.CL_SUCCESS)
+            if (blank == null || errBuffer.get(0) != CL10.CL_SUCCESS) {
                 throw new ExcavatorFatalException(excavator, "Failed to allocate blank buffer");
+            }
 
             blankInit.rewind();
 
             for (int i = 0; i < 2; i++) {
-                if (platformVersion == PlatformVersion.V1_1)
-                    output[i] = CL10.clCreateBuffer(context, CL10.CL_MEM_COPY_HOST_PTR | CL10.CL_MEM_WRITE_ONLY, blankInit, errBuffer);
-                else
-                    output[i] = CL10.clCreateBuffer(context, CL10.CL_MEM_COPY_HOST_PTR | CL10.CL_MEM_WRITE_ONLY | CL12.CL_MEM_HOST_READ_ONLY, blankInit, errBuffer);
+                if (platformVersion == PlatformVersion.V1_1) {
+                    output[i] = CL10.clCreateBuffer(context, CL10.CL_MEM_COPY_HOST_PTR
+                            | CL10.CL_MEM_WRITE_ONLY, blankInit, errBuffer);
+                } else {
+                    output[i] = CL10.clCreateBuffer(context, CL10.CL_MEM_COPY_HOST_PTR
+                            | CL10.CL_MEM_WRITE_ONLY | CL12.CL_MEM_HOST_READ_ONLY, blankInit, errBuffer);
+                }
 
                 blankInit.rewind();
 
@@ -152,8 +160,7 @@ public class GPUDeviceState extends DeviceState {
             boolean skipProcessing;
             boolean skipUnmap = false;
 
-            while(excavator.getRunning()) {
-
+            while (excavator.getRunning()) {
                 submittedBlock = false;
                 resetBuffer = false;
                 hwError = false;
@@ -161,29 +168,29 @@ public class GPUDeviceState extends DeviceState {
 
                 WorkState workIncoming = null;
 
-                if(requestedNewWork) {
+                if (requestedNewWork) {
                     try {
                         workIncoming = getIncomingQueue().take();
-                    } catch(InterruptedException f) {
+                    } catch (InterruptedException f) {
                         continue;
                     }
                 } else {
                     workIncoming = getIncomingQueue().poll();
                 }
 
-                if(workIncoming != null) {
+                if (workIncoming != null) {
                     setWorkState(workIncoming);
                     requestedNewWork = false;
                     resetBuffer = true;
                     skipProcessing = true;
                 }
 
-                if(!skipProcessing | !skipUnmap) {
-                    for(int z = 0; z < OUTPUTS; z++) {
+                if (!skipProcessing | !skipUnmap) {
+                    for (int z = 0; z < OUTPUTS; z++) {
                         int nonce = outputBuffer.getInt(z * 4);
 
-                        if(nonce != 0) {
-                            for(int j = 0; j < 19; j++)
+                        if (nonce != 0) {
+                            for (int j = 0; j < 19; j++)
                                 digestInput.putInt(j * 4, getWorkState().getData(j));
 
                             digestInput.putInt(19 * 4, nonce);
@@ -196,10 +203,10 @@ public class GPUDeviceState extends DeviceState {
                             long H = ((long) (0xFF & digestOutput[31]) << 24) | ((long) (0xFF & digestOutput[30]) << 16)
                                     | ((long) (0xFF & digestOutput[29]) << 8) | ((long) (0xFF & digestOutput[28]));
 
-                            if(H == 0) {
+                            if (H == 0) {
                                 excavator.debug("Attempt " + excavator.incrementAttempts() + " from " + getExecutionName());
 
-                                if(getWorkState().getTarget(7) != 0 || G <= getWorkState().getTarget(6)) {
+                                if (getWorkState().getTarget(7) != 0 || G <= getWorkState().getTarget(6)) {
                                     getWorkState().submitNonce(nonce);
                                     submittedBlock = true;
                                 }
@@ -210,8 +217,8 @@ public class GPUDeviceState extends DeviceState {
                         }
                     }
 
-                    if(hwError && submittedBlock == false) {
-                        if(hardwareCheck && !excavator.getBitcoinOptions().getDebug()) {
+                    if (hwError && submittedBlock == false) {
+                        if (hardwareCheck && !excavator.getBitcoinOptions().getDebug()) {
                             excavator.error("Invalid solution " + excavator.incrementHWErrors()
                                     + " from " + getDeviceName() + ", possible driver or hardware issue");
                         } else {
@@ -221,20 +228,19 @@ public class GPUDeviceState extends DeviceState {
                     }
                 }
 
-                if(resetBuffer) {
+                if (resetBuffer) {
                     CL10.clEnqueueCopyBuffer(queue, blank, output[outputIndex], 0, 0, OUTPUTS * 4, null, null);
                 }
 
-                if(!skipUnmap) {
+                if (!skipUnmap) {
                     CL10.clEnqueueUnmapMemObject(queue, output[outputIndex], outputBuffer, null, null);
                     outputIndex = (outputIndex == 0) ? 1 : 0;
                 }
-                //------------
 
                 long workBase = getWorkState().getBase();
                 long increment = workSize.get();
 
-                if(excavator.getCurrentTime() - 3600000 > getResetNetworkState()) {
+                if (excavator.getCurrentTime() - 3600000 > getResetNetworkState()) {
                     setResetNetworkState(excavator.getCurrentTime());
 
                     excavator.getNetworkStates().get(0).addGetQueue(this);
@@ -243,7 +249,7 @@ public class GPUDeviceState extends DeviceState {
                     requestedNewWork = skipUnmap = getWorkState().update(increment);
                 }
 
-                if(!requestedNewWork) {
+                if (!requestedNewWork) {
                     excavator.addAndGetHashCount(increment);
                     getDeviceHashCount().addAndGet(increment);
                     runs.incrementAndGet();
@@ -298,18 +304,18 @@ public class GPUDeviceState extends DeviceState {
                     int err = CL10.clEnqueueNDRangeKernel(queue, kernel, 1, workBaseBuffer, workSizeBuffer,
                             localWorkSize, null, null);
 
-                    if(err != CL10.CL_SUCCESS && err != CL10.CL_INVALID_KERNEL_ARGS
+                    if (err != CL10.CL_SUCCESS && err != CL10.CL_INVALID_KERNEL_ARGS
                             && err != CL10.CL_INVALID_GLOBAL_OFFSET) {
                         try {
                             throw new ExcavatorFatalException(excavator, "Failed to queue kernel, error " + err);
-                        } catch(ExcavatorFatalException e) {
+                        } catch (ExcavatorFatalException e) {
                             log.error(e.getMessage());
                         }
                     } else {
-                        if(err == CL10.CL_INVALID_KERNEL_ARGS) {
+                        if (err == CL10.CL_INVALID_KERNEL_ARGS) {
                             excavator.debug("Spurious CL_INVALID_KERNEL_ARGS error, ignoring");
                             skipUnmap = true;
-                        } else if(err == CL10.CL_INVALID_GLOBAL_OFFSET) {
+                        } else if (err == CL10.CL_INVALID_GLOBAL_OFFSET) {
                             excavator.error("Spurious CL_INVALID_GLOBAL_OFFSET error, offset: "
                                     + workBase + ", work size: " + increment);
                             skipUnmap = true;

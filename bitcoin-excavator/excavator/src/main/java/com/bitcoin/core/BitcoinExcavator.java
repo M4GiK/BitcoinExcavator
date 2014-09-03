@@ -76,9 +76,14 @@ public class BitcoinExcavator implements Excavator {
      */
     List<Thread> threads = new ArrayList<>();
 
+    /**
+     * This method add delta and return hash count.
+     *
+     * @param delta The value to add.
+     * @return actual hash count after add operation.
+     */
     public Long addAndGetHashCount(Long delta) {
-        // TODO Auto-generated method stub
-        return null;
+        return hashCount.addAndGet(delta);
     }
 
     /**
@@ -119,6 +124,7 @@ public class BitcoinExcavator implements Excavator {
 
             list.append(networkStates.get(i).getQueryUrl().toString());
 
+
             if (i >= 1 && i < networkStates.size() - 1) {
                 list.append(", ");
             }
@@ -137,7 +143,6 @@ public class BitcoinExcavator implements Excavator {
      * Methods starts operations on GPU.
      */
     private void startGPU() throws ExcavatorFatalException {
-        //TODO make implementation for GPU
         Long previousHashCount = 0L;
         Long previousAdjustedStartTime = this.startTime = (getCurrentTime() - 1);
         Double previousAdjustedHashCount = 0.0;
@@ -148,7 +153,77 @@ public class BitcoinExcavator implements Excavator {
 
         List<List<? extends DeviceState>> allDeviceStates = new ArrayList<List<? extends  DeviceState>>();
         List<? extends  DeviceState> GPUDeviceStates = new GPUHardwareType(this).getDeviceStates();
+        deviceCount += GPUDeviceStates.size();
+        allDeviceStates.add(GPUDeviceStates);
 
+        while(running.get()) {
+            for(List<? extends  DeviceState> deviceStates : allDeviceStates) {
+                for(DeviceState deviceState : deviceStates) {
+                    deviceState.checkDevice();
+                }
+            }
+
+            Long now = getCurrentTime();
+            Long currentHashCount = hashCount.get();
+            Double adjustedHashCount = (double) (currentHashCount - previousHashCount)
+                    / (double) (now - previousAdjustedStartTime);
+            Double hashLongCount = (double) currentHashCount / (double) (now - startTime) / 1000.0;
+
+            if(now - startTime > TIME_OFFSET * 2) {
+                double averageHashCount = (adjustedHashCount + previousAdjustedHashCount) / 2.0 / 1000.0;
+
+                hashMeter.setLength(0);
+
+                if(!bitcoinOptions.getDebug()) {
+                    hashMeterFormatter.format("\rmhash: %.1f/%.1f | accept: %d | reject: %d | hw error: %d",
+                            averageHashCount, hashLongCount, blocks.get(), rejects.get(), hwErrors.get());
+                } else {
+                    hashMeterFormatter.format("\rmh: %.1f/%.1f | a/r/hwe: %d/%d/%d | gh: ", averageHashCount,
+                            hashLongCount, blocks.get(), rejects.get(), hwErrors.get());
+                    Double basisAverage = 0.0;
+
+                    for(List<? extends DeviceState> deviceStates : allDeviceStates) {
+                        for(DeviceState deviceState : deviceStates) {
+                            hashMeterFormatter.format("%.1f ", deviceState.getLongDeviceHashCount()
+                                    / 1000.0 / 1000.0 / 1000.0);
+                            basisAverage += deviceState.getBasis();
+                        }
+                    }
+
+                    basisAverage = 1000 / (basisAverage / deviceCount);
+
+                    hashMeterFormatter.format("| fps: %.1f", basisAverage);
+                }
+
+                System.out.print(hashMeter);
+                //log.info(String.valueOf(hashMeter));
+            } else {
+                System.out.print("\rWaiting...");
+                //log.info("\rWaiting...");
+            }
+
+            if(getCurrentTime() - TIME_OFFSET * 2 > previousAdjustedStartTime) {
+                previousHashCount = currentHashCount;
+                previousAdjustedHashCount = adjustedHashCount;
+                previousAdjustedStartTime = now - 1;
+            }
+
+            if(bitcoinOptions.getDebugtimer() && getCurrentTime() > startTime + 60 * 1000) {
+                info("Debug timer is up, quitting...");
+                System.exit(0);
+            }
+
+            try {
+                if (now - startTime > TIME_OFFSET) {
+                    Thread.sleep(1000);
+                } else {
+                    Thread.sleep(1);
+                }
+            } catch (InterruptedException e) {
+
+            }
+        }
+        hashMeterFormatter.close();
     }
 
     /**
@@ -211,24 +286,40 @@ public class BitcoinExcavator implements Excavator {
         }
     }
 
+    /**
+     * Increments attempts.
+     *
+     * @return the amount of attempts.
+     */
     public Long incrementAttempts() {
-        // TODO Auto-generated method stub
-        return null;
+        return attempts.incrementAndGet();
     }
 
+    /**
+     * Increments blocks amount.
+     *
+     * @return the amount of blocks
+     */
     public Long incrementBlocks() {
-        // TODO Auto-generated method stub
-        return null;
+        return blocks.incrementAndGet();
     }
 
+    /**
+     * Increments HW errors.
+     *
+     * @return the amount of HW errors.
+     */
     public Long incrementHWErrors() {
-        // TODO Auto-generated method stub
-        return null;
+        return hwErrors.incrementAndGet();
     }
 
+    /**
+     * Increments rejects amount.
+     *
+     * @return the amount of rejects.
+     */
     public Long incrementRejects() {
-        // TODO Auto-generated method stub
-        return null;
+        return rejects.incrementAndGet();
     }
 
     /**
