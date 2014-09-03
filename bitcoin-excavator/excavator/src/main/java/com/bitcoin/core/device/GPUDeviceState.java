@@ -8,6 +8,7 @@ package com.bitcoin.core.device;
 import com.bitcoin.core.BitcoinExcavator;
 import com.bitcoin.core.Excavator;
 import com.bitcoin.core.ExcavatorFatalException;
+import com.bitcoin.core.network.WorkState;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLUtil;
 import org.lwjgl.PointerBuffer;
@@ -41,12 +42,16 @@ public class GPUDeviceState extends DeviceState {
         private final CLMem output[] = new CLMem[2];
         private final CLMem blank;
 
+        private final ByteBuffer digestInput = ByteBuffer.allocate(80);
+        private final int[] midstate2 = new int[16];
         private final MessageDigest digestInside;
         private final MessageDigest digestOutside;
         private final CLCommandQueue queue;
 
         private ByteBuffer outputBuffer;
         private Integer outputIndex = 0;
+        private boolean requestedNewWork;
+        private byte[] digestOutput;
 
         /**
          * Constructor for {@link com.bitcoin.core.device.GPUDeviceState.GPUExecutionState}.
@@ -67,7 +72,8 @@ public class GPUDeviceState extends DeviceState {
             queue = createQueue();
             blank = blankInitialization();
             outputBuffer = CL10.clEnqueueMapBuffer(queue, output[outputIndex], 1, CL10.CL_MAP_READ, 0, OUTPUTS * 4, null, null, null);
-            //TODO
+            excavator.getNetworkStates().get(0).addGetQueue(this);
+            requestedNewWork = true;
         }
 
         /**
@@ -140,7 +146,180 @@ public class GPUDeviceState extends DeviceState {
          */
         @Override
         public void run() {
+            boolean submittedBlock;
+            boolean resetBuffer;
+            boolean hwError;
+            boolean skipProcessing;
+            boolean skipUnmap = false;
 
+            while(excavator.getRunning()) {
+
+                submittedBlock = false;
+                resetBuffer = false;
+                hwError = false;
+                skipProcessing = false;
+
+                WorkState workIncoming = null;
+
+                if(requestedNewWork) {
+                    try {
+                        workIncoming = getIncomingQueue().take();
+                    } catch(InterruptedException f) {
+                        continue;
+                    }
+                } else {
+                    workIncoming = getIncomingQueue().poll();
+                }
+
+                if(workIncoming != null) {
+                    setWorkState(workIncoming);
+                    requestedNewWork = false;
+                    resetBuffer = true;
+                    skipProcessing = true;
+                }
+
+                if(!skipProcessing | !skipUnmap) {
+                    for(int z = 0; z < OUTPUTS; z++) {
+                        int nonce = outputBuffer.getInt(z * 4);
+
+                        if(nonce != 0) {
+                            for(int j = 0; j < 19; j++)
+                                digestInput.putInt(j * 4, getWorkState().getData(j));
+
+                            digestInput.putInt(19 * 4, nonce);
+
+                            digestOutput = digestOutside.digest(digestInside.digest(digestInput.array()));
+
+                            long G = ((long) (0xFF & digestOutput[27]) << 24) | ((long) (0xFF & digestOutput[26]) << 16)
+                                    | ((long) (0xFF & digestOutput[25]) << 8) | ((long) (0xFF & digestOutput[24]));
+
+                            long H = ((long) (0xFF & digestOutput[31]) << 24) | ((long) (0xFF & digestOutput[30]) << 16)
+                                    | ((long) (0xFF & digestOutput[29]) << 8) | ((long) (0xFF & digestOutput[28]));
+
+                            if(H == 0) {
+                                excavator.debug("Attempt " + excavator.incrementAttempts() + " from " + getExecutionName());
+
+                                if(getWorkState().getTarget(7) != 0 || G <= getWorkState().getTarget(6)) {
+                                    getWorkState().submitNonce(nonce);
+                                    submittedBlock = true;
+                                }
+                            } else {
+                                hwError = true;
+                            }
+                            resetBuffer = true;
+                        }
+                    }
+
+                    if(hwError && submittedBlock == false) {
+                        if(hardwareCheck && !excavator.getBitcoinOptions().getDebug()) {
+                            excavator.error("Invalid solution " + excavator.incrementHWErrors()
+                                    + " from " + getDeviceName() + ", possible driver or hardware issue");
+                        } else {
+                            excavator.debug("Invalid solution " + excavator.incrementHWErrors()
+                                    + " from " + getExecutionName() + ", possible driver or hardware issue");
+                        }
+                    }
+                }
+
+                if(resetBuffer) {
+                    CL10.clEnqueueCopyBuffer(queue, blank, output[outputIndex], 0, 0, OUTPUTS * 4, null, null);
+                }
+
+                if(!skipUnmap) {
+                    CL10.clEnqueueUnmapMemObject(queue, output[outputIndex], outputBuffer, null, null);
+                    outputIndex = (outputIndex == 0) ? 1 : 0;
+                }
+                //------------
+
+                long workBase = getWorkState().getBase();
+                long increment = workSize.get();
+
+                if(excavator.getCurrentTime() - 3600000 > getResetNetworkState()) {
+                    setResetNetworkState(excavator.getCurrentTime());
+
+                    excavator.getNetworkStates().get(0).addGetQueue(this);
+                    requestedNewWork = skipUnmap = true;
+                } else {
+                    requestedNewWork = skipUnmap = getWorkState().update(increment);
+                }
+
+                if(!requestedNewWork) {
+                    excavator.addAndGetHashCount(increment);
+                    getDeviceHashCount().addAndGet(increment);
+                    runs.incrementAndGet();
+
+                    workSizeBuffer.put(0, increment);
+                    workBaseBuffer.put(0, workBase);
+
+                    System.arraycopy(getWorkState().getMidstate(), 0, midstate2, 0, 8);
+
+                    BitcoinExcavator.sharound(midstate2, 0, 1, 2, 3, 4, 5, 6, 7, getWorkState().getData(16), 0x428A2F98);
+                    BitcoinExcavator.sharound(midstate2, 7, 0, 1, 2, 3, 4, 5, 6, getWorkState().getData(17), 0x71374491);
+                    BitcoinExcavator.sharound(midstate2, 6, 7, 0, 1, 2, 3, 4, 5, getWorkState().getData(18), 0xB5C0FBCF);
+
+                    int W16 = getWorkState().getData(16) + (BitcoinExcavator.rot(getWorkState().getData(17), 7)
+                            ^ BitcoinExcavator.rot(getWorkState().getData(17), 18) ^ (getWorkState().getData(17) >>> 3));
+                    int W17 = getWorkState().getData(17) + (BitcoinExcavator.rot(getWorkState().getData(18), 7)
+                            ^ BitcoinExcavator.rot(getWorkState().getData(18), 18) ^ (getWorkState().getData(18) >>> 3))
+                            + 0x01100000;
+                    int W18 = getWorkState().getData(18) + (BitcoinExcavator.rot(W16, 17) ^ BitcoinExcavator.rot(W16, 19)
+                            ^ (W16 >>> 10));
+                    int W19 = 0x11002000 + (BitcoinExcavator.rot(W17, 17) ^ BitcoinExcavator.rot(W17, 19) ^ (W17 >>> 10));
+                    int W31 = 0x00000280 + (BitcoinExcavator.rot(W16, 7) ^ BitcoinExcavator.rot(W16, 18) ^ (W16 >>> 3));
+                    int W32 = W16 + (BitcoinExcavator.rot(W17, 7) ^ BitcoinExcavator.rot(W17, 18) ^ (W17 >>> 3));
+
+                    int PreVal4 = getWorkState().getMidstate(4) + (BitcoinExcavator.rot(midstate2[1], 6)
+                            ^ BitcoinExcavator.rot(midstate2[1], 11) ^ BitcoinExcavator.rot(midstate2[1], 25))
+                            + (midstate2[3] ^ (midstate2[1] & (midstate2[2] ^ midstate2[3]))) + 0xe9b5dba5;
+                    int T1 = (BitcoinExcavator.rot(midstate2[5], 2) ^ BitcoinExcavator.rot(midstate2[5], 13)
+                            ^ BitcoinExcavator.rot(midstate2[5], 22)) + ((midstate2[5] & midstate2[6])
+                            | (midstate2[7] & (midstate2[5] | midstate2[6])));
+
+                    int PreVal4_state0 = PreVal4 + getWorkState().getMidstate(0);
+                    int PreVal4_state0_k7 = (int) (PreVal4_state0 + 0xAB1C5ED5L);
+                    int PreVal4_T1 = PreVal4 + T1;
+                    int B1_plus_K6 = (int) (midstate2[1] + 0x923f82a4L);
+                    int C1_plus_K5 = (int) (midstate2[2] + 0x59f111f1L);
+                    int W16_plus_K16 = (int) (W16 + 0xe49b69c1L);
+                    int W17_plus_K17 = (int) (W17 + 0xefbe4786L);
+
+                    kernel.setArg(0, PreVal4_state0).setArg(1, PreVal4_state0_k7).setArg(2, PreVal4_T1)
+                            .setArg(3, W18).setArg(4, W19).setArg(5, W16).setArg(6, W17).setArg(7, W16_plus_K16)
+                            .setArg(8, W17_plus_K17).setArg(9, W31).setArg(10, W32)
+                            .setArg(11, (int) (midstate2[3] + 0xB956c25bL)).setArg(12, midstate2[1])
+                            .setArg(13, midstate2[2]).setArg(14, midstate2[7]).setArg(15, midstate2[5])
+                            .setArg(16, midstate2[6]).setArg(17, C1_plus_K5).setArg(18, B1_plus_K6)
+                            .setArg(19, getWorkState().getMidstate(0)).setArg(20, getWorkState().getMidstate(1))
+                            .setArg(21, getWorkState().getMidstate(2)).setArg(22, getWorkState().getMidstate(3))
+                            .setArg(23, getWorkState().getMidstate(4)).setArg(24, getWorkState().getMidstate(5))
+                            .setArg(25, getWorkState().getMidstate(6)).setArg(26, getWorkState().getMidstate(7))
+                            .setArg(27, output[outputIndex]);
+
+                    int err = CL10.clEnqueueNDRangeKernel(queue, kernel, 1, workBaseBuffer, workSizeBuffer,
+                            localWorkSize, null, null);
+
+                    if(err != CL10.CL_SUCCESS && err != CL10.CL_INVALID_KERNEL_ARGS
+                            && err != CL10.CL_INVALID_GLOBAL_OFFSET) {
+                        try {
+                            throw new ExcavatorFatalException(excavator, "Failed to queue kernel, error " + err);
+                        } catch(ExcavatorFatalException e) {
+                            log.error(e.getMessage());
+                        }
+                    } else {
+                        if(err == CL10.CL_INVALID_KERNEL_ARGS) {
+                            excavator.debug("Spurious CL_INVALID_KERNEL_ARGS error, ignoring");
+                            skipUnmap = true;
+                        } else if(err == CL10.CL_INVALID_GLOBAL_OFFSET) {
+                            excavator.error("Spurious CL_INVALID_GLOBAL_OFFSET error, offset: "
+                                    + workBase + ", work size: " + increment);
+                            skipUnmap = true;
+                        } else {
+                            outputBuffer = CL10.clEnqueueMapBuffer(queue, output[outputIndex],
+                                    1, CL10.CL_MAP_READ, 0, OUTPUTS * 4, null, null, null);
+                        }
+                    }
+                }
+            }
         }
     }
 

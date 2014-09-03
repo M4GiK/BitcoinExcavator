@@ -100,8 +100,23 @@ public class WorkState {
         return isWorking;
     }
 
+    /**
+     * Submits nonce value.
+     *
+     * @param nonce The nonce value.
+     */
+    public void submitNonce(int nonce) {
+        data[19] = nonce;
+        networkState.addSendQueue(this);
+    }
+
+
     public Integer[] getData() {
         return data;
+    }
+
+    public int getData(int n) {
+        return data[n];
     }
 
     public void setData(Integer index, Integer value) {
@@ -112,12 +127,20 @@ public class WorkState {
         return midstate;
     }
 
+    public int getMidstate(int n) {
+        return midstate[n];
+    }
+
     public void setMidstate(Integer index, Integer value) {
         midstate[index] = value;
     }
 
     public Long[] getTarget() {
         return target;
+    }
+
+    public long getTarget(int n) {
+        return target[n];
     }
 
     public void setTarget(Integer index, Long value) {

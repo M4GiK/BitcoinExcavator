@@ -22,8 +22,12 @@ public abstract class DeviceState {
 
     public abstract void checkDevice();
 
-    public Long getDeviceHashCount() {
+    public Long getLongDeviceHashCount() {
         return deviceHashCount.get();
+    }
+
+    public AtomicLong getDeviceHashCount() {
+        return deviceHashCount;
     }
 
     public String getDeviceName() {

@@ -5,9 +5,9 @@
  */
 package com.bitcoin.core;
 
+import com.bitcoin.core.network.NetworkState;
 import com.bitcoin.util.BitcoinOptions;
-
-import java.net.Proxy;
+import java.util.List;
 
 /**
  * Interface for excavating coins.
@@ -114,5 +114,19 @@ public interface Excavator {
      * @param information
      */
     void info(String information);
+
+    /**
+     * Gets debug message.
+     *
+     * @param message
+     */
+    void debug(String message);
+
+    /**
+     * Gets list of {@link com.bitcoin.core.network.NetworkState}.
+     *
+     * @return the list of {@link com.bitcoin.core.network.NetworkState}.
+     */
+    List<NetworkState> getNetworkStates();
 
 }

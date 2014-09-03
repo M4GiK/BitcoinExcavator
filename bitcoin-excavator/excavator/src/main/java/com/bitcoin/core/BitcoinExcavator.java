@@ -59,6 +59,8 @@ public class BitcoinExcavator implements Excavator {
 
     private BitcoinOptions bitcoinOptions = null;
 
+    private ArrayList<NetworkState> networkStates = null;
+
     private Long startTime;
 
     public BitcoinExcavator(BitcoinOptions bitcoinOptions) throws BitcoinExcavatorFatalException {
@@ -107,7 +109,7 @@ public class BitcoinExcavator implements Excavator {
     public void execute() {
         log.info("Bitcoin Excavator process started");
         threads.add(Thread.currentThread());
-        ArrayList<NetworkState> networkStates = NetworkStateBuilder.networkConfiguration(bitcoinOptions, this);
+        networkStates = NetworkStateBuilder.networkConfiguration(bitcoinOptions, this);
         StringBuilder list = new StringBuilder();
 
         for (int i = 0; i < networkStates.size(); i++) {
@@ -147,6 +149,33 @@ public class BitcoinExcavator implements Excavator {
         List<List<? extends DeviceState>> allDeviceStates = new ArrayList<List<? extends  DeviceState>>();
         List<? extends  DeviceState> GPUDeviceStates = new GPUHardwareType(this).getDeviceStates();
 
+    }
+
+    /**
+     * This is an implementation of the ROT algorithm.
+     * @param x
+     * @param y
+     * @return The rot value.
+     */
+    public static int rot(int x, int y) {
+        return (x >>> y) | (x << (32 - y));
+    }
+
+    public static void sharound(int out[], int na, int nb, int nc, int nd, int ne, int nf, int ng, int nh, int x, int K) {
+        int a = out[na];
+        int b = out[nb];
+        int c = out[nc];
+        int d = out[nd];
+        int e = out[ne];
+        int f = out[nf];
+        int g = out[ng];
+        int h = out[nh];
+
+        int t1 = h + (rot(e, 6) ^ rot(e, 11) ^ rot(e, 25)) + ((e & f) ^ ((~e) & g)) + K + x;
+        int t2 = (rot(a, 2) ^ rot(a, 13) ^ rot(a, 22)) + ((a & b) ^ (a & c) ^ (b & c));
+
+        out[nd] = d + t1;
+        out[nh] = t1 + t2;
     }
 
     /**
@@ -210,6 +239,27 @@ public class BitcoinExcavator implements Excavator {
     public void info(String information) {
         log.info(getCurrentTime() + " " + information);
         threads.get(0).interrupt();
+    }
+
+    /**
+     * Gets debug message.
+     *
+     * @param message
+     */
+    public void debug(String message) {
+        if(bitcoinOptions.getDebug()) {
+            log.debug(dateTime() + " DEBUG: " + message);
+            threads.get(0).interrupt();
+        }
+    }
+
+    /**
+     * Gets list of {@link com.bitcoin.core.network.NetworkState}.
+     *
+     * @return the list of {@link com.bitcoin.core.network.NetworkState}.
+     */
+    public List<NetworkState> getNetworkStates() {
+        return networkStates;
     }
 
     public AtomicLong getAttempts() {

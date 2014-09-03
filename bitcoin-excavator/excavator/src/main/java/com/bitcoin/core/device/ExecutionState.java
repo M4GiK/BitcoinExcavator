@@ -70,4 +70,8 @@ public abstract class ExecutionState implements Runnable {
     public void setWorkState(WorkState workState) {
         this.workState = workState;
     }
+
+    public LinkedBlockingDeque<WorkState> getIncomingQueue() {
+        return incomingQueue;
+    }
 }
