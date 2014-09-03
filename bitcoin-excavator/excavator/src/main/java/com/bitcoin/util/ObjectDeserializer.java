@@ -1,3 +1,8 @@
+/**
+ * Project BitcoinExcavator.
+ * Copyright Michał Szczygieł & Aleksander Śmierciak
+ * Created at Sept. 2, 2014.
+ */
 package com.bitcoin.util;
 
 import java.io.IOException;

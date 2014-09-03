@@ -138,7 +138,7 @@ public class MainView extends Application {
         if (args.length > 0) { // TODO  don't forget replace "==" to ">"
             log.info("Terminal mode is running.");
             BitcoinOptionsBuilder builder = new BitcoinOptionsBuilder(new ObjectJsonDeserializer<>());
-            builder.terminalOptions(args);
+            //builder.terminalOptions(args);
             BitcoinExcavator bitcoinExcavator = new BitcoinExcavator(
                     builder.terminalOptions(args));
             bitcoinExcavator.execute();

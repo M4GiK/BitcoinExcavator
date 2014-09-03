@@ -66,7 +66,7 @@ public class GPUHardwareType extends HardwareType {
     }
 
     /**
-     * Prepares platform to lunch GPU devices.
+     * Prepares platform to launch GPU devices.
      *
      * @return the list of prepared GPU devices.
      */
@@ -172,7 +172,7 @@ public class GPUHardwareType extends HardwareType {
     }
 
     /**
-     * Prepares loaded kernel to lunch on platform.
+     * Prepares loaded kernel to launch on platform.
      *
      * @param kernelToPrepare Data to prepare.
      * @return prepared kernel.

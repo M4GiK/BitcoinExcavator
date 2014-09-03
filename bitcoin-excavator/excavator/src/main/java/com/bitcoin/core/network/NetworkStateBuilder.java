@@ -1,3 +1,8 @@
+/**
+ * Project BitcoinExcavator.
+ * Copyright Michał Szczygieł & Aleksander Śmierciak
+ * Created at Sept. 3, 2014.
+ */
 package com.bitcoin.core.network;
 
 import com.bitcoin.core.Excavator;
@@ -10,6 +15,11 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 
+/**
+ * Class responsible for build {@link com.bitcoin.core.network.NetworkState}.
+ *
+ * @author m4gik <michal.szczygiel@wp.pl>, Aleksander Śmierciak
+ */
 public class NetworkStateBuilder {
     private static final String URL_SEPARATOR = "+++++";
 
@@ -26,10 +36,9 @@ public class NetworkStateBuilder {
      * @param excavator      The instance of  {@link com.bitcoin.core.Excavator} to bind the Threads.
      * @return List of networks states.
      */
-    public static ArrayList<NetworkState> networkConfiguration(
-            BitcoinOptions bitcoinOptions, Excavator excavator) {
-        ArrayList<NetworkState> networkStatesList = new ArrayList<NetworkState>(
-                bitcoinOptions.getNetworkStatesAmount());
+    public static ArrayList<NetworkState> networkConfiguration(BitcoinOptions bitcoinOptions, Excavator excavator) {
+        setNetworkOptions(bitcoinOptions);
+        ArrayList<NetworkState> networkStatesList = new ArrayList<NetworkState>(bitcoinOptions.getNetworkStatesAmount());
 
         for (int i = 0; i < bitcoinOptions.getNetworkStatesAmount(); i++) {
 
@@ -127,5 +136,30 @@ public class NetworkStateBuilder {
             }
         }
         return networkStatesList;
+    }
+
+    /**
+     * Sets network options for {@link com.bitcoin.core.network.NetworkStateBuilder}.
+     *
+     * @param bitcoinOptions The instance of {@link com.bitcoin.util.BitcoinOptions}
+     *                       with options.
+     */
+    private static void setNetworkOptions(BitcoinOptions bitcoinOptions) {
+        Integer networkOptions = 0;
+
+        if (bitcoinOptions.getUrl() != null) {
+            networkOptions = bitcoinOptions.getUrl().length;
+        } else {
+            networkOptions = Math
+                    .max(bitcoinOptions.getUser().length, networkOptions);
+            networkOptions = Math.max(bitcoinOptions.getPassword().length,
+                    networkOptions);
+            networkOptions = Math
+                    .max(bitcoinOptions.getHost().length, networkOptions);
+            networkOptions = Math
+                    .max(bitcoinOptions.getPort().length, networkOptions);
+        }
+
+        bitcoinOptions.setNetworkStatesAmount(networkOptions);
     }
 }

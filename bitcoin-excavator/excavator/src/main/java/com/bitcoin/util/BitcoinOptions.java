@@ -9,6 +9,11 @@ package com.bitcoin.util;
 import java.net.Proxy;
 import java.util.Set;
 
+/**
+ * Container for Bitcoin options.
+ *
+ * @author m4gik <michal.szczygiel@wp.pl>, Aleksander Śmierciak
+ */
 public class BitcoinOptions {
     private String[] url;
 

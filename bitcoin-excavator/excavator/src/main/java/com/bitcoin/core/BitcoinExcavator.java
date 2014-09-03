@@ -61,7 +61,11 @@ public class BitcoinExcavator implements Excavator {
 
     private Long startTime;
 
-    public BitcoinExcavator(BitcoinOptions bitcoinOptions) {
+    public BitcoinExcavator(BitcoinOptions bitcoinOptions) throws BitcoinExcavatorFatalException {
+        if (bitcoinOptions == null) {
+            throw new BitcoinExcavatorFatalException(this, "Bitcoin options can not be null");
+        }
+
         this.bitcoinOptions = bitcoinOptions;
     }
 
@@ -104,8 +108,7 @@ public class BitcoinExcavator implements Excavator {
     public void execute() {
         log.info("Bitcoin Excavator process started");
 
-        NetworkStateBuilder builder = new NetworkStateBuilder();
-        ArrayList<NetworkState> networkStates = builder.networkConfiguration(bitcoinOptions, this);
+        ArrayList<NetworkState> networkStates = NetworkStateBuilder.networkConfiguration(bitcoinOptions, this);
         StringBuilder list = new StringBuilder();
 
         for (int i = 0; i < networkStates.size(); i++) {

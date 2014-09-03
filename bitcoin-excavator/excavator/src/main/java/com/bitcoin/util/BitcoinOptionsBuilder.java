@@ -1,3 +1,8 @@
+/**
+ * Project BitcoinExcavator.
+ * Copyright Michał Szczygieł & Aleksander Śmierciak
+ * Created at Sept. 3, 2014.
+ */
 package com.bitcoin.util;
 
 import org.apache.commons.cli.*;
@@ -14,6 +19,7 @@ import java.util.Collections;
 import java.util.HashSet;
 
 public class BitcoinOptionsBuilder {
+
     /**
      * Logger for monitoring runtime.
      */
@@ -37,7 +43,7 @@ public class BitcoinOptionsBuilder {
      * @param args The list of arguments given from terminal.
      * @return The instance of {@link BitcoinOptions} class.
      */
-    public BitcoinOptions terminalOptions(String... args) {
+    public static BitcoinOptions terminalOptions(String... args) {
         Options options = new Options();
         PosixParser parser = new PosixParser();
 
@@ -81,7 +87,7 @@ public class BitcoinOptionsBuilder {
                             + "before starting bitcoind or bitcoin --daemon");
         }
 
-        return getOptionsFromCommanLine(commandLine);
+        return BitcoinValidator.validateNetworkParameters(getOptionsFromCommanLine(commandLine));
     }
 
     /**
