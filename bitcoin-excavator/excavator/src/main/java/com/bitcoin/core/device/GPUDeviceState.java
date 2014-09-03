@@ -5,6 +5,7 @@
  */
 package com.bitcoin.core.device;
 
+import com.bitcoin.core.BitcoinExcavator;
 import com.bitcoin.core.Excavator;
 import com.bitcoin.core.ExcavatorFatalException;
 import org.lwjgl.BufferUtils;
@@ -16,6 +17,8 @@ import org.slf4j.LoggerFactory;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -24,6 +27,122 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author m4gik <michal.szczygiel@wp.pl>
  */
 public class GPUDeviceState extends DeviceState {
+
+    /**
+     * This class represents GPU execution state.
+     *
+     * @author m4gik <michal.szczygiel@wp.pl>
+     */
+    public class GPUExecutionState extends ExecutionState {
+
+        private final IntBuffer errBuffer = BufferUtils.createIntBuffer(1);
+        private final PointerBuffer workBaseBuffer = BufferUtils.createPointerBuffer(1);
+        private final PointerBuffer workSizeBuffer = BufferUtils.createPointerBuffer(1);
+        private final CLMem output[] = new CLMem[2];
+        private final CLMem blank;
+
+        private final MessageDigest digestInside;
+        private final MessageDigest digestOutside;
+        private final CLCommandQueue queue;
+
+        private ByteBuffer outputBuffer;
+        private Integer outputIndex = 0;
+
+        /**
+         * Constructor for {@link com.bitcoin.core.device.GPUDeviceState.GPUExecutionState}.
+         *
+         * @param executorName The name of executor.
+         * @throws ExcavatorFatalException
+         */
+        public GPUExecutionState(String executorName) throws ExcavatorFatalException {
+            super(executorName);
+
+            try {
+                digestInside = MessageDigest.getInstance("SHA-256");
+                digestOutside = MessageDigest.getInstance("SHA-256");
+            } catch (NoSuchAlgorithmException e) {
+                throw new ExcavatorFatalException(excavator, "Your Java implementation does not have a MessageDigest for SHA-256");
+            }
+
+            queue = createQueue();
+            blank = blankInitialization();
+            outputBuffer = CL10.clEnqueueMapBuffer(queue, output[outputIndex], 1, CL10.CL_MAP_READ, 0, OUTPUTS * 4, null, null, null);
+            //TODO
+        }
+
+        /**
+         * Initializes the blank.
+         *
+         * @return {@link org.lwjgl.opencl.CLMem} initialized.
+         * @throws ExcavatorFatalException
+         */
+        private CLMem blankInitialization() throws ExcavatorFatalException {
+            CLMem blank = null;
+            IntBuffer blankInit = BufferUtils.createIntBuffer(OUTPUTS * 4);
+
+            for (int i = 0; i < OUTPUTS; i++)
+                blankInit.put(0);
+
+            blankInit.rewind();
+
+            if (platformVersion == PlatformVersion.V1_1)
+                blank = CL10.clCreateBuffer(context, CL10.CL_MEM_COPY_HOST_PTR | CL10.CL_MEM_READ_ONLY, blankInit, errBuffer);
+            else
+                blank = CL10.clCreateBuffer(context, CL10.CL_MEM_COPY_HOST_PTR | CL10.CL_MEM_READ_ONLY | CL12.CL_MEM_HOST_NO_ACCESS, blankInit, errBuffer);
+
+            if (blank == null || errBuffer.get(0) != CL10.CL_SUCCESS)
+                throw new ExcavatorFatalException(excavator, "Failed to allocate blank buffer");
+
+            blankInit.rewind();
+
+            for (int i = 0; i < 2; i++) {
+                if (platformVersion == PlatformVersion.V1_1)
+                    output[i] = CL10.clCreateBuffer(context, CL10.CL_MEM_COPY_HOST_PTR | CL10.CL_MEM_WRITE_ONLY, blankInit, errBuffer);
+                else
+                    output[i] = CL10.clCreateBuffer(context, CL10.CL_MEM_COPY_HOST_PTR | CL10.CL_MEM_WRITE_ONLY | CL12.CL_MEM_HOST_READ_ONLY, blankInit, errBuffer);
+
+                blankInit.rewind();
+
+                if (output[i] == null || errBuffer.get(0) != CL10.CL_SUCCESS) {
+                    throw new ExcavatorFatalException(excavator, "Failed to allocate output buffer");
+                }
+            }
+
+            return blank;
+        }
+
+        /**
+         * Creates queue for {@link org.lwjgl.opencl.CLCommandQueue}.
+         *
+         * @return created queue.
+         * @throws ExcavatorFatalException
+         */
+        private CLCommandQueue createQueue() throws ExcavatorFatalException {
+            CLCommandQueue queue = CL10.clCreateCommandQueue(context, device, 0, errBuffer);
+
+            if (queue == null || errBuffer.get(0) != CL10.CL_SUCCESS) {
+                throw new ExcavatorFatalException(excavator, "Failed to allocate queue");
+            }
+
+            return queue;
+        }
+
+        /**
+         * When an object implementing interface <code>Runnable</code> is used
+         * to create a thread, starting the thread causes the object's
+         * <code>run</code> method to be called in that separately executing
+         * thread.
+         * <p/>
+         * The general contract of the method <code>run</code> is that it may
+         * take any action whatsoever.
+         *
+         * @see Thread#run()
+         */
+        @Override
+        public void run() {
+
+        }
+    }
 
     /**
      * Logger for monitoring runtime.
@@ -60,6 +179,7 @@ public class GPUDeviceState extends DeviceState {
      * @param platform
      * @param version
      * @param device
+     * @throws ExcavatorFatalException
      */
     public GPUDeviceState(GPUHardwareType hardwareType, String deviceName, CLPlatform platform,
                           PlatformVersion version, CLDevice device) throws ExcavatorFatalException {
@@ -88,8 +208,9 @@ public class GPUDeviceState extends DeviceState {
      * Sets local work size for {@link com.bitcoin.core.device.GPUDeviceState}.
      *
      * @param forceWorkSize The value of force work size.
+     * @throws ExcavatorFatalException
      */
-    private void setLocalWorkSize(Integer forceWorkSize) {
+    private void setLocalWorkSize(Integer forceWorkSize) throws ExcavatorFatalException {
         if (forceWorkSize == 0) {
             ByteBuffer rkwgs = BufferUtils.createByteBuffer(8);
 
@@ -282,7 +403,7 @@ public class GPUDeviceState extends DeviceState {
     }
 
     /**
-     *  Checks the status of current device.
+     * Checks the status of current device.
      */
     @Override
     public void checkDevice() {
