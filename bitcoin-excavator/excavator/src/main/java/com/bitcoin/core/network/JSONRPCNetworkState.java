@@ -319,7 +319,6 @@ public class JSONRPCNetworkState extends NetworkState {
         for (int i = 0; i < 8; i++) {
             parse = midstates.substring(i * 8, (i * 8) + 8);
             workState.setMidstate(i, Integer.reverseBytes((int) Long.parseLong(parse, 16)));
-
         }
 
         for (int i = 0; i < 8; i++) {
@@ -665,7 +664,7 @@ public class JSONRPCNetworkState extends NetworkState {
         }
     }
 
-    public Boolean doSendWorkMessage(WorkState workState) throws IOException {
+    Boolean doSendWorkMessage(WorkState workState) throws IOException {
         StringBuilder dataOutput = new StringBuilder(8 * 32 + 1);
         Formatter dataFormatter = new Formatter(dataOutput);
         Integer[] data = workState.getData();

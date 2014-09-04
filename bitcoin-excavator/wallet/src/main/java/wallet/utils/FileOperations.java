@@ -31,7 +31,9 @@ public class FileOperations {
     private final static Logger LOGGER = Logger.getLogger(FileOperations.class
             .getName());
 
-    public static final String PROPERTIES = "/wallets/properties.json";
+    public static final String PROPERTIES = "/options/wallet-properties.json";
+
+    public static final String BITCOIN_OPTIONS = "/options/bitcoin-properties.json";
 
     public static String APP_PATH = System.getProperty("user.dir");
 

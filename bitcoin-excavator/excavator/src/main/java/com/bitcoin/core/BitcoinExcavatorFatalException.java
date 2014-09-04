@@ -26,6 +26,6 @@ public class BitcoinExcavatorFatalException extends Exception {
     public BitcoinExcavatorFatalException(BitcoinExcavator bitcoinExcavator, String reason) {
         super(reason);
         bitcoinExcavator.error(reason);
-        bitcoinExcavator.halt();
+        bitcoinExcavator.stop();
     }
 }

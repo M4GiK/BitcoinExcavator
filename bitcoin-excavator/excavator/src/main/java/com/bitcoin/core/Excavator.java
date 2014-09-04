@@ -14,7 +14,7 @@ import java.util.List;
  *
  * @author m4gik <michal.szczygiel@wp.pl>
  */
-public interface Excavator {
+public interface Excavator extends Runnable{
 
     /**
      * The value represents two 32 bits.
@@ -78,7 +78,7 @@ public interface Excavator {
     /**
      * Method stops digging, and close all running process.
      */
-    void halt();
+    void stop();
 
     /**
      * Increments attempts.

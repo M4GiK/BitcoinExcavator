@@ -6,14 +6,18 @@
 package com.bitcoin.controller;
 
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import com.bitcoin.core.BitcoinExcavator;
+import com.bitcoin.core.BitcoinExcavatorFatalException;
+import com.bitcoin.util.BitcoinOptionsBuilder;
+import com.bitcoin.util.GuiUtils;
+import com.bitcoin.util.ObjectJsonDeserializer;
 import com.bitcoin.view.MainView;
 import javafx.animation.*;
 import javafx.application.Platform;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
@@ -28,7 +32,9 @@ import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import wallet.utils.FileOperations;
 
+import static com.bitcoin.view.MainView.excavator;
 
 /**
  * Main view controller for excavator.
@@ -80,7 +86,6 @@ public class MainViewController implements Initializable {
                 fadeTransition.setToValue(1.0);
                 fadeTransition.play();
             }
-
             if (recenltySelectedTab.equals(setupTab)) {
                 mainPage.setOpacity(0.0);
                 aboutPage.setOpacity(0.0);
@@ -88,7 +93,6 @@ public class MainViewController implements Initializable {
                 fadeTransition.setToValue(1.0);
                 fadeTransition.play();
             }
-
             if (recenltySelectedTab.equals(aboutTab)) {
                 setupPage.setOpacity(0.0);
                 mainPage.setOpacity(0.0);
@@ -97,28 +101,22 @@ public class MainViewController implements Initializable {
                 fadeTransition.play();
             }
         });
-
         Tooltip.install(bitcoinExcavator, new Tooltip(resources.getString("toolTipExcavator")));
         Tooltip.install(bitcoinWallet, new Tooltip(resources.getString("toolTipWallet")));
-
         // Initialize something ..
         Platform.runLater(MainViewController.this::readyToGoAnimation);
     }
 
     public void readyToGoAnimation() {
-
         // Sync progress bar slides out ...
         FadeTransition reveal = new FadeTransition(Duration.millis(500), progressBox);
         reveal.setToValue(0.0);
-
         // Buttons slide in a appears simultaneously.
         FadeTransition arrive = new FadeTransition(Duration.millis(600), container);
         arrive.setToValue(1.0);
-
         // Buttons slide in a appears simultaneously.
         TranslateTransition transit = new TranslateTransition(Duration.millis(600), controlsBox);
         transit.setToY(0.0);
-
         // Slide out happens then slide in/fade happens.
         SequentialTransition sequentialTransition = new SequentialTransition(reveal, arrive, transit);
         sequentialTransition.setCycleCount(1);
@@ -127,54 +125,59 @@ public class MainViewController implements Initializable {
         progressBox.setDisable(true);
     }
 
-    private EventHandler<MouseEvent> mouseOverForExcavator = new EventHandler<MouseEvent>() {
-        @Override
-        public void handle(MouseEvent mouseEvent) {
+    private EventHandler<MouseEvent> mouseOverForExcavator =  mouseEvent -> {
             ScaleTransition scale = new ScaleTransition(Duration.millis(600), bitcoinExcavator);
             scale.setToX(.85f);
             scale.setToY(.85f);
             scale.setAutoReverse(true);
             scale.play();
-        }
     };
 
-    private EventHandler<MouseEvent> mouseExitFromExcavator = new EventHandler<MouseEvent>() {
-        @Override
-        public void handle(MouseEvent mouseEvent) {
+    private EventHandler<MouseEvent> mouseExitFromExcavator =  mouseEvent -> {
             ScaleTransition rescale = new ScaleTransition(Duration.millis(600), bitcoinExcavator);
             rescale.setToX(1.0f);
             rescale.setToY(1.0f);
             rescale.play();
+    };
+
+    private EventHandler<MouseEvent> mouseClickedOnExcavator = mouseEvent -> {
+        if(excavator == null) {
+            Platform.runLater(MainViewController.this::startExcavator);
+        } else {
+            System.out.println(excavator.getHashCount() + " " + excavator.getCurrentTime());
         }
     };
 
-    private EventHandler<MouseEvent> mouseClickedOnExcavator = mouseEvent -> System.out.println("lol");
+    private void startExcavator() {
+        try {
+            BitcoinOptionsBuilder builder = new BitcoinOptionsBuilder(new ObjectJsonDeserializer<>());
+            excavator = new BitcoinExcavator(builder.fromFile(FileOperations.APP_PATH
+                    + FileOperations.BITCOIN_OPTIONS));
+            Thread excavatorThread = new Thread(excavator);
+            excavatorThread.start();
+        } catch (BitcoinExcavatorFatalException e) {
+            GuiUtils.crashAlert(e);
+        } catch (IOException e) {
+            GuiUtils.crashAlert(e);
+        }
+    }
 
-    private EventHandler<MouseEvent> mouseOverForBitcoinWallet = new EventHandler<MouseEvent>() {
-        @Override
-        public void handle(MouseEvent mouseEvent) {
+    private EventHandler<MouseEvent> mouseOverForBitcoinWallet =  mouseEvent -> {
             ScaleTransition scale = new ScaleTransition(Duration.millis(600), bitcoinWallet);
             scale.setToX(.85f);
             scale.setToY(.85f);
             scale.setAutoReverse(true);
             scale.play();
-        }
     };
 
-    private EventHandler<MouseEvent> mouseExitFromBitcoinWallet = new EventHandler<MouseEvent>() {
-        @Override
-        public void handle(MouseEvent mouseEvent) {
+    private EventHandler<MouseEvent> mouseExitFromBitcoinWallet =  mouseEvent -> {
             ScaleTransition rescale = new ScaleTransition(Duration.millis(600), bitcoinWallet);
             rescale.setToX(1.0f);
             rescale.setToY(1.0f);
             rescale.play();
-        }
     };
 
-    private EventHandler<MouseEvent> mouseClickedOnBitcoinWallet = new EventHandler<MouseEvent>() {
-        @Override
-        public void handle(MouseEvent mouseEvent) {
-
+    private EventHandler<MouseEvent> mouseClickedOnBitcoinWallet = mouseEvent -> {
             if (walletStage == null) {
                 walletStage = new Stage();
                 walletStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
@@ -183,7 +186,6 @@ public class MainViewController implements Initializable {
                         walletStage.hide();
                     }
                 });
-
                 try {
                     MainView.walletView.start(walletStage);
                 } catch (Exception e) {
@@ -192,7 +194,5 @@ public class MainViewController implements Initializable {
             } else {
                 walletStage.show();
             }
-        }
     };
-
 }

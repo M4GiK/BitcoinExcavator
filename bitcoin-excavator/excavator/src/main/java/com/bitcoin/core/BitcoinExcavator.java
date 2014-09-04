@@ -288,7 +288,7 @@ public class BitcoinExcavator implements Excavator {
     /**
      * Method stops digging, and close all running process.
      */
-    public void halt() {
+    public void stop() {
         running.set(false);
 
         for (int i = 0; i < getThreads().size(); i++) {
@@ -439,5 +439,10 @@ public class BitcoinExcavator implements Excavator {
 
     public void setBitcoinOptions(BitcoinOptions bitcoinOptions) {
         this.bitcoinOptions = bitcoinOptions;
+    }
+
+    @Override
+    public void run() {
+        execute();
     }
 }

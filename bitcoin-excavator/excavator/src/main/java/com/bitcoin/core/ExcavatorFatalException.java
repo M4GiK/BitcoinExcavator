@@ -26,6 +26,6 @@ public class ExcavatorFatalException extends Exception {
     public ExcavatorFatalException(Excavator excavator, String reason) {
         super(reason);
         excavator.error(reason);
-        excavator.halt();
+        excavator.stop();
     }
 }

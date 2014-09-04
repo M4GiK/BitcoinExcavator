@@ -8,6 +8,7 @@ package com.bitcoin.view;
 import com.aquafx_project.AquaFx;
 import com.bitcoin.controller.MainViewController;
 import com.bitcoin.core.BitcoinExcavator;
+import com.bitcoin.core.Excavator;
 import com.bitcoin.util.*;
 import com.google.common.base.Throwables;
 import javafx.application.Application;
@@ -18,6 +19,7 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import wallet.utils.FileOperations;
 
 import java.io.IOException;
 import java.net.URL;
@@ -44,11 +46,17 @@ public class MainView extends Application {
     /** Instance of main view what mean the bitcoin-excavator view **/
     public static MainView instance;
 
+    /** Instance of Bitcoin excavator **/
+    public static BitcoinExcavator excavator;
+
     /** **/
     private StackPane uiStack;
 
     /** **/
     private Pane mainUI;
+
+    /** The main stage of application **/
+    private Stage mainWindow;
 
     /**
      * Logger for monitoring runtime.
@@ -66,12 +74,12 @@ public class MainView extends Application {
 
         // Show the crash dialog for any exceptions that we don't handle and that hit the main loop.
         GuiUtils.handleCrashesOnThisThread();
+        setMainWindow(mainWindow);
 
         try {
             init(mainWindow);
         } catch (Throwable t) {
-            if (Throwables
-                    .getRootCause(t) instanceof MissingResourceException) {
+            if (Throwables.getRootCause(t) instanceof MissingResourceException) {
                 // Nicer message for the case where the block store file is locked.
                 GuiUtils.informationalAlert("Wrong properties",
                         "Something goes wrong: \n" + t.toString());
@@ -86,10 +94,18 @@ public class MainView extends Application {
         }
     }
 
+    /**
+     * THis method stops working wallet and excavator if are running.
+     * @throws Exception
+     */
     @Override
     public void stop() throws Exception {
         if(walletView.isRunning()) {
             walletView.stop();
+        }
+
+        if(excavator.getRunning()) {
+            excavator.stop();
         }
     }
 
@@ -135,16 +151,21 @@ public class MainView extends Application {
      * @throws Exception
      */
     public static void main(String[] args) throws Exception {
-        if (args.length > 0) { // TODO  don't forget replace "==" to ">"
+        if (args.length == 0) { // TODO  don't forget replace "==" to ">"
             log.info("Terminal mode is running.");
-            BitcoinOptionsBuilder builder = new BitcoinOptionsBuilder(new ObjectJsonDeserializer<>());
-            BitcoinExcavator bitcoinExcavator = new BitcoinExcavator(
-                    builder.terminalOptions(args));
-            bitcoinExcavator.execute();
+            excavator = new BitcoinExcavator(BitcoinOptionsBuilder.terminalOptions(args));
+            excavator.execute();
         } else {
             launch(args);
         }
 
     }
 
+    public Stage getMainWindow() {
+        return mainWindow;
+    }
+
+    public void setMainWindow(Stage mainWindow) {
+        this.mainWindow = mainWindow;
+    }
 }
