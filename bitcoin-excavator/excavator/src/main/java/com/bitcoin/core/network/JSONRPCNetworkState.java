@@ -19,6 +19,7 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
 
+import com.bitcoin.core.device.ExecutionState;
 import org.apache.commons.codec.binary.Base64;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.JsonProcessingException;
@@ -30,7 +31,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.bitcoin.core.Excavator;
-import com.bitcoin.core.device.ExecutionState;
 
 /**
  * This class is responsible for JSON RPC network state.
@@ -234,23 +234,23 @@ public class JSONRPCNetworkState extends NetworkState {
      */
     public static final Integer TEN_MINUTES = 10 * 60 * 1000;
 
-    private GetWorkAsync getWorkAsync;
+    private final GetWorkAsync getWorkAsync = this.new GetWorkAsync();
 
-    private LinkedBlockingDeque<WorkState> incomingQueue;
+    private final SendWorkAsync sendWorkAsync = this.new SendWorkAsync();
+
+    private final ObjectMapper mapper = new ObjectMapper();
+
+    private LinkedBlockingDeque<WorkState> incomingQueue = new LinkedBlockingDeque<>();
 
     private LongPollAsync longPollAsync;
 
     private URL longPollUrl;
 
-    private ObjectMapper mapper;
-
-    private Boolean noDelay;
+    private Boolean noDelay = false;
 
     private String rejectReason;
 
-    private Boolean rollNTime;
-
-    private SendWorkAsync sendWorkAsync;
+    private Boolean rollNTime = false;
 
     private String userPassword;
 
@@ -272,12 +272,12 @@ public class JSONRPCNetworkState extends NetworkState {
                 .trim().replace("\r\n", ""));
 
         Thread thread = new Thread(getWorkAsync,
-                "DiabloMiner JSONRPC GetWorkAsync for " + queryUrl.getHost());
+                "Excavator JSONRPC GetWorkAsync for " + queryUrl.getHost());
         thread.start();
         getExcavator().addThread(thread);
 
         thread = new Thread(sendWorkAsync,
-                "DiabloMiner JSONRPC SendWorkAsync for " + queryUrl.getHost());
+                "Excavator JSONRPC SendWorkAsync for " + queryUrl.getHost());
         thread.start();
         getExcavator().addThread(thread);
     }
@@ -313,29 +313,24 @@ public class JSONRPCNetworkState extends NetworkState {
 
         for (int i = 0; i < 32; i++) {
             parse = datas.substring(i * 8, (i * 8) + 8);
-            workState.setData(i,
-                    Integer.reverseBytes((int) Long.parseLong(parse, 16)));
+            workState.setData(i, Integer.reverseBytes((int) Long.parseLong(parse, 16)));
         }
 
         for (int i = 0; i < 8; i++) {
             parse = midstates.substring(i * 8, (i * 8) + 8);
-            workState.setMidstate(i,
-                    Integer.reverseBytes((int) Long.parseLong(parse, 16)));
+            workState.setMidstate(i, Integer.reverseBytes((int) Long.parseLong(parse, 16)));
+
         }
 
         for (int i = 0; i < 8; i++) {
             parse = targets.substring(i * 8, (i * 8) + 8);
-            workState
-                    .setTarget(
-                            i,
-                            (Long.reverseBytes(Long.parseLong(parse, 16) << 16))
-                                    >>> 16);
+            workState.setTarget(i, (Long.reverseBytes(Long.parseLong(parse, 16) << 16)) >>> 16);
         }
 
         return workState;
     }
 
-    JsonNode doJSONRPCCall(Boolean longPoll, ObjectNode message)
+    public JsonNode doJSONRPCCall(Boolean longPoll, ObjectNode message)
             throws IOException {
         HttpURLConnection connection = null;
 
@@ -406,7 +401,7 @@ public class JSONRPCNetworkState extends NetworkState {
 
                     longPollAsync = new LongPollAsync();
                     Thread thread = new Thread(longPollAsync,
-                            "DiabloMiner JSONRPC LongPollAsync for "
+                            "Excavator JSONRPC LongPollAsync for "
                                     + url.getHost());
                     thread.start();
                     getExcavator().addThread(thread);
@@ -670,7 +665,7 @@ public class JSONRPCNetworkState extends NetworkState {
         }
     }
 
-    Boolean doSendWorkMessage(WorkState workState) throws IOException {
+    public Boolean doSendWorkMessage(WorkState workState) throws IOException {
         StringBuilder dataOutput = new StringBuilder(8 * 32 + 1);
         Formatter dataFormatter = new Formatter(dataOutput);
         Integer[] data = workState.getData();

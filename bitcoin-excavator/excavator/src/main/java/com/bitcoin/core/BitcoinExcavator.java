@@ -61,6 +61,10 @@ public class BitcoinExcavator implements Excavator {
 
     private ArrayList<NetworkState> networkStates = null;
 
+    private NetworkState networkStateHead = null;
+
+    private NetworkState networkStateTail = null;
+
     private Long startTime;
 
     public BitcoinExcavator(BitcoinOptions bitcoinOptions) throws BitcoinExcavatorFatalException {
@@ -115,6 +119,8 @@ public class BitcoinExcavator implements Excavator {
         log.info("Bitcoin Excavator process started");
         threads.add(Thread.currentThread());
         networkStates = NetworkStateBuilder.networkConfiguration(bitcoinOptions, this);
+
+
         StringBuilder list = new StringBuilder();
 
         for (int i = 0; i < networkStates.size(); i++) {
@@ -124,11 +130,19 @@ public class BitcoinExcavator implements Excavator {
 
             list.append(networkStates.get(i).getQueryUrl().toString());
 
+            if(networkStateHead == null) {
+                networkStateHead = networkStateTail = networkStates.get(i);
+            } else {
+                networkStateTail.setNetworkStateNext(networkStates.get(i));
+                networkStateTail = networkStates.get(i);
+            }
 
             if (i >= 1 && i < networkStates.size() - 1) {
                 list.append(", ");
             }
         }
+
+        networkStateTail.setNetworkStateNext(networkStateHead);
 
         log.info("Connecting to: " + list);
 
@@ -351,6 +365,15 @@ public class BitcoinExcavator implements Excavator {
      */
     public List<NetworkState> getNetworkStates() {
         return networkStates;
+    }
+
+    /**
+     * Gets head of network states.
+     *
+     * @return head of network states.
+     */
+    public NetworkState getNetworkStateHead() {
+        return networkStateHead;
     }
 
     public AtomicLong getAttempts() {

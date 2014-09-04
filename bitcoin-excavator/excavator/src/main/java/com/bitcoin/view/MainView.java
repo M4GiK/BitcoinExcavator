@@ -142,7 +142,7 @@ public class MainView extends Application {
                     builder.terminalOptions(args));
             bitcoinExcavator.execute();
         } else {
-            launch(null);
+            launch(args);
         }
 
     }

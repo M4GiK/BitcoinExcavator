@@ -129,4 +129,11 @@ public interface Excavator {
      */
     List<NetworkState> getNetworkStates();
 
+    /**
+     * Gets head of network states.
+     *
+     * @return head of network states.
+     */
+    NetworkState getNetworkStateHead();
+
 }

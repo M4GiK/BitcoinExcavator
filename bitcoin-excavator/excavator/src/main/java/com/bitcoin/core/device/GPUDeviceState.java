@@ -72,7 +72,7 @@ public class GPUDeviceState extends DeviceState {
             queue = createQueue();
             blank = blankInitialization();
             outputBuffer = CL10.clEnqueueMapBuffer(queue, output[outputIndex], 1, CL10.CL_MAP_READ, 0, OUTPUTS * 4, null, null, null);
-            excavator.getNetworkStates().get(0).addGetQueue(this);
+            excavator.getNetworkStateHead().addGetQueue(this);
             requestedNewWork = true;
         }
 
@@ -243,7 +243,7 @@ public class GPUDeviceState extends DeviceState {
                 if (excavator.getCurrentTime() - 3600000 > getResetNetworkState()) {
                     setResetNetworkState(excavator.getCurrentTime());
 
-                    excavator.getNetworkStates().get(0).addGetQueue(this);
+                    excavator.getNetworkStateHead().addGetQueue(this);
                     requestedNewWork = skipUnmap = true;
                 } else {
                     requestedNewWork = skipUnmap = getWorkState().update(increment);

@@ -25,7 +25,7 @@ public class WorkState {
 
     private final Integer[] data = new Integer[32];
 
-    private final Integer[] midstate = new Integer[8];
+    private final int[] midstate = new int[8];
 
     private final Long[] target = new Long[8];
 
@@ -107,7 +107,7 @@ public class WorkState {
      */
     public void submitNonce(int nonce) {
         data[19] = nonce;
-        networkState.addSendQueue(this);
+        getNetworkState().addSendQueue(this);
     }
 
 
@@ -123,7 +123,7 @@ public class WorkState {
         data[index] = value;
     }
 
-    public Integer[] getMidstate() {
+    public int[] getMidstate() {
         return midstate;
     }
 
