@@ -80,6 +80,7 @@ public class MainView extends Application {
         instance = this;
         // Show the crash dialog for any exceptions that we don't handle and that hit the main loop.
         GuiUtils.handleCrashesOnThisThread();
+        FileOperations.initializeFolders();
         try {
             init(mainWindow);
         } catch (Throwable t) {

@@ -46,6 +46,23 @@ public class FileOperations {
     };
 
     /**
+     * This method initialize folders for this project.
+     */
+    public static void initializeFolders() {
+        File optionsDir = new File(APP_PATH + "/options");
+
+        if (!optionsDir.exists()) {
+            optionsDir.mkdir();
+        }
+
+        File walletDir = new File(APP_PATH + "/wallets");
+
+        if (!walletDir.exists()) {
+            walletDir.mkdir();
+        }
+    }
+
+    /**
      * Updates properties files with given wallet name.
      *
      * @param walletName wallet name to add to properties.
