@@ -134,6 +134,7 @@ public class MainView extends Application {
 
         // Configure the window with a StackPane so we can overlay things on top of the main UI.
         uiStack = new StackPane(mainUI);
+        mainWindow.setResizable(false);
         mainWindow.setTitle(APP_NAME);
         final Scene scene = new Scene(uiStack);
 

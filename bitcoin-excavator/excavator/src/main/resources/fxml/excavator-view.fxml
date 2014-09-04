@@ -40,6 +40,19 @@
                                         <Image url="@../images/bitcoin_wallet.png" />
                                     </image>
                                 </ImageView>
+                        <ImageView disable="true" fitHeight="100.0" fitWidth="141.0" layoutX="85.0" layoutY="197.0" opacity="0.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../images/stop_icon.png" />
+                           </image>
+                        </ImageView>
+                        <Label disable="true" layoutX="24.0" layoutY="88.0" opacity="0.0" text="Speed:" />
+                        <Label disable="true" layoutX="25.0" layoutY="125.0" opacity="0.0" text="Errors:" />
+                        <Label disable="true" layoutX="24.0" layoutY="54.0" opacity="0.0" text="Avg. speed:" />
+                        <Label disable="true" layoutX="111.0" layoutY="54.0" opacity="0.0" text="Label" />
+                        <Label disable="true" layoutX="110.0" layoutY="88.0" opacity="0.0" text="Label" />
+                        <Label disable="true" layoutX="111.0" layoutY="125.0" opacity="0.0" text="Label" />
+                        <Label layoutX="26.0" layoutY="155.0" opacity="0.0" text="Hashes:" />
+                        <Label disable="true" layoutX="110.0" layoutY="155.0" opacity="0.0" text="Label" />
                             </children>
                         </AnchorPane>
                     </content>

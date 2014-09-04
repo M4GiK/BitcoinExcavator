@@ -9,6 +9,8 @@ package com.bitcoin.controller;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import com.bitcoin.core.BitcoinExcavator;
 import com.bitcoin.core.BitcoinExcavatorFatalException;
@@ -27,6 +29,9 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.CubicCurveTo;
+import javafx.scene.shape.MoveTo;
+import javafx.scene.shape.Path;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
@@ -35,6 +40,7 @@ import org.slf4j.LoggerFactory;
 import wallet.utils.FileOperations;
 
 import static com.bitcoin.view.MainView.excavator;
+import static com.bitcoin.view.MainView.instance;
 
 /**
  * Main view controller for excavator.
@@ -141,11 +147,17 @@ public class MainViewController implements Initializable {
     };
 
     private EventHandler<MouseEvent> mouseClickedOnExcavator = mouseEvent -> {
-        if(excavator == null) {
-            Platform.runLater(MainViewController.this::startExcavator);
-        } else {
-            System.out.println(excavator.getHashCount() + " " + excavator.getCurrentTime());
-        }
+//        ScaleTransition scaleTransition = new ScaleTransition(Duration.millis(600), instance.getMainWindow());
+//        scaleTransition.setToX(1.0f);
+//        scaleTransition.setToY(1.2f);
+//        scaleTransition.play();
+
+
+//        if(excavator == null) {
+//            Platform.runLater(MainViewController.this::startExcavator);
+//        } else {
+//            System.out.println(excavator.getHashCount() + " " + excavator.getCurrentTime());
+//        }
     };
 
     private void startExcavator() {
