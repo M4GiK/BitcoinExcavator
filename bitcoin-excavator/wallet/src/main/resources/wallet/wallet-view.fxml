@@ -61,7 +61,7 @@
     </ImageView>
     <StackPane layoutX="14.0" layoutY="81.0" prefHeight="249.0" style="-fx-background-color: transparent;">
       <children>
-            <ScrollPane minWidth="-Infinity" nodeOrientation="LEFT_TO_RIGHT" pannable="true" prefHeight="249.0" style="-fx-background-color: transparent; -fx-background: transparent;" vbarPolicy="NEVER">
+            <ScrollPane nodeOrientation="LEFT_TO_RIGHT" pannable="true" prefHeight="250.0" prefWidth="450.0" style="-fx-background-color: transparent; -fx-background: transparent;" vbarPolicy="NEVER">
               <content>
                   <VBox fx:id="connectionsListView" style="-icons-color: black; -fx-text-fill: gray; -fx-background-color: transparent; -fx-effect: innershadow( three-pass-box , rgba(0,0,0,0.4) , 6, 0.0 , 0 , 2 );">
                       <children>
