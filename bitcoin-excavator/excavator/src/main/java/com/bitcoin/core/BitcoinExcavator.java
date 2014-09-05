@@ -31,6 +31,7 @@ public class BitcoinExcavator implements Excavator {
      */
     private static final Logger log = LoggerFactory
             .getLogger(BitcoinExcavator.class);
+    private Double flops;
 
     /**
      * Returns actual time.
@@ -66,6 +67,10 @@ public class BitcoinExcavator implements Excavator {
     private NetworkState networkStateTail = null;
 
     private Long startTime;
+
+    private Double speed;
+
+    private Double avgSpeed;
 
     public BitcoinExcavator(BitcoinOptions bitcoinOptions) throws BitcoinExcavatorFatalException {
         if (bitcoinOptions == null) {
@@ -165,14 +170,14 @@ public class BitcoinExcavator implements Excavator {
         Formatter hashMeterFormatter = new Formatter(hashMeter);
         Integer deviceCount = 0;
 
-        List<List<? extends DeviceState>> allDeviceStates = new ArrayList<List<? extends  DeviceState>>();
-        List<? extends  DeviceState> GPUDeviceStates = new GPUHardwareType(this).getDeviceStates();
+        List<List<? extends DeviceState>> allDeviceStates = new ArrayList<List<? extends DeviceState>>();
+        List<? extends DeviceState> GPUDeviceStates = new GPUHardwareType(this).getDeviceStates();
         deviceCount += GPUDeviceStates.size();
         allDeviceStates.add(GPUDeviceStates);
 
-        while(running.get()) {
-            for(List<? extends  DeviceState> deviceStates : allDeviceStates) {
-                for(DeviceState deviceState : deviceStates) {
+        while (running.get()) {
+            for (List<? extends DeviceState> deviceStates : allDeviceStates) {
+                for (DeviceState deviceState : deviceStates) {
                     deviceState.checkDevice();
                 }
             }
@@ -182,13 +187,15 @@ public class BitcoinExcavator implements Excavator {
             Double adjustedHashCount = (double) (currentHashCount - previousHashCount)
                     / (double) (now - previousAdjustedStartTime);
             Double hashLongCount = (double) currentHashCount / (double) (now - startTime) / 1000.0;
+            setSpeed(hashLongCount);
 
-            if(now - startTime > TIME_OFFSET * 2) {
+            if (now - startTime > TIME_OFFSET * 2) {
                 double averageHashCount = (adjustedHashCount + previousAdjustedHashCount) / 2.0 / 1000.0;
+                setAvgBasis(getFlops(allDeviceStates, deviceCount));
 
                 hashMeter.setLength(0);
 
-                if(!bitcoinOptions.getDebug()) {
+                if (!bitcoinOptions.getDebug()) {
                     hashMeterFormatter.format("\rmhash: %.1f/%.1f | accept: %d | reject: %d | hw error: %d",
                             averageHashCount, hashLongCount, blocks.get(), rejects.get(), hwErrors.get());
                 } else {
@@ -196,8 +203,8 @@ public class BitcoinExcavator implements Excavator {
                             hashLongCount, blocks.get(), rejects.get(), hwErrors.get());
                     Double basisAverage = 0.0;
 
-                    for(List<? extends DeviceState> deviceStates : allDeviceStates) {
-                        for(DeviceState deviceState : deviceStates) {
+                    for (List<? extends DeviceState> deviceStates : allDeviceStates) {
+                        for (DeviceState deviceState : deviceStates) {
                             hashMeterFormatter.format("%.1f ", deviceState.getLongDeviceHashCount()
                                     / 1000.0 / 1000.0 / 1000.0);
                             basisAverage += deviceState.getBasis();
@@ -205,24 +212,21 @@ public class BitcoinExcavator implements Excavator {
                     }
 
                     basisAverage = 1000 / (basisAverage / deviceCount);
-
                     hashMeterFormatter.format("| fps: %.1f", basisAverage);
                 }
 
                 System.out.print(hashMeter);
-                //log.info(String.valueOf(hashMeter));
             } else {
                 System.out.print("\rWaiting...");
-                //log.info("\rWaiting...");
             }
 
-            if(getCurrentTime() - TIME_OFFSET * 2 > previousAdjustedStartTime) {
+            if (getCurrentTime() - TIME_OFFSET * 2 > previousAdjustedStartTime) {
                 previousHashCount = currentHashCount;
                 previousAdjustedHashCount = adjustedHashCount;
                 previousAdjustedStartTime = now - 1;
             }
 
-            if(bitcoinOptions.getDebugtimer() && getCurrentTime() > startTime + 60 * 1000) {
+            if (bitcoinOptions.getDebugtimer() && getCurrentTime() > startTime + 60 * 1000) {
                 info("Debug timer is up, quitting...");
                 System.exit(0);
             }
@@ -298,6 +302,8 @@ public class BitcoinExcavator implements Excavator {
                 thread.interrupt();
             }
         }
+
+        log.info("Bitcoin excavator stop digging");
     }
 
     /**
@@ -444,5 +450,35 @@ public class BitcoinExcavator implements Excavator {
     @Override
     public void run() {
         execute();
+    }
+
+    public Double getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(Double speed) {
+        this.speed = speed;
+    }
+
+    public Double getAvgBasis() {
+        return avgSpeed;
+    }
+
+    public void setAvgBasis(Double avgBasis) {
+        this.avgSpeed = avgBasis;
+    }
+
+    public Double getFlops(List<List<? extends DeviceState>> allDeviceStates, Integer deviceCount) {
+        Double basisAverage = 0.0;
+
+        for(List<? extends DeviceState> deviceStates : allDeviceStates) {
+            for(DeviceState deviceState : deviceStates) {
+                basisAverage += deviceState.getBasis();
+            }
+        }
+
+        basisAverage = 1000 / (basisAverage / deviceCount);
+
+        return basisAverage;
     }
 }

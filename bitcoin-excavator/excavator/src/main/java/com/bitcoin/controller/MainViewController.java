@@ -22,16 +22,13 @@ import javafx.animation.*;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.Initializable;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import javafx.scene.shape.CubicCurveTo;
-import javafx.scene.shape.MoveTo;
-import javafx.scene.shape.Path;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
@@ -40,7 +37,6 @@ import org.slf4j.LoggerFactory;
 import wallet.utils.FileOperations;
 
 import static com.bitcoin.view.MainView.excavator;
-import static com.bitcoin.view.MainView.instance;
 
 /**
  * Main view controller for excavator.
@@ -59,6 +55,7 @@ public class MainViewController implements Initializable {
     public ProgressIndicator progress;
     public Label loadingLabel;
     public ImageView bitcoinExcavator;
+    public ImageView bitcoinExcavatorStop;
     public ImageView bitcoinWallet;
     public TabPane container;
     public AnchorPane mainPage;
@@ -67,9 +64,20 @@ public class MainViewController implements Initializable {
     public Tab mainTab;
     public Tab setupTab;
     public Tab aboutTab;
+    public Label excavatorSpeedLabel;
+    public Label excavatorBlocksLabel;
+    public Label excavatorErrorsLabel;
+    public Label excavatorHashesLabel;
+    public Label excavatorSpeed;
+    public Label excavatorAvgBasis;
+    public Label excavatorBlocks;
+    public Label excavatorErrors;
+    public Label excavatorHashes;
+    public Pane excavatorPane;
 
     private ResourceBundle resources = null;
     private Stage walletStage;
+    private Boolean excavatorStopClicked = false;
 
     public void initialize(URL location, ResourceBundle resources) {
         this.resources = resources;
@@ -81,6 +89,9 @@ public class MainViewController implements Initializable {
         bitcoinExcavator.setOnMouseEntered(mouseOverForExcavator);
         bitcoinExcavator.setOnMouseExited(mouseExitFromExcavator);
         bitcoinExcavator.setOnMouseClicked(mouseClickedOnExcavator);
+        bitcoinExcavatorStop.setOnMouseEntered(mouseOverForExcavatorStop);
+        bitcoinExcavatorStop.setOnMouseExited(mouseExitFromExcavatorStop);
+        bitcoinExcavatorStop.setOnMouseClicked(mouseClickedOnExcavatorStop);
         bitcoinWallet.setOnMouseEntered(mouseOverForBitcoinWallet);
         bitcoinWallet.setOnMouseExited(mouseExitFromBitcoinWallet);
         bitcoinWallet.setOnMouseClicked(mouseClickedOnBitcoinWallet);
@@ -131,42 +142,46 @@ public class MainViewController implements Initializable {
         progressBox.setDisable(true);
     }
 
-    private EventHandler<MouseEvent> mouseOverForExcavator =  mouseEvent -> {
-            ScaleTransition scale = new ScaleTransition(Duration.millis(600), bitcoinExcavator);
-            scale.setToX(.85f);
-            scale.setToY(.85f);
-            scale.setAutoReverse(true);
-            scale.play();
+    private EventHandler<MouseEvent> mouseOverForExcavator = mouseEvent -> {
+        ScaleTransition scale = new ScaleTransition(Duration.millis(600), bitcoinExcavator);
+        scale.setToX(.85f);
+        scale.setToY(.85f);
+        scale.setAutoReverse(true);
+        scale.play();
     };
 
-    private EventHandler<MouseEvent> mouseExitFromExcavator =  mouseEvent -> {
-            ScaleTransition rescale = new ScaleTransition(Duration.millis(600), bitcoinExcavator);
-            rescale.setToX(1.0f);
-            rescale.setToY(1.0f);
-            rescale.play();
+    private EventHandler<MouseEvent> mouseExitFromExcavator = mouseEvent -> {
+        ScaleTransition rescale = new ScaleTransition(Duration.millis(600), bitcoinExcavator);
+        rescale.setToX(1.0f);
+        rescale.setToY(1.0f);
+        rescale.play();
     };
 
     private EventHandler<MouseEvent> mouseClickedOnExcavator = mouseEvent -> {
-//        ScaleTransition scaleTransition = new ScaleTransition(Duration.millis(600), instance.getMainWindow());
-//        scaleTransition.setToX(1.0f);
-//        scaleTransition.setToY(1.2f);
-//        scaleTransition.play();
+        bitcoinExcavator.setDisable(true);
+        FadeTransition fadeTransitionOff = new FadeTransition(Duration.millis(600), bitcoinExcavator);
+        fadeTransitionOff.setToValue(0.0f);
+        fadeTransitionOff.play();
 
+        excavatorPane.setDisable(false);
+        FadeTransition fadeTransitionOn = new FadeTransition(Duration.millis(600), excavatorPane);
+        fadeTransitionOn.setToValue(1.0f);
+        fadeTransitionOn.play();
 
-//        if(excavator == null) {
-//            Platform.runLater(MainViewController.this::startExcavator);
-//        } else {
-//            System.out.println(excavator.getHashCount() + " " + excavator.getCurrentTime());
-//        }
+        if (excavator == null || excavatorStopClicked) {
+            Platform.runLater(MainViewController.this::startExcavator);
+        }
     };
 
     private void startExcavator() {
         try {
+            excavatorStopClicked = false;
             BitcoinOptionsBuilder builder = new BitcoinOptionsBuilder(new ObjectJsonDeserializer<>());
             excavator = new BitcoinExcavator(builder.fromFile(FileOperations.APP_PATH
                     + FileOperations.BITCOIN_OPTIONS));
             Thread excavatorThread = new Thread(excavator);
             excavatorThread.start();
+            setExcavatorValues(excavator);
         } catch (BitcoinExcavatorFatalException e) {
             GuiUtils.crashAlert(e);
         } catch (IOException e) {
@@ -174,37 +189,92 @@ public class MainViewController implements Initializable {
         }
     }
 
-    private EventHandler<MouseEvent> mouseOverForBitcoinWallet =  mouseEvent -> {
-            ScaleTransition scale = new ScaleTransition(Duration.millis(600), bitcoinWallet);
-            scale.setToX(.85f);
-            scale.setToY(.85f);
-            scale.setAutoReverse(true);
-            scale.play();
+    private void setExcavatorValues(BitcoinExcavator excavator) {
+        Timer timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                Platform.runLater(MainViewController.this::refreshExcavatorValues);
+                if (excavatorStopClicked == true) {
+                    timer.cancel();
+                    timer.purge();
+                }
+            }
+        }, 0, 5000);
+    }
+
+    private void refreshExcavatorValues() {
+        excavatorSpeed.setText(String.format("%.1f Mhash", excavator.getSpeed()));
+        excavatorAvgBasis.setText(String.format("%.1f fps", excavator.getAvgBasis()));
+        excavatorBlocks.setText(excavator.getBlocks().toString());
+        excavatorErrors.setText(excavator.getHwErrors().toString());
+        excavatorHashes.setText(excavator.getHashCount().toString());
+    }
+
+    private EventHandler<MouseEvent> mouseOverForBitcoinWallet = mouseEvent -> {
+        ScaleTransition scale = new ScaleTransition(Duration.millis(600), bitcoinWallet);
+        scale.setToX(.85f);
+        scale.setToY(.85f);
+        scale.setAutoReverse(true);
+        scale.play();
     };
 
-    private EventHandler<MouseEvent> mouseExitFromBitcoinWallet =  mouseEvent -> {
-            ScaleTransition rescale = new ScaleTransition(Duration.millis(600), bitcoinWallet);
-            rescale.setToX(1.0f);
-            rescale.setToY(1.0f);
-            rescale.play();
+    private EventHandler<MouseEvent> mouseExitFromBitcoinWallet = mouseEvent -> {
+        ScaleTransition rescale = new ScaleTransition(Duration.millis(600), bitcoinWallet);
+        rescale.setToX(1.0f);
+        rescale.setToY(1.0f);
+        rescale.play();
     };
 
     private EventHandler<MouseEvent> mouseClickedOnBitcoinWallet = mouseEvent -> {
-            if (walletStage == null) {
-                walletStage = new Stage();
-                walletStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-                    @Override
-                    public void handle(WindowEvent event) {
-                        walletStage.hide();
-                    }
-                });
-                try {
-                    MainView.walletView.start(walletStage);
-                } catch (Exception e) {
-                    e.printStackTrace();
+        if (walletStage == null) {
+            walletStage = new Stage();
+            walletStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+                @Override
+                public void handle(WindowEvent event) {
+                    walletStage.hide();
                 }
-            } else {
-                walletStage.show();
+            });
+            try {
+                MainView.walletView.start(walletStage);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
+        } else {
+            walletStage.show();
+        }
+    };
+
+    private EventHandler<MouseEvent> mouseOverForExcavatorStop = mouseEvent -> {
+        ScaleTransition scale = new ScaleTransition(Duration.millis(600), bitcoinExcavatorStop);
+        scale.setToX(.85f);
+        scale.setToY(.85f);
+        scale.setAutoReverse(true);
+        scale.play();
+    };
+
+    private EventHandler<MouseEvent> mouseExitFromExcavatorStop = mouseEvent -> {
+        ScaleTransition rescale = new ScaleTransition(Duration.millis(600), bitcoinExcavatorStop);
+        rescale.setToX(1.0f);
+        rescale.setToY(1.0f);
+        rescale.play();
+    };
+
+    private EventHandler<MouseEvent> mouseClickedOnExcavatorStop = mouseEvent -> {
+        excavatorStopClicked = true;
+
+        excavatorPane.setDisable(true);
+        FadeTransition fadeTransitionOff = new FadeTransition(Duration.millis(600), excavatorPane);
+        fadeTransitionOff.setToValue(0.0f);
+        fadeTransitionOff.play();
+
+        bitcoinExcavator.setDisable(false);
+        FadeTransition fadeTransitionOn = new FadeTransition(Duration.millis(600), bitcoinExcavator);
+        fadeTransitionOn.setToValue(1.0f);
+        fadeTransitionOn.play();
+
+        if (excavator != null) {
+            excavator.stop();
+        }
     };
 }

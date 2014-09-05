@@ -40,19 +40,25 @@
                                         <Image url="@../images/bitcoin_wallet.png" />
                                     </image>
                                 </ImageView>
-                        <ImageView disable="true" fitHeight="100.0" fitWidth="141.0" layoutX="85.0" layoutY="197.0" opacity="0.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../images/stop_icon.png" />
-                           </image>
-                        </ImageView>
-                        <Label disable="true" layoutX="24.0" layoutY="88.0" opacity="0.0" text="Speed:" />
-                        <Label disable="true" layoutX="25.0" layoutY="125.0" opacity="0.0" text="Errors:" />
-                        <Label disable="true" layoutX="24.0" layoutY="54.0" opacity="0.0" text="Avg. speed:" />
-                        <Label disable="true" layoutX="111.0" layoutY="54.0" opacity="0.0" text="Label" />
-                        <Label disable="true" layoutX="110.0" layoutY="88.0" opacity="0.0" text="Label" />
-                        <Label disable="true" layoutX="111.0" layoutY="125.0" opacity="0.0" text="Label" />
-                        <Label layoutX="26.0" layoutY="155.0" opacity="0.0" text="Hashes:" />
-                        <Label disable="true" layoutX="110.0" layoutY="155.0" opacity="0.0" text="Label" />
+                        <Pane fx:id="excavatorPane" disable="true" opacity="0.0" prefHeight="311.0" prefWidth="296.0">
+                           <children>
+                              <ImageView fx:id="bitcoinExcavatorStop" fitHeight="100.0" fitWidth="141.0" layoutX="81.0" layoutY="181.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../images/stop_icon.png" />
+                                 </image>
+                              </ImageView>
+                              <Label fx:id="excavatorSpeedLabel" layoutX="25.0" layoutY="20.0" text="%excavatorSpeed" />
+                              <Label fx:id="excavatorSpeed" layoutX="170.0" layoutY="20.0" text="0" />
+                              <Label fx:id="excavatorAvgBasisLabel" layoutX="25.0" layoutY="55.0" text="%excavatorAvgBasis" />
+                              <Label fx:id="excavatorAvgBasis" layoutX="170.0" layoutY="55.0" text="0" />
+                              <Label fx:id="excavatorBlocksLabel" layoutX="25.0" layoutY="90.0" text="%excavatorBlocks" />
+                              <Label fx:id="excavatorBlocks" layoutX="170.0" layoutY="90.0" text="0" />
+                              <Label fx:id="excavatorErrorsLabel" layoutX="25.0" layoutY="125.0" text="%excavatorErrors" />
+                              <Label fx:id="excavatorErrors" layoutX="170.0" layoutY="125.0" text="0" />
+                              <Label fx:id="excavatorHashesLabel" layoutX="25.0" layoutY="160.0" text="%excavatorHashes" />
+                              <Label fx:id="excavatorHashes" layoutX="170.0" layoutY="160.0" text="0" />
+                           </children>
+                        </Pane>
                             </children>
                         </AnchorPane>
                     </content>
@@ -83,7 +89,7 @@
                 </Tab>
             </tabs>
         </TabPane>
-        <Label layoutX="14.0" layoutY="13.0" text="%appTitle">
+        <Label layoutX="14.0" layoutY="10.0" text="%appTitle">
             <font>
                 <Font name="Ubuntu" size="40.0" fx:id="x1" />
             </font>
