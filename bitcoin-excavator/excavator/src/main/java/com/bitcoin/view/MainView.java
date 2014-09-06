@@ -110,6 +110,9 @@ public class MainView extends Application {
         if(excavator.getRunning()) {
             excavator.stop();
         }
+
+        // Forcibly terminate the JVM because Orchid likes to spew non-daemon threads everywhere.
+        Runtime.getRuntime().exit(0);
     }
 
     /**

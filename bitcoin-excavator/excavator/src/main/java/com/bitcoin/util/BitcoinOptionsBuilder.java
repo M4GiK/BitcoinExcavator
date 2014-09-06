@@ -32,7 +32,7 @@ public class BitcoinOptionsBuilder {
     }
 
     public BitcoinOptions fromFile(String path) throws IOException {
-        return deserializer.loadFromFile(path);
+        return BitcoinValidator.validateNetworkParameters(deserializer.loadFromFile(path));
     }
 
     /**
