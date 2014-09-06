@@ -6,14 +6,9 @@
 package com.bitcoin.controller;
 
 
-import java.io.IOException;
-import java.net.URL;
-import java.util.ResourceBundle;
-import java.util.Timer;
-import java.util.TimerTask;
-
 import com.bitcoin.core.BitcoinExcavator;
 import com.bitcoin.core.BitcoinExcavatorFatalException;
+import com.bitcoin.util.BitcoinOptions;
 import com.bitcoin.util.BitcoinOptionsBuilder;
 import com.bitcoin.util.GuiUtils;
 import com.bitcoin.util.ObjectJsonDeserializer;
@@ -35,6 +30,10 @@ import javafx.util.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import wallet.utils.FileOperations;
+
+import java.io.IOException;
+import java.net.URL;
+import java.util.*;
 
 import static com.bitcoin.view.MainView.excavator;
 
@@ -59,7 +58,7 @@ public class MainViewController implements Initializable {
     public ImageView bitcoinWallet;
     public TabPane container;
     public AnchorPane mainPage;
-    public AnchorPane setupPage;
+    public ScrollPane setupPage;
     public AnchorPane aboutPage;
     public Tab mainTab;
     public Tab setupTab;
@@ -74,10 +73,22 @@ public class MainViewController implements Initializable {
     public Label excavatorErrors;
     public Label excavatorHashes;
     public Pane excavatorPane;
+    public TextField WorkLifetimeField;
+    public TextField NetworkStatesAmountField;
+    public CheckBox DebuggingModeTick;
+    public CheckBox DebuggingTimerTick;
+    public TextField EnabledDevicesField;
+    public TextField GpuTargetFpsField;
+    public TextField GpuTargetFpsBaseField;
+    public TextField GpuForceWorkSizeField;
+    public TextField GpuVectorsField;
+    public CheckBox GpuNoArrayTick;
+    public CheckBox GpuDebugSourceTick;
 
     private ResourceBundle resources = null;
     private Stage walletStage;
     private Boolean excavatorStopClicked = false;
+    private BitcoinOptions bitcoinOptions;
 
     public void initialize(URL location, ResourceBundle resources) {
         this.resources = resources;
@@ -120,8 +131,58 @@ public class MainViewController implements Initializable {
         });
         Tooltip.install(bitcoinExcavator, new Tooltip(resources.getString("toolTipExcavator")));
         Tooltip.install(bitcoinWallet, new Tooltip(resources.getString("toolTipWallet")));
+
+        readOptionsFromFile();
+
         // Initialize something ..
         Platform.runLater(MainViewController.this::readyToGoAnimation);
+    }
+
+    private void readOptionsFromFile() {
+        BitcoinOptionsBuilder builder = new BitcoinOptionsBuilder(new ObjectJsonDeserializer<>());
+        try {
+            bitcoinOptions = builder.fromFile(FileOperations.APP_PATH + FileOperations.BITCOIN_OPTIONS);
+        } catch (IOException e) {
+            GuiUtils.crashAlert(e);
+        }
+
+        setSetupPageFields();
+    }
+
+    private void setSetupPageFields() {
+        if (bitcoinOptions.getWorklifetime() != null) {
+            WorkLifetimeField.setText(bitcoinOptions.getWorklifetime().toString());
+        }
+        if (bitcoinOptions.getNetworkStatesAmount() != null) {
+            NetworkStatesAmountField.setText(bitcoinOptions.getNetworkStatesAmount().toString());
+        }
+        DebuggingModeTick.setSelected(bitcoinOptions.getDebug());
+        DebuggingTimerTick.setSelected(bitcoinOptions.getDebugtimer());
+        if (bitcoinOptions.getEnabledDevices() != null) {
+            EnabledDevicesField.setText(bitcoinOptions.getEnabledDevices().toString());
+        }
+        if (bitcoinOptions.getGPUTargetFPS() != null) {
+            GpuTargetFpsField.setText(bitcoinOptions.getGPUTargetFPS().toString());
+        }
+        if (bitcoinOptions.getGPUTargetFPSBasis() != null) {
+            GpuTargetFpsBaseField.setText(bitcoinOptions.getGPUTargetFPSBasis().toString());
+        }
+        if (bitcoinOptions.getGPUForceWorkSize() != null) {
+            GpuForceWorkSizeField.setText(bitcoinOptions.getGPUForceWorkSize().toString());
+        }
+        if (bitcoinOptions.getGPUVectors() != null) {
+            GpuVectorsField.setText(integersToString(bitcoinOptions.getGPUVectors()));
+        }
+        GpuNoArrayTick.setSelected(bitcoinOptions.getGPUNoArray());
+        GpuDebugSourceTick.setSelected(bitcoinOptions.getGPUDebugSource());
+    }
+
+    private <T> String integersToString(Integer[] integers) {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < integers.length; ++i) {
+            builder.append(integers[i].toString());
+        }
+        return builder.toString();
     }
 
     public void readyToGoAnimation() {
@@ -176,15 +237,11 @@ public class MainViewController implements Initializable {
     private void startExcavator() {
         try {
             excavatorStopClicked = false;
-            BitcoinOptionsBuilder builder = new BitcoinOptionsBuilder(new ObjectJsonDeserializer<>());
-            excavator = new BitcoinExcavator(builder.fromFile(FileOperations.APP_PATH
-                    + FileOperations.BITCOIN_OPTIONS));
+            excavator = new BitcoinExcavator(bitcoinOptions);
             Thread excavatorThread = new Thread(excavator);
             excavatorThread.start();
             setExcavatorValues(excavator);
         } catch (BitcoinExcavatorFatalException e) {
-            GuiUtils.crashAlert(e);
-        } catch (IOException e) {
             GuiUtils.crashAlert(e);
         }
     }
@@ -277,4 +334,63 @@ public class MainViewController implements Initializable {
             excavator.stop();
         }
     };
+
+    public void keyTypedInWorkLifetimeField() {
+        int workLifetime = Integer.parseInt(WorkLifetimeField.getText());
+        bitcoinOptions.setWorklifetime(workLifetime);
+    }
+
+    public void keyTypedInWorkStatesAmountField() {
+        int networkStatesAmount = Integer.parseInt(NetworkStatesAmountField.getText());
+        bitcoinOptions.setNetworkStatesAmount(networkStatesAmount);
+    }
+
+    public void actionInDebuggingModeTick() {
+        boolean debuggingMode = DebuggingModeTick.isSelected();
+        bitcoinOptions.setDebug(debuggingMode);
+    }
+
+    public void actionInDebuggingTimerTick() {
+        boolean debuggingTimer = DebuggingTimerTick.isSelected();
+        bitcoinOptions.setDebugtimer(debuggingTimer);
+    }
+
+    public void keyTypedInEnabledDevicesField() {
+        Set<String> enabledDevices = new HashSet<>(Arrays.asList(EnabledDevicesField.getText().split(",")));
+        bitcoinOptions.setEnabledDevices(enabledDevices);
+    }
+
+    public void keyTypedInGpuTargetFpsField() {
+        double gpuTargetFps = Double.parseDouble(GpuTargetFpsField.getText());
+        bitcoinOptions.setGPUTargetFPS(gpuTargetFps);
+    }
+
+    public void keyTypedInGpuTargetFpsBaseField() {
+        double gpuTargetFpsBase = Double.parseDouble(GpuTargetFpsBaseField.getText());
+        bitcoinOptions.setGPUTargetFPSBasis(gpuTargetFpsBase);
+    }
+
+    public void keyTypedInGpuForceWorkSizeField() {
+        int gpuForceWorkSize = Integer.getInteger(GpuForceWorkSizeField.getText());
+        bitcoinOptions.setGPUForceWorkSize(gpuForceWorkSize);
+    }
+
+    public void keyTypedInGpuVectorsField() {
+        String[] gpuVectorStrings = GpuVectorsField.getText().split(",");
+        Integer[] gpuVectors = new Integer[gpuVectorStrings.length];
+        for (int i = 0; i < gpuVectorStrings.length; ++i) {
+            gpuVectors[i] = Integer.parseInt(gpuVectorStrings[i]);
+        }
+        bitcoinOptions.setGPUVectors(gpuVectors);
+    }
+
+    public void actionInGpuNoArrayTick() {
+        boolean gpuNoArray = GpuNoArrayTick.isSelected();
+        bitcoinOptions.setGPUNoArray(gpuNoArray);
+    }
+
+    public void actionInGpuDebugSourceTick() {
+        boolean gpuDebugSource = GpuDebugSourceTick.isSelected();
+        bitcoinOptions.setGPUDebugSource(gpuDebugSource);
+    }
 }
