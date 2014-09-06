@@ -30,6 +30,7 @@ public class ObjectJsonSerializationTests {
     }
 
     public ObjectJsonSerializationTests(BitcoinOptions options) {
+        options.setUrl(new String[]{"http://google.com"});
         this.options = options;
     }
 
@@ -37,6 +38,6 @@ public class ObjectJsonSerializationTests {
     public void isReversibleOperation() throws IOException {
         String serialized = serializer.serialize(options);
         BitcoinOptions deserialized = deserializer.deserialize(serialized);
-        assertThat(deserialized, is(equalTo(options)));
+        assertThat(deserialized.getUrl(), is(equalTo(options.getUrl())));
     }
 }
