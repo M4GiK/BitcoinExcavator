@@ -27,6 +27,7 @@
         <launch4j.x86-64.version>3.1.0-beta1</launch4j.x86-64.version>
         <launch4j.x86-64.os>macosx-x86-10.8</launch4j.x86-64.os>
         <launch4j.dir>${basedir}/launch4j/launch4j</launch4j.dir>
+        <maven.assembly.plugin.version>2.4</maven.assembly.plugin.version>
     </properties>
 
     <pluginRepositories>
@@ -44,6 +45,11 @@
 
     <build>
         <plugins>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+            </plugin>
 
             <plugin>
                 <groupId>com.zenjava</groupId>
@@ -139,6 +145,51 @@
             </plugin>
 
         </plugins>
+
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-assembly-plugin</artifactId>
+                    <version>2.4</version>
+                    <configuration>
+                        <descriptorRefs>
+                            <descriptorRef>jar-with-dependencies</descriptorRef>
+                        </descriptorRefs>
+                        <finalName>excavator</finalName>
+                        <appendAssemblyId>false</appendAssemblyId>
+                        <archive>
+                            <manifest>
+                                <mainClass>com.bitcoin.view.MainView</mainClass>
+                            </manifest>
+                        </archive>
+                        <artifactItems>
+                            <artifactItem>
+                                <groupId>com.bitcoin</groupId>
+                                <artifactId>excavator</artifactId>
+                                <name>excavator</name>
+                                <packaging>jar</packaging>
+                                <version>1.0-SNAPSHOT</version>
+                                <type>jar</type>
+                                <overWrite>true</overWrite>
+                            </artifactItem>
+                        </artifactItems>
+                        <overWriteReleases>false</overWriteReleases>
+                        <overWriteSnapshots>true</overWriteSnapshots>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>make-assembly</id>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>single</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
     </build>
 
 
