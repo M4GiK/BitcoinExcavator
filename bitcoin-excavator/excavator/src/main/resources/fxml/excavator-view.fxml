@@ -64,7 +64,10 @@
                     </content>
                 </Tab>
                 <Tab fx:id="setupTab" text="%setupTab">
-                    <ScrollPane prefViewportHeight="304.0" prefViewportWidth="600.0" >
+                    <ScrollPane prefViewportHeight="304.0" prefViewportWidth="600.0">
+                        <padding>
+                            <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                        </padding>
                         <fx:include fx:id="setupPage" source="excavator-options.fxml"/>
                     </ScrollPane>
                 </Tab>

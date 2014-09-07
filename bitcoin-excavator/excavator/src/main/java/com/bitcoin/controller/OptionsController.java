@@ -1,20 +1,24 @@
 package com.bitcoin.controller;
 
 import com.bitcoin.util.BitcoinOptions;
+import com.bitcoin.util.Credential;
+import javafx.collections.FXCollections;
 import javafx.fxml.Initializable;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.TextFieldListCell;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 
 import java.net.URL;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.ResourceBundle;
-import java.util.Set;
+import java.util.*;
 
 public class OptionsController implements Initializable {
     public GridPane setupPage;
 
+    public ListView credentialsView;
+    public TextField proxyField;
     public TextField workLifetimeField;
     public CheckBox debuggingModeTick;
     public CheckBox debuggingTimerTick;
@@ -30,6 +34,7 @@ public class OptionsController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        credentialsView.setCellFactory(TextFieldListCell.forListView());
     }
 
     private void setSetupPageFields() {
@@ -64,6 +69,7 @@ public class OptionsController implements Initializable {
     public void setModel(BitcoinOptions model) {
         this.model = model;
         setSetupPageFields();
+        populateCredentialsView();
     }
 
     private String integersToString(Integer[] integers) {
@@ -74,8 +80,21 @@ public class OptionsController implements Initializable {
         return builder.toString();
     }
 
-    public void keyTypedInWorkLifetimeField() {
-        int workLifetime = Integer.parseInt(workLifetimeField.getText());
+    private void populateCredentialsView() {
+        List<String> items = new ArrayList<>();
+        for (Credential credential : model.getCredentials()) {
+            items.add(credential.toString());
+        }
+        credentialsView.setItems(FXCollections.observableList(items));
+    }
+
+    public void keyTypedInProxyField() {
+
+    }
+
+    public void keyTypedInWorkLifetimeField(KeyEvent event) {
+        if (event.getText() == null) return;
+        int workLifetime = Integer.parseInt(event.getText());
         model.setWorklifetime(workLifetime);
     }
 
@@ -89,28 +108,33 @@ public class OptionsController implements Initializable {
         model.setDebugtimer(debuggingTimer);
     }
 
-    public void keyTypedInEnabledDevicesField() {
-        Set<String> enabledDevices = new HashSet<>(Arrays.asList(enabledDevicesField.getText().split(",")));
+    public void keyTypedInEnabledDevicesField(KeyEvent event) {
+        if (event.getText() == null) return;
+        Set<String> enabledDevices = new HashSet<>(Arrays.asList(event.getText().split(",")));
         model.setEnabledDevices(enabledDevices);
     }
 
-    public void keyTypedInGpuTargetFpsField() {
-        double gpuTargetFps = Double.parseDouble(gpuTargetFpsField.getText());
+    public void keyTypedInGpuTargetFpsField(KeyEvent event) {
+        if (event.getText() == null) return;
+        double gpuTargetFps = Double.parseDouble(event.getText());
         model.setGPUTargetFPS(gpuTargetFps);
     }
 
-    public void keyTypedInGpuTargetFpsBaseField() {
-        double gpuTargetFpsBase = Double.parseDouble(gpuTargetFpsBaseField.getText());
+    public void keyTypedInGpuTargetFpsBaseField(KeyEvent event) {
+        if (event.getText() == null) return;
+        double gpuTargetFpsBase = Double.parseDouble(event.getText());
         model.setGPUTargetFPSBasis(gpuTargetFpsBase);
     }
 
-    public void keyTypedInGpuForceWorkSizeField() {
-        int gpuForceWorkSize = Integer.getInteger(gpuForceWorkSizeField.getText());
+    public void keyTypedInGpuForceWorkSizeField(KeyEvent event) {
+        if (event.getText() == null) return;
+        int gpuForceWorkSize = Integer.getInteger(event.getText());
         model.setGPUForceWorkSize(gpuForceWorkSize);
     }
 
-    public void keyTypedInGpuVectorsField() {
-        String[] gpuVectorStrings = gpuVectorsField.getText().split(",");
+    public void keyTypedInGpuVectorsField(KeyEvent event) {
+        if (event.getText() == null) return;
+        String[] gpuVectorStrings = event.getText().split(",");
         Integer[] gpuVectors = new Integer[gpuVectorStrings.length];
         for (int i = 0; i < gpuVectorStrings.length; ++i) {
             gpuVectors[i] = Integer.parseInt(gpuVectorStrings[i]);
@@ -126,5 +150,27 @@ public class OptionsController implements Initializable {
     public void actionInGpuDebugSourceTick() {
         boolean gpuDebugSource = gpuDebugSourceTick.isSelected();
         model.setGPUDebugSource(gpuDebugSource);
+    }
+
+    public void editCommitInCredentialsView(ListView.EditEvent<String> event) {
+        credentialsView.getItems().set(event.getIndex(), event.getNewValue());
+        Credential oldValue = model.getCredential(event.getIndex());
+        String text = event.getNewValue();
+        String[] parts = text.split("://|:|@");
+
+        if (parts.length != 5) {
+            throw new IllegalArgumentException("Could not parse credentials: " + text);
+        }
+
+        // "PROTOCOL://LOGIN:PASSWORD@HOST:PORT"
+        String protocol = parts[0];
+        String login = parts[1];
+        String password = parts[2];
+        String host = parts[3];
+        Integer port = Integer.parseInt(parts[4]);
+        Credential newValue = new Credential(login, password, host, protocol, "", port);
+
+        model.removeCredential(oldValue);
+        model.addCredential(newValue);
     }
 }

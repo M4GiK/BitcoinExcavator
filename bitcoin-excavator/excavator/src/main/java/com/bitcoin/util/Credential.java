@@ -73,4 +73,9 @@ public class Credential {
     public int getPort() {
         return this.port;
     }
+
+    @Override
+    public String toString() {
+        return String.format("%s://%s:%s@%s:%d", protocol, login, password, host, port);
+    }
 }
