@@ -103,11 +103,11 @@ public class MainView extends Application {
      */
     @Override
     public void stop() throws Exception {
-        if(walletView.isRunning()) {
+        if(walletView != null && walletView.isRunning()) {
             walletView.stop();
         }
 
-        if(excavator.getRunning()) {
+        if(excavator != null && excavator.getRunning()) {
             excavator.stop();
         }
 
