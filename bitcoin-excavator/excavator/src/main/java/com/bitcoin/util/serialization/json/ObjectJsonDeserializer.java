@@ -3,15 +3,16 @@
  * Copyright Michał Szczygieł & Aleksander Śmierciak
  * Created at Sept. 2, 2014.
  */
-package com.bitcoin.util;
+package com.bitcoin.util.serialization.json;
 
+import com.bitcoin.util.serialization.ObjectDeserializer;
 import com.cedarsoftware.util.io.JsonReader;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class ObjectJsonDeserializer<T> implements ObjectDeserializer<T> {
+class ObjectJsonDeserializer<T> implements ObjectDeserializer<T> {
     @Override
     public T loadFromFile(String path) throws IOException {
         if (path == null) throw new IllegalArgumentException("path cannot be null");

@@ -11,7 +11,9 @@ import com.bitcoin.core.BitcoinExcavatorFatalException;
 import com.bitcoin.util.BitcoinOptions;
 import com.bitcoin.util.BitcoinOptionsBuilder;
 import com.bitcoin.util.GuiUtils;
-import com.bitcoin.util.ObjectJsonDeserializer;
+import com.bitcoin.util.serialization.ObjectSerializationFactory;
+import com.bitcoin.util.serialization.SerializationFactory;
+import com.bitcoin.util.serialization.json.JsonSerializationFactory;
 import com.bitcoin.view.MainView;
 import javafx.animation.*;
 import javafx.application.Platform;
@@ -139,7 +141,10 @@ public class MainViewController implements Initializable {
     }
 
     private void readOptionsFromFile() {
-        BitcoinOptionsBuilder builder = new BitcoinOptionsBuilder(new ObjectJsonDeserializer<>());
+        SerializationFactory serializationFactory = new JsonSerializationFactory();
+        ObjectSerializationFactory<BitcoinOptions> bitcoinOptionsFactory = serializationFactory.createObjectSerializationFactory();
+        bitcoinOptionsFactory.createDeserializer();
+        BitcoinOptionsBuilder builder = new BitcoinOptionsBuilder(bitcoinOptionsFactory.createDeserializer());
         try {
             bitcoinOptions = builder.fromFile(FileOperations.APP_PATH + FileOperations.BITCOIN_OPTIONS);
         } catch (IOException e) {

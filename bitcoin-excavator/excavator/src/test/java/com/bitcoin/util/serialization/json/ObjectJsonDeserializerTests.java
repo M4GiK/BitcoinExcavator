@@ -1,5 +1,7 @@
-package com.bitcoin.util;
+package com.bitcoin.util.serialization.json;
 
+import com.bitcoin.util.BitcoinOptions;
+import com.bitcoin.util.serialization.ObjectDeserializer;
 import org.junit.Test;
 
 import java.io.IOException;

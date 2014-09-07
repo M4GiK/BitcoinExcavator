@@ -5,6 +5,7 @@
  */
 package com.bitcoin.util;
 
+import com.bitcoin.util.serialization.ObjectDeserializer;
 import org.apache.commons.cli.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

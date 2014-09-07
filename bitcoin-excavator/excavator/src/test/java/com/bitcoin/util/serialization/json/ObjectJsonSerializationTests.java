@@ -1,5 +1,9 @@
-package com.bitcoin.util;
+package com.bitcoin.util.serialization.json;
 
+import com.bitcoin.util.BitcoinOptions;
+import com.bitcoin.util.Credential;
+import com.bitcoin.util.serialization.ObjectDeserializer;
+import com.bitcoin.util.serialization.ObjectSerializer;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;

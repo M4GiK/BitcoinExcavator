@@ -3,7 +3,7 @@
  * Copyright Michał Szczygieł & Aleksander Śmierciak
  * Created at Sept. 2, 2014.
  */
-package com.bitcoin.util;
+package com.bitcoin.util.serialization;
 
 import java.io.IOException;
 import java.io.InputStream;

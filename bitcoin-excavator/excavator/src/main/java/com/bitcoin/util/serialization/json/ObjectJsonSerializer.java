@@ -3,8 +3,9 @@
  * Copyright Michał Szczygieł & Aleksander Śmierciak
  * Created at Sept. 2, 2014.
  */
-package com.bitcoin.util;
+package com.bitcoin.util.serialization.json;
 
+import com.bitcoin.util.serialization.ObjectSerializer;
 import com.cedarsoftware.util.io.JsonWriter;
 
 import java.io.FileOutputStream;
@@ -13,7 +14,7 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ObjectJsonSerializer<T> implements ObjectSerializer<T> {
+class ObjectJsonSerializer<T> implements ObjectSerializer<T> {
     private final Map<String, Object> serializationArguments;
 
     public ObjectJsonSerializer() {
