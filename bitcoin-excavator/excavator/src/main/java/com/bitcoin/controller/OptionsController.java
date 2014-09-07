@@ -2,6 +2,7 @@ package com.bitcoin.controller;
 
 import com.bitcoin.util.BitCoinOptions;
 import com.bitcoin.util.Credential;
+import com.bitcoin.util.GuiUtils;
 import javafx.collections.FXCollections;
 import javafx.fxml.Initializable;
 import javafx.scene.control.CheckBox;
@@ -94,8 +95,12 @@ public class OptionsController implements Initializable {
 
     public void keyTypedInWorkLifetimeField(KeyEvent event) {
         if (event.getText() == null) return;
-        int workLifetime = Integer.parseInt(event.getText());
-        model.setWorklifetime(workLifetime);
+        try {
+            int workLifetime = Integer.parseInt(event.getText());
+            model.setWorklifetime(workLifetime);
+        } catch (NumberFormatException e) {
+            GuiUtils.informationalAlert("Invalid characters found", "New value will be ignored.");
+        }
     }
 
     public void actionInDebuggingModeTick() {
@@ -116,30 +121,46 @@ public class OptionsController implements Initializable {
 
     public void keyTypedInGpuTargetFpsField(KeyEvent event) {
         if (event.getText() == null) return;
-        double gpuTargetFps = Double.parseDouble(event.getText());
-        model.setGPUTargetFPS(gpuTargetFps);
+        try {
+            double gpuTargetFps = Double.parseDouble(event.getText());
+            model.setGPUTargetFPS(gpuTargetFps);
+        } catch (NumberFormatException e) {
+            GuiUtils.informationalAlert("Invalid characters found", "New value will be ignored.");
+        }
     }
 
     public void keyTypedInGpuTargetFpsBaseField(KeyEvent event) {
         if (event.getText() == null) return;
-        double gpuTargetFpsBase = Double.parseDouble(event.getText());
-        model.setGPUTargetFPSBasis(gpuTargetFpsBase);
+        try {
+            double gpuTargetFpsBase = Double.parseDouble(event.getText());
+            model.setGPUTargetFPSBasis(gpuTargetFpsBase);
+        } catch (NumberFormatException e) {
+            GuiUtils.informationalAlert("Invalid characters found", "New value will be ignored.");
+        }
     }
 
     public void keyTypedInGpuForceWorkSizeField(KeyEvent event) {
         if (event.getText() == null) return;
-        int gpuForceWorkSize = Integer.getInteger(event.getText());
-        model.setGPUForceWorkSize(gpuForceWorkSize);
+        try {
+            int gpuForceWorkSize = Integer.parseInt(event.getText());
+            model.setGPUForceWorkSize(gpuForceWorkSize);
+        } catch (NumberFormatException e) {
+            GuiUtils.informationalAlert("Invalid characters found", "New value will be ignored.");
+        }
     }
 
     public void keyTypedInGpuVectorsField(KeyEvent event) {
         if (event.getText() == null) return;
         String[] gpuVectorStrings = event.getText().split(",");
         Integer[] gpuVectors = new Integer[gpuVectorStrings.length];
-        for (int i = 0; i < gpuVectorStrings.length; ++i) {
-            gpuVectors[i] = Integer.parseInt(gpuVectorStrings[i]);
+        try {
+            for (int i = 0; i < gpuVectorStrings.length; ++i) {
+                gpuVectors[i] = Integer.parseInt(gpuVectorStrings[i]);
+            }
+            model.setGPUVectors(gpuVectors);
+        } catch (NumberFormatException e) {
+            GuiUtils.informationalAlert("Invalid characters found", "New value will be ignored.");
         }
-        model.setGPUVectors(gpuVectors);
     }
 
     public void actionInGpuNoArrayTick() {
