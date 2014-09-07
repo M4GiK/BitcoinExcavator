@@ -26,13 +26,21 @@ class ObjectJsonDeserializer<T> implements ObjectDeserializer<T> {
         if (stream == null) throw new IllegalArgumentException("stream cannot be null");
 
         JsonReader reader = new JsonReader(stream);
-        return (T)reader.readObject();
+        try {
+            return (T) reader.readObject();
+        } catch (NoClassDefFoundError e) {
+            throw new IOException(e);
+        }
     }
 
     @Override
     public T deserialize(String string) throws IOException {
         if (string == null) throw new IllegalArgumentException("string cannot be null");
 
-        return (T)JsonReader.jsonToJava(string);
+        try {
+            return (T)JsonReader.jsonToJava(string);
+        } catch (NoClassDefFoundError e) {
+            throw new IOException(e);
+        }
     }
 }
