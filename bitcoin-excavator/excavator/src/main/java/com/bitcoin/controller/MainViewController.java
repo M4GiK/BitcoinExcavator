@@ -31,7 +31,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import wallet.utils.FileOperations;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.Timer;
@@ -139,11 +138,11 @@ public class MainViewController implements Initializable {
 
     private BitCoinOptions retrieveOptions() {
         BitCoinOptionsBuilder builder = createBitcoinOptionsBuilder();
-        BitCoinOptions options = null;
+        BitCoinOptions options;
         try {
             options = builder.fromFile(FileOperations.APP_PATH + FileOperations.BITCOIN_OPTIONS);
-        } catch (IOException e) {
-            GuiUtils.crashAlert(e);
+        } catch (Exception e) {
+            options = new BitCoinOptions();
         }
         return options;
     }
