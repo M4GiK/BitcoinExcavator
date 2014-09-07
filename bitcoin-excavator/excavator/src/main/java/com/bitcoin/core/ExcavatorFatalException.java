@@ -20,7 +20,7 @@ public class ExcavatorFatalException extends Exception {
     /**
      * Constructor for {@link ExcavatorFatalException} class.
      *
-     * @param excavator Instance of {@link BitcoinExcavator} class.
+     * @param excavator Instance of {@link BitCoinExcavator} class.
      * @param reason    Message with error.
      */
     public ExcavatorFatalException(Excavator excavator, String reason) {

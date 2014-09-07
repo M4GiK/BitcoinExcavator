@@ -5,7 +5,7 @@
  */
 package com.bitcoin.core.device;
 
-import com.bitcoin.core.BitcoinExcavator;
+import com.bitcoin.core.BitCoinExcavator;
 import com.bitcoin.core.Excavator;
 import com.bitcoin.core.ExcavatorFatalException;
 import com.bitcoin.core.network.WorkState;
@@ -218,7 +218,7 @@ public class GPUDeviceState extends DeviceState {
                     }
 
                     if (hwError && submittedBlock == false) {
-                        if (hardwareCheck && !excavator.getBitcoinOptions().getDebug()) {
+                        if (hardwareCheck && !excavator.getBitCoinOptions().getDebug()) {
                             excavator.error("Invalid solution " + excavator.incrementHWErrors()
                                     + " from " + getDeviceName() + ", possible driver or hardware issue");
                         } else {
@@ -259,26 +259,26 @@ public class GPUDeviceState extends DeviceState {
 
                     System.arraycopy(getWorkState().getMidstate(), 0, midstate2, 0, 8);
 
-                    BitcoinExcavator.sharound(midstate2, 0, 1, 2, 3, 4, 5, 6, 7, getWorkState().getData(16), 0x428A2F98);
-                    BitcoinExcavator.sharound(midstate2, 7, 0, 1, 2, 3, 4, 5, 6, getWorkState().getData(17), 0x71374491);
-                    BitcoinExcavator.sharound(midstate2, 6, 7, 0, 1, 2, 3, 4, 5, getWorkState().getData(18), 0xB5C0FBCF);
+                    BitCoinExcavator.sharound(midstate2, 0, 1, 2, 3, 4, 5, 6, 7, getWorkState().getData(16), 0x428A2F98);
+                    BitCoinExcavator.sharound(midstate2, 7, 0, 1, 2, 3, 4, 5, 6, getWorkState().getData(17), 0x71374491);
+                    BitCoinExcavator.sharound(midstate2, 6, 7, 0, 1, 2, 3, 4, 5, getWorkState().getData(18), 0xB5C0FBCF);
 
-                    int W16 = getWorkState().getData(16) + (BitcoinExcavator.rot(getWorkState().getData(17), 7)
-                            ^ BitcoinExcavator.rot(getWorkState().getData(17), 18) ^ (getWorkState().getData(17) >>> 3));
-                    int W17 = getWorkState().getData(17) + (BitcoinExcavator.rot(getWorkState().getData(18), 7)
-                            ^ BitcoinExcavator.rot(getWorkState().getData(18), 18) ^ (getWorkState().getData(18) >>> 3))
+                    int W16 = getWorkState().getData(16) + (BitCoinExcavator.rot(getWorkState().getData(17), 7)
+                            ^ BitCoinExcavator.rot(getWorkState().getData(17), 18) ^ (getWorkState().getData(17) >>> 3));
+                    int W17 = getWorkState().getData(17) + (BitCoinExcavator.rot(getWorkState().getData(18), 7)
+                            ^ BitCoinExcavator.rot(getWorkState().getData(18), 18) ^ (getWorkState().getData(18) >>> 3))
                             + 0x01100000;
-                    int W18 = getWorkState().getData(18) + (BitcoinExcavator.rot(W16, 17) ^ BitcoinExcavator.rot(W16, 19)
+                    int W18 = getWorkState().getData(18) + (BitCoinExcavator.rot(W16, 17) ^ BitCoinExcavator.rot(W16, 19)
                             ^ (W16 >>> 10));
-                    int W19 = 0x11002000 + (BitcoinExcavator.rot(W17, 17) ^ BitcoinExcavator.rot(W17, 19) ^ (W17 >>> 10));
-                    int W31 = 0x00000280 + (BitcoinExcavator.rot(W16, 7) ^ BitcoinExcavator.rot(W16, 18) ^ (W16 >>> 3));
-                    int W32 = W16 + (BitcoinExcavator.rot(W17, 7) ^ BitcoinExcavator.rot(W17, 18) ^ (W17 >>> 3));
+                    int W19 = 0x11002000 + (BitCoinExcavator.rot(W17, 17) ^ BitCoinExcavator.rot(W17, 19) ^ (W17 >>> 10));
+                    int W31 = 0x00000280 + (BitCoinExcavator.rot(W16, 7) ^ BitCoinExcavator.rot(W16, 18) ^ (W16 >>> 3));
+                    int W32 = W16 + (BitCoinExcavator.rot(W17, 7) ^ BitCoinExcavator.rot(W17, 18) ^ (W17 >>> 3));
 
-                    int PreVal4 = getWorkState().getMidstate(4) + (BitcoinExcavator.rot(midstate2[1], 6)
-                            ^ BitcoinExcavator.rot(midstate2[1], 11) ^ BitcoinExcavator.rot(midstate2[1], 25))
+                    int PreVal4 = getWorkState().getMidstate(4) + (BitCoinExcavator.rot(midstate2[1], 6)
+                            ^ BitCoinExcavator.rot(midstate2[1], 11) ^ BitCoinExcavator.rot(midstate2[1], 25))
                             + (midstate2[3] ^ (midstate2[1] & (midstate2[2] ^ midstate2[3]))) + 0xe9b5dba5;
-                    int T1 = (BitcoinExcavator.rot(midstate2[5], 2) ^ BitcoinExcavator.rot(midstate2[5], 13)
-                            ^ BitcoinExcavator.rot(midstate2[5], 22)) + ((midstate2[5] & midstate2[6])
+                    int T1 = (BitCoinExcavator.rot(midstate2[5], 2) ^ BitCoinExcavator.rot(midstate2[5], 13)
+                            ^ BitCoinExcavator.rot(midstate2[5], 22)) + ((midstate2[5] & midstate2[6])
                             | (midstate2[7] & (midstate2[5] | midstate2[6])));
 
                     int PreVal4_state0 = PreVal4 + getWorkState().getMidstate(0);
@@ -376,7 +376,7 @@ public class GPUDeviceState extends DeviceState {
         this.executions = new ExecutionState[GPUHardwareType.EXECUTION_TOTAL];
         setDeviceName(deviceName);
         setResetNetworkState(hardwareType.getExcavator().getCurrentTime());
-        context = prepareContext(excavator.getBitcoinOptions().getGPUForceWorkSize());
+        context = prepareContext(excavator.getBitCoinOptions().getGPUForceWorkSize());
 
         Boolean hasBitAlign = isBitAlign();
         Boolean hasBFI_INT = isBFI_INT(hasBitAlign);
@@ -386,7 +386,7 @@ public class GPUDeviceState extends DeviceState {
         validBuild(CL10.clBuildProgram(program, device, compileOptions, null), program);
         operationsForBFI_INT(hasBFI_INT, program, compileOptions);
         kernel = createKernel(program);
-        setLocalWorkSize(excavator.getBitcoinOptions().getGPUForceWorkSize());
+        setLocalWorkSize(excavator.getBitCoinOptions().getGPUForceWorkSize());
     }
 
     /**
@@ -599,7 +599,7 @@ public class GPUDeviceState extends DeviceState {
         int totalVectors = hardwareType.getTotalVectors();
         long ws = workSize.get();
 
-        if (now > startTime + Excavator.TIME_OFFSET * 2 && currentRuns > lastRuns + excavator.getBitcoinOptions().getGPUTargetFPS()) {
+        if (now > startTime + Excavator.TIME_OFFSET * 2 && currentRuns > lastRuns + excavator.getBitCoinOptions().getGPUTargetFPS()) {
             setBasis((double) elapsed / (double) (currentRuns - lastRuns));
 
             if (getBasis() < targetFPSBasis / 4)

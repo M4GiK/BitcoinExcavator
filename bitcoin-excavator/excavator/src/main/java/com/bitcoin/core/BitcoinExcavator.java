@@ -9,7 +9,7 @@ import com.bitcoin.core.device.DeviceState;
 import com.bitcoin.core.device.GPUHardwareType;
 import com.bitcoin.core.network.NetworkState;
 import com.bitcoin.core.network.NetworkStatesBuilder;
-import com.bitcoin.util.BitcoinOptions;
+import com.bitcoin.util.BitCoinOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,13 +24,13 @@ import java.util.concurrent.atomic.AtomicLong;
  *
  * @author m4gik <michal.szczygiel@wp.pl>
  */
-public class BitcoinExcavator implements Excavator {
+public class BitCoinExcavator implements Excavator {
 
     /**
      * Logger for monitoring runtime.
      */
     private static final Logger log = LoggerFactory
-            .getLogger(BitcoinExcavator.class);
+            .getLogger(BitCoinExcavator.class);
     private Double flops;
 
     /**
@@ -58,7 +58,7 @@ public class BitcoinExcavator implements Excavator {
 
     private AtomicBoolean running = new AtomicBoolean(true);
 
-    private BitcoinOptions bitcoinOptions = null;
+    private BitCoinOptions bitCoinOptions = null;
 
     private ArrayList<NetworkState> networkStates = null;
 
@@ -72,12 +72,12 @@ public class BitcoinExcavator implements Excavator {
 
     private Double avgSpeed;
 
-    public BitcoinExcavator(BitcoinOptions bitcoinOptions) throws BitcoinExcavatorFatalException {
-        if (bitcoinOptions == null) {
-            throw new BitcoinExcavatorFatalException(this, "Bitcoin options can not be null");
+    public BitCoinExcavator(BitCoinOptions bitCoinOptions) throws BitCoinExcavatorFatalException {
+        if (bitCoinOptions == null) {
+            throw new BitCoinExcavatorFatalException(this, "Bitcoin options can not be null");
         }
 
-        this.bitcoinOptions = bitcoinOptions;
+        this.bitCoinOptions = bitCoinOptions;
     }
 
     /**
@@ -124,7 +124,7 @@ public class BitcoinExcavator implements Excavator {
         log.info("Bitcoin Excavator process started");
         threads.add(Thread.currentThread());
         NetworkStatesBuilder networkStatesBuilder = new NetworkStatesBuilder();
-        networkStates = networkStatesBuilder.createNetworkStates(bitcoinOptions, this);
+        networkStates = networkStatesBuilder.createNetworkStates(bitCoinOptions, this);
 
 
         StringBuilder list = new StringBuilder();
@@ -196,7 +196,7 @@ public class BitcoinExcavator implements Excavator {
 
                 hashMeter.setLength(0);
 
-                if (!bitcoinOptions.getDebug()) {
+                if (!bitCoinOptions.getDebug()) {
                     hashMeterFormatter.format("\rmhash: %.1f/%.1f | accept: %d | reject: %d | hw error: %d",
                             averageHashCount, hashLongCount, blocks.get(), rejects.get(), hwErrors.get());
                 } else {
@@ -227,7 +227,7 @@ public class BitcoinExcavator implements Excavator {
                 previousAdjustedStartTime = now - 1;
             }
 
-            if (bitcoinOptions.getDebugtimer() && getCurrentTime() > startTime + 60 * 1000) {
+            if (bitCoinOptions.getDebugtimer() && getCurrentTime() > startTime + 60 * 1000) {
                 info("Debug timer is up, quitting...");
                 System.exit(0);
             }
@@ -359,7 +359,7 @@ public class BitcoinExcavator implements Excavator {
      * @param message
      */
     public void debug(String message) {
-        if(bitcoinOptions.getDebug()) {
+        if(bitCoinOptions.getDebug()) {
             log.debug(dateTime() + " DEBUG: " + message);
             threads.get(0).interrupt();
         }
@@ -414,10 +414,10 @@ public class BitcoinExcavator implements Excavator {
     /**
      * Gets options for {@link com.bitcoin.core.Excavator} class.
      *
-     * @return The instance of {@link com.bitcoin.util.BitcoinOptions}.
+     * @return The instance of {@link com.bitcoin.util.BitCoinOptions}.
      */
-    public BitcoinOptions getBitcoinOptions() {
-        return bitcoinOptions;
+    public BitCoinOptions getBitCoinOptions() {
+        return bitCoinOptions;
     }
 
     public void setRejects(AtomicLong rejects) {
@@ -444,8 +444,8 @@ public class BitcoinExcavator implements Excavator {
         this.hwErrors = hwErrors;
     }
 
-    public void setBitcoinOptions(BitcoinOptions bitcoinOptions) {
-        this.bitcoinOptions = bitcoinOptions;
+    public void setBitCoinOptions(BitCoinOptions bitCoinOptions) {
+        this.bitCoinOptions = bitCoinOptions;
     }
 
     @Override

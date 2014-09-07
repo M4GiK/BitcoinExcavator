@@ -1,13 +1,13 @@
 package com.bitcoin.util.serialization.json;
 
-import com.bitcoin.util.BitcoinOptions;
+import com.bitcoin.util.BitCoinOptions;
 import com.bitcoin.util.serialization.ObjectDeserializer;
 import org.junit.Test;
 
 import java.io.IOException;
 
 public class ObjectJsonDeserializerTests {
-    private final ObjectDeserializer<BitcoinOptions> deserializer = new ObjectJsonDeserializer<>();
+    private final ObjectDeserializer<BitCoinOptions> deserializer = new ObjectJsonDeserializer<>();
 
     @Test (expected = IllegalArgumentException.class)
     public void throwsIfInputStringIsNull() throws IOException {

@@ -1,6 +1,6 @@
 package com.bitcoin.util.serialization.json;
 
-import com.bitcoin.util.BitcoinOptions;
+import com.bitcoin.util.BitCoinOptions;
 import com.bitcoin.util.Credential;
 import com.bitcoin.util.serialization.ObjectDeserializer;
 import com.bitcoin.util.serialization.ObjectSerializer;
@@ -18,22 +18,22 @@ import static org.junit.Assert.assertThat;
 
 @RunWith(Parameterized.class)
 public class ObjectJsonSerializationTests {
-    private final BitcoinOptions options;
+    private final BitCoinOptions options;
 
-    private final ObjectSerializer<BitcoinOptions> serializer = new ObjectJsonSerializer<>();
+    private final ObjectSerializer<BitCoinOptions> serializer = new ObjectJsonSerializer<>();
 
-    private final ObjectDeserializer<BitcoinOptions> deserializer = new ObjectJsonDeserializer<>();
+    private final ObjectDeserializer<BitCoinOptions> deserializer = new ObjectJsonDeserializer<>();
 
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
         Object[][] data = new Object[][]
                 {
-                        { new BitcoinOptions() }
+                        { new BitCoinOptions() }
                 };
         return Arrays.asList(data);
     }
 
-    public ObjectJsonSerializationTests(BitcoinOptions options) {
+    public ObjectJsonSerializationTests(BitCoinOptions options) {
         options.addCredential(new Credential("login", "password", "host", "protocol", "path", 1));
         this.options = options;
     }
@@ -41,7 +41,7 @@ public class ObjectJsonSerializationTests {
     @Test
     public void isReversibleOperation() throws IOException {
         String serialized = serializer.serialize(options);
-        BitcoinOptions deserialized = deserializer.deserialize(serialized);
+        BitCoinOptions deserialized = deserializer.deserialize(serialized);
         assertThat(deserialized, is(equalTo(options)));
     }
 }

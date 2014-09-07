@@ -1,6 +1,6 @@
 package com.bitcoin.util.serialization.json;
 
-import com.bitcoin.util.BitcoinOptions;
+import com.bitcoin.util.BitCoinOptions;
 import com.bitcoin.util.serialization.ObjectSerializer;
 import org.junit.Test;
 
@@ -8,7 +8,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 public class ObjectJsonSerializerTests {
-    private final ObjectSerializer<BitcoinOptions> serializer = new ObjectJsonSerializer<>();
+    private final ObjectSerializer<BitCoinOptions> serializer = new ObjectJsonSerializer<>();
 
     @Test(expected = IllegalArgumentException.class)
     public void saveToFileThrowsIfObjectIsNull() throws IOException {
@@ -17,12 +17,12 @@ public class ObjectJsonSerializerTests {
 
     @Test(expected = IllegalArgumentException.class)
     public void saveToFileThrowsIfPathIsNull() throws IOException {
-        serializer.saveToFile(new BitcoinOptions(), null);
+        serializer.saveToFile(new BitCoinOptions(), null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void saveToFileThrowsIfPathIsEmpty() throws IOException {
-        serializer.saveToFile(new BitcoinOptions(), "");
+        serializer.saveToFile(new BitCoinOptions(), "");
     }
 
     @Test (expected = IllegalArgumentException.class)
@@ -32,6 +32,6 @@ public class ObjectJsonSerializerTests {
 
     @Test (expected = IllegalArgumentException.class)
     public void saveToStreamThrowsIfOutputStreamIsNull() throws IOException {
-        serializer.saveToStream(new BitcoinOptions(), null);
+        serializer.saveToStream(new BitCoinOptions(), null);
     }
 }

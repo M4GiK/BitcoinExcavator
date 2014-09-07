@@ -1,6 +1,6 @@
 package com.bitcoin.controller;
 
-import com.bitcoin.util.BitcoinOptions;
+import com.bitcoin.util.BitCoinOptions;
 import com.bitcoin.util.Credential;
 import javafx.collections.FXCollections;
 import javafx.fxml.Initializable;
@@ -30,7 +30,7 @@ public class OptionsController implements Initializable {
     public CheckBox gpuNoArrayTick;
     public CheckBox gpuDebugSourceTick;
 
-    private BitcoinOptions model;
+    private BitCoinOptions model;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -62,11 +62,11 @@ public class OptionsController implements Initializable {
         gpuDebugSourceTick.setSelected(model.getGPUDebugSource());
     }
 
-    public BitcoinOptions getModel() {
+    public BitCoinOptions getModel() {
         return model;
     }
 
-    public void setModel(BitcoinOptions model) {
+    public void setModel(BitCoinOptions model) {
         this.model = model;
         setSetupPageFields();
         populateCredentialsView();

@@ -10,7 +10,7 @@ package com.bitcoin.core;
  *
  * @author m4gik <michal.szczygiel@wp.pl>
  */
-public class BitcoinExcavatorFatalException extends Exception {
+public class BitCoinExcavatorFatalException extends Exception {
 
     /**
      * Auto generated serial version UID.
@@ -18,14 +18,14 @@ public class BitcoinExcavatorFatalException extends Exception {
     private static final long serialVersionUID = 2838224304757516060L;
 
     /**
-     * Constructor for {@link BitcoinExcavatorFatalException} class.
+     * Constructor for {@link BitCoinExcavatorFatalException} class.
      *
-     * @param bitcoinExcavator Instance of {@link BitcoinExcavator} class.
+     * @param bitCoinExcavator Instance of {@link BitCoinExcavator} class.
      * @param reason           Message with error.
      */
-    public BitcoinExcavatorFatalException(BitcoinExcavator bitcoinExcavator, String reason) {
+    public BitCoinExcavatorFatalException(BitCoinExcavator bitCoinExcavator, String reason) {
         super(reason);
-        bitcoinExcavator.error(reason);
-        bitcoinExcavator.stop();
+        bitCoinExcavator.error(reason);
+        bitCoinExcavator.stop();
     }
 }

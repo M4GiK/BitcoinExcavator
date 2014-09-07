@@ -342,7 +342,7 @@ public class JSONRPCNetworkState extends NetworkState {
                 url = getQueryUrl();
             }
 
-            Proxy proxy = getExcavator().getBitcoinOptions().getProxy();
+            Proxy proxy = getExcavator().getBitCoinOptions().getProxy();
 
             if (proxy == null) {
                 connection = (HttpURLConnection) url.openConnection();
@@ -439,7 +439,7 @@ public class JSONRPCNetworkState extends NetworkState {
                             setWorkLifetime(60000L);
                         } else {
                             setWorkLifetime(Long.valueOf(
-                                    getExcavator().getBitcoinOptions()
+                                    getExcavator().getBitCoinOptions()
                                             .getWorklifetime()));
                         }
 

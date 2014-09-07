@@ -19,32 +19,32 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 
-public class BitcoinOptionsBuilder {
+public class BitCoinOptionsBuilder {
 
     /**
      * Logger for monitoring runtime.
      */
-    private static final Logger log = LoggerFactory.getLogger(BitcoinOptions.class);
+    private static final Logger log = LoggerFactory.getLogger(BitCoinOptions.class);
 
-    ObjectDeserializer<BitcoinOptions> deserializer;
+    ObjectDeserializer<BitCoinOptions> deserializer;
 
-    public BitcoinOptionsBuilder(ObjectDeserializer<BitcoinOptions> deserializer) {
+    public BitCoinOptionsBuilder(ObjectDeserializer<BitCoinOptions> deserializer) {
         this.deserializer = deserializer;
     }
 
-    public BitcoinOptions fromFile(String path) throws IOException {
-        return BitcoinValidator.validateNetworkParameters(deserializer.loadFromFile(path));
+    public BitCoinOptions fromFile(String path) throws IOException {
+        return BitCoinValidator.validateNetworkParameters(deserializer.loadFromFile(path));
     }
 
     /**
-     * This method returns the instance of {@link BitcoinOptions} class
+     * This method returns the instance of {@link BitCoinOptions} class
      * from terminal arguments.
      * (example string  -l http://m4gik24119m4gik:qetuo1357@api.polmine.pl:8347)
      *
      * @param args The list of arguments given from terminal.
-     * @return The instance of {@link BitcoinOptions} class.
+     * @return The instance of {@link BitCoinOptions} class.
      */
-    public static BitcoinOptions terminalOptions(String... args) {
+    public static BitCoinOptions terminalOptions(String... args) {
         Options options = new Options();
         PosixParser parser = new PosixParser();
 
@@ -88,18 +88,18 @@ public class BitcoinOptionsBuilder {
                             + "before starting bitcoind or bitcoin --daemon");
         }
 
-        return BitcoinValidator.validateNetworkParameters(getOptionsFromCommanLine(commandLine));
+        return BitCoinValidator.validateNetworkParameters(getOptionsFromCommanLine(commandLine));
     }
 
     /**
-     * This method get infomration from command line and put it to {@link com.bitcoin.util.BitcoinOptions}
+     * This method get infomration from command line and put it to {@link BitCoinOptions}
      *
      * @param commandLine The instance of {@link org.apache.commons.cli.CommandLine} with command line parameters.
-     * @return The instance of {@link com.bitcoin.util.BitcoinOptions} with options.
+     * @return The instance of {@link BitCoinOptions} with options.
      */
-    public static BitcoinOptions getOptionsFromCommanLine(
+    public static BitCoinOptions getOptionsFromCommanLine(
             CommandLine commandLine) {
-        BitcoinOptions bitcoinOptions = new BitcoinOptions();
+        BitCoinOptions bitCoinOptions = new BitCoinOptions();
 
 //        if (commandLine.hasOption("user")) {
 //            bitcoinOptions.setUser(commandLine.getOptionValues("user"));
@@ -123,7 +123,7 @@ public class BitcoinOptionsBuilder {
                             ":");
 
             if (proxySettings.length >= 2) {
-                bitcoinOptions.setProxy(new Proxy(Proxy.Type.HTTP,
+                bitCoinOptions.setProxy(new Proxy(Proxy.Type.HTTP,
                         new InetSocketAddress(proxySettings[0],
                                 Integer.valueOf(proxySettings[2]))));
             }
@@ -148,24 +148,24 @@ public class BitcoinOptionsBuilder {
         }
 
         if (commandLine.hasOption("worklifetime")) {
-            bitcoinOptions.setWorklifetime(Integer.parseInt(
+            bitCoinOptions.setWorklifetime(Integer.parseInt(
                     commandLine.getOptionValue("worklifetime")) * 1000);
         }
 
         if (commandLine.hasOption("debug")) {
-            bitcoinOptions.setDebug(true);
+            bitCoinOptions.setDebug(true);
         }
 
         if (commandLine.hasOption("debugtimer")) {
-            bitcoinOptions.setDebugtimer(true);
+            bitCoinOptions.setDebugtimer(true);
         }
 
         if (commandLine.hasOption("devices")) {
             String devices[] = commandLine.getOptionValues("devices");
-            bitcoinOptions.setEnabledDevices(new HashSet<>());
+            bitCoinOptions.setEnabledDevices(new HashSet<>());
 
             for (String device : devices) {
-                bitcoinOptions.getEnabledDevices().add(device);
+                bitCoinOptions.getEnabledDevices().add(device);
 
                 if (Integer.parseInt(device) == 0) {
                     log.error("Do not use 0 with -D, devices start at 1");
@@ -174,56 +174,56 @@ public class BitcoinOptionsBuilder {
         }
 
         if (commandLine.hasOption("fps")) {
-            bitcoinOptions.setGPUTargetFPS(Double.parseDouble(commandLine
+            bitCoinOptions.setGPUTargetFPS(Double.parseDouble(commandLine
                     .getOptionValue("fps")));
 
-            if (bitcoinOptions.getGPUTargetFPS() < 0.1) {
+            if (bitCoinOptions.getGPUTargetFPS() < 0.1) {
                 log.error("--fps argument is too low, adjusting to 0.1");
-                bitcoinOptions.setGPUTargetFPS(0.1);
+                bitCoinOptions.setGPUTargetFPS(0.1);
             }
         }
 
         if (commandLine.hasOption("noarray")) {
-            bitcoinOptions.setGPUNoArray(true);
+            bitCoinOptions.setGPUNoArray(true);
         }
 
         if (commandLine.hasOption("worksize")) {
-            bitcoinOptions.setGPUForceWorkSize(
+            bitCoinOptions.setGPUForceWorkSize(
                     Integer.parseInt(commandLine.getOptionValue("worksize")));
         }
 
         if (commandLine.hasOption("vectors")) {
             String tempVectors[] = commandLine.getOptionValue("vectors")
                     .split(",");
-            bitcoinOptions.setGPUVectors(new Integer[tempVectors.length]);
+            bitCoinOptions.setGPUVectors(new Integer[tempVectors.length]);
 
-            for (int i = 0; i < bitcoinOptions.getGPUVectors().length; i++) {
-                bitcoinOptions.getGPUVectors()[i] = Integer
+            for (int i = 0; i < bitCoinOptions.getGPUVectors().length; i++) {
+                bitCoinOptions.getGPUVectors()[i] = Integer
                         .parseInt(tempVectors[i]);
 
-                if (bitcoinOptions.getGPUVectors()[i] > 16) {
+                if (bitCoinOptions.getGPUVectors()[i] > 16) {
                     log.error("Use comma-seperated vector layouts");
-                } else if (bitcoinOptions.getGPUVectors()[i] != 1
-                        && bitcoinOptions.getGPUVectors()[i] != 2
-                        && bitcoinOptions.getGPUVectors()[i] != 3
-                        && bitcoinOptions.getGPUVectors()[i] != 4
-                        && bitcoinOptions.getGPUVectors()[i] != 8
-                        && bitcoinOptions.getGPUVectors()[i] != 16) {
-                    log.error(bitcoinOptions.getGPUVectors()[i]
+                } else if (bitCoinOptions.getGPUVectors()[i] != 1
+                        && bitCoinOptions.getGPUVectors()[i] != 2
+                        && bitCoinOptions.getGPUVectors()[i] != 3
+                        && bitCoinOptions.getGPUVectors()[i] != 4
+                        && bitCoinOptions.getGPUVectors()[i] != 8
+                        && bitCoinOptions.getGPUVectors()[i] != 16) {
+                    log.error(bitCoinOptions.getGPUVectors()[i]
                             + "is not a vector length of 1, 2, 3, 4, 8, or 16");
                 }
             }
-            Arrays.sort(bitcoinOptions.getGPUVectors(),
+            Arrays.sort(bitCoinOptions.getGPUVectors(),
                     Collections.reverseOrder());
         } else {
-            bitcoinOptions.setGPUVectors(new Integer[1]);
-            bitcoinOptions.getGPUVectors()[0] = 1;
+            bitCoinOptions.setGPUVectors(new Integer[1]);
+            bitCoinOptions.getGPUVectors()[0] = 1;
         }
 
         if (commandLine.hasOption("ds")) {
-            bitcoinOptions.setGPUDebugSource(true);
+            bitCoinOptions.setGPUDebugSource(true);
         }
 
-        return bitcoinOptions;
+        return bitCoinOptions;
     }
 }

@@ -60,8 +60,8 @@ public class GPUHardwareType extends HardwareType {
     public GPUHardwareType(Excavator excavator) throws ExcavatorFatalException {
         super(excavator);
         kernel = loadKernel(KERNEL_PATH);
-        debugSource(excavator.getBitcoinOptions().getGPUDebugSource());
-        targetFPSBasis = 1000.0 / (getExcavator().getBitcoinOptions().getGPUTargetFPS());
+        debugSource(excavator.getBitCoinOptions().getGPUDebugSource());
+        targetFPSBasis = 1000.0 / (getExcavator().getBitCoinOptions().getGPUTargetFPS());
         deviceStates = preparePlatform();
     }
 
@@ -86,7 +86,7 @@ public class GPUHardwareType extends HardwareType {
             throw new ExcavatorFatalException(getExcavator(), "No OpenCL platforms found");
         }
 
-        Set<String> enabledDevices = getExcavator().getBitcoinOptions().getEnabledDevices();
+        Set<String> enabledDevices = getExcavator().getBitCoinOptions().getEnabledDevices();
         Integer count = 1;
         Integer platformCount = 0;
 
@@ -182,7 +182,7 @@ public class GPUHardwareType extends HardwareType {
         String kernelLines[] = kernelToPrepare.split("\n");
         Long vectorBase = 0L;
         Integer totalVectorsPOT;
-        Integer[] vectors = getExcavator().getBitcoinOptions().getGPUVectors();
+        Integer[] vectors = getExcavator().getBitCoinOptions().getGPUVectors();
 
         for (Integer vector : vectors) {
             totalVectors += vector;
@@ -201,7 +201,7 @@ public class GPUHardwareType extends HardwareType {
         for (int i = 0; i < kernelLines.length; i++) {
             String kernelLine = kernelLines[i];
 
-            if (getExcavator().getBitcoinOptions().getGPUNoArray() && !kernelLine.contains("z ZA")) {
+            if (getExcavator().getBitCoinOptions().getGPUNoArray() && !kernelLine.contains("z ZA")) {
                 kernelLine = kernelLine.replaceAll("ZA\\[([0-9]+)\\]", "ZA$1");
             }
 
@@ -245,7 +245,7 @@ public class GPUHardwareType extends HardwareType {
                 for (int j = 0; j < vectors.length; j++) {
                     String replace = kernelLine;
 
-                    if (getExcavator().getBitcoinOptions().getGPUNoArray() && replace.contains("z ZA")) {
+                    if (getExcavator().getBitCoinOptions().getGPUNoArray() && replace.contains("z ZA")) {
                         replace = "";
 
                         for (int k = 0; k < 930; k += 5) {

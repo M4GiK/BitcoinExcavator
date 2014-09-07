@@ -14,7 +14,7 @@ import java.util.*;
  *
  * @author m4gik <michal.szczygiel@wp.pl>, Aleksander Śmierciak
  */
-public class BitcoinOptions {
+public class BitCoinOptions {
     private List<Credential> credentials = new ArrayList<>();
 
     private Proxy proxy;
@@ -44,7 +44,7 @@ public class BitcoinOptions {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        BitcoinOptions that = (BitcoinOptions) o;
+        BitCoinOptions that = (BitCoinOptions) o;
 
         if (GPUDebugSource != null ? !GPUDebugSource.equals(that.GPUDebugSource) : that.GPUDebugSource != null)
             return false;

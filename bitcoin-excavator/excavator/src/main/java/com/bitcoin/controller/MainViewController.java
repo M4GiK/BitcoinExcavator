@@ -6,10 +6,10 @@
 package com.bitcoin.controller;
 
 
-import com.bitcoin.core.BitcoinExcavator;
-import com.bitcoin.core.BitcoinExcavatorFatalException;
-import com.bitcoin.util.BitcoinOptions;
-import com.bitcoin.util.BitcoinOptionsBuilder;
+import com.bitcoin.core.BitCoinExcavator;
+import com.bitcoin.core.BitCoinExcavatorFatalException;
+import com.bitcoin.util.BitCoinOptions;
+import com.bitcoin.util.BitCoinOptionsBuilder;
 import com.bitcoin.util.GuiUtils;
 import com.bitcoin.util.serialization.ObjectSerializationFactory;
 import com.bitcoin.util.serialization.SerializationFactory;
@@ -133,13 +133,13 @@ public class MainViewController implements Initializable {
     }
 
     private void readOptionsFromFile() {
-        BitcoinOptions options = retrieveOptions();
+        BitCoinOptions options = retrieveOptions();
         setupPageController.setModel(options);
     }
 
-    private BitcoinOptions retrieveOptions() {
-        BitcoinOptionsBuilder builder = createBitcoinOptionsBuilder();
-        BitcoinOptions options = null;
+    private BitCoinOptions retrieveOptions() {
+        BitCoinOptionsBuilder builder = createBitcoinOptionsBuilder();
+        BitCoinOptions options = null;
         try {
             options = builder.fromFile(FileOperations.APP_PATH + FileOperations.BITCOIN_OPTIONS);
         } catch (IOException e) {
@@ -148,11 +148,11 @@ public class MainViewController implements Initializable {
         return options;
     }
 
-    private BitcoinOptionsBuilder createBitcoinOptionsBuilder() {
+    private BitCoinOptionsBuilder createBitcoinOptionsBuilder() {
         SerializationFactory serializationFactory = new JsonSerializationFactory();
-        ObjectSerializationFactory<BitcoinOptions> bitcoinOptionsFactory = serializationFactory.createObjectSerializationFactory();
+        ObjectSerializationFactory<BitCoinOptions> bitcoinOptionsFactory = serializationFactory.createObjectSerializationFactory();
         bitcoinOptionsFactory.createDeserializer();
-        return new BitcoinOptionsBuilder(bitcoinOptionsFactory.createDeserializer());
+        return new BitCoinOptionsBuilder(bitcoinOptionsFactory.createDeserializer());
     }
 
     public void readyToGoAnimation() {
@@ -207,16 +207,16 @@ public class MainViewController implements Initializable {
     private void startExcavator() {
         try {
             excavatorStopClicked = false;
-            excavator = new BitcoinExcavator(setupPageController.getModel());
+            excavator = new BitCoinExcavator(setupPageController.getModel());
             Thread excavatorThread = new Thread(excavator);
             excavatorThread.start();
             setExcavatorValues(excavator);
-        } catch (BitcoinExcavatorFatalException e) {
+        } catch (BitCoinExcavatorFatalException e) {
             GuiUtils.crashAlert(e);
         }
     }
 
-    private void setExcavatorValues(BitcoinExcavator excavator) {
+    private void setExcavatorValues(BitCoinExcavator excavator) {
         Timer timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
