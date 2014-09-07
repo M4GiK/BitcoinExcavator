@@ -7,7 +7,7 @@
 package com.bitcoin.util;
 
 import java.net.Proxy;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Container for Bitcoin options.
@@ -15,21 +15,11 @@ import java.util.Set;
  * @author m4gik <michal.szczygiel@wp.pl>, Aleksander Śmierciak
  */
 public class BitcoinOptions {
-    private String[] url;
-
-    private String[] user;
-
-    private String[] password;
-
-    private String[] host;
-
-    private String[] port;
+    private List<Credential> credentials = new ArrayList<>();
 
     private Proxy proxy;
 
     private Integer worklifetime = 5000;
-
-    private Integer networkStatesAmount;
 
     private Boolean debug = false;
 
@@ -48,6 +38,50 @@ public class BitcoinOptions {
     private Boolean GPUNoArray = false;
 
     private Boolean GPUDebugSource = false;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        BitcoinOptions that = (BitcoinOptions) o;
+
+        if (GPUDebugSource != null ? !GPUDebugSource.equals(that.GPUDebugSource) : that.GPUDebugSource != null)
+            return false;
+        if (GPUForceWorkSize != null ? !GPUForceWorkSize.equals(that.GPUForceWorkSize) : that.GPUForceWorkSize != null)
+            return false;
+        if (GPUNoArray != null ? !GPUNoArray.equals(that.GPUNoArray) : that.GPUNoArray != null) return false;
+        if (GPUTargetFPS != null ? !GPUTargetFPS.equals(that.GPUTargetFPS) : that.GPUTargetFPS != null) return false;
+        if (GPUTargetFPSBasis != null ? !GPUTargetFPSBasis.equals(that.GPUTargetFPSBasis) : that.GPUTargetFPSBasis != null)
+            return false;
+        if (!Arrays.equals(GPUVectors, that.GPUVectors)) return false;
+        if (credentials != null ? !credentials.equals(that.credentials) : that.credentials != null) return false;
+        if (debug != null ? !debug.equals(that.debug) : that.debug != null) return false;
+        if (debugtimer != null ? !debugtimer.equals(that.debugtimer) : that.debugtimer != null) return false;
+        if (enabledDevices != null ? !enabledDevices.equals(that.enabledDevices) : that.enabledDevices != null)
+            return false;
+        if (proxy != null ? !proxy.equals(that.proxy) : that.proxy != null) return false;
+        if (worklifetime != null ? !worklifetime.equals(that.worklifetime) : that.worklifetime != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = credentials != null ? credentials.hashCode() : 0;
+        result = 31 * result + (proxy != null ? proxy.hashCode() : 0);
+        result = 31 * result + (worklifetime != null ? worklifetime.hashCode() : 0);
+        result = 31 * result + (debug != null ? debug.hashCode() : 0);
+        result = 31 * result + (debugtimer != null ? debugtimer.hashCode() : 0);
+        result = 31 * result + (enabledDevices != null ? enabledDevices.hashCode() : 0);
+        result = 31 * result + (GPUTargetFPS != null ? GPUTargetFPS.hashCode() : 0);
+        result = 31 * result + (GPUTargetFPSBasis != null ? GPUTargetFPSBasis.hashCode() : 0);
+        result = 31 * result + (GPUForceWorkSize != null ? GPUForceWorkSize.hashCode() : 0);
+        result = 31 * result + (GPUVectors != null ? Arrays.hashCode(GPUVectors) : 0);
+        result = 31 * result + (GPUNoArray != null ? GPUNoArray.hashCode() : 0);
+        result = 31 * result + (GPUDebugSource != null ? GPUDebugSource.hashCode() : 0);
+        return result;
+    }
 
     /**
      * Gets proxy information.
@@ -73,54 +107,6 @@ public class BitcoinOptions {
 
     public void setWorklifetime(Integer worklifetime) {
         this.worklifetime = worklifetime;
-    }
-
-    public String[] getUrl() {
-        return url;
-    }
-
-    public void setUrl(String[] url) {
-        this.url = url;
-    }
-
-    public String[] getUser() {
-        return user;
-    }
-
-    public void setUser(String[] user) {
-        this.user = user;
-    }
-
-    public String[] getPassword() {
-        return password;
-    }
-
-    public void setPassword(String[] password) {
-        this.password = password;
-    }
-
-    public String[] getHost() {
-        return host;
-    }
-
-    public void setHost(String[] host) {
-        this.host = host;
-    }
-
-    public String[] getPort() {
-        return port;
-    }
-
-    public void setPort(String[] port) {
-        this.port = port;
-    }
-
-    public Integer getNetworkStatesAmount() {
-        return networkStatesAmount;
-    }
-
-    public void setNetworkStatesAmount(Integer networkStatesAmount) {
-        this.networkStatesAmount = networkStatesAmount;
     }
 
     public Boolean getDebug() {
@@ -193,5 +179,21 @@ public class BitcoinOptions {
 
     public void setGPUDebugSource(Boolean GPUDebugSource) {
         this.GPUDebugSource = GPUDebugSource;
+    }
+
+    public Credential getCredential(int index) {
+        return credentials.get(index);
+    }
+
+    public Collection<Credential> getCredentials() {
+        return credentials;
+    }
+
+    public void addCredential(Credential credential) {
+        credentials.add(credential);
+    }
+
+    public void removeCredential(Credential credential) {
+        credentials.remove(credential);
     }
 }

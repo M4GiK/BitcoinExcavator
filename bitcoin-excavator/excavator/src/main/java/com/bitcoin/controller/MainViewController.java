@@ -153,9 +153,6 @@ public class MainViewController implements Initializable {
         if (bitcoinOptions.getWorklifetime() != null) {
             WorkLifetimeField.setText(bitcoinOptions.getWorklifetime().toString());
         }
-        if (bitcoinOptions.getNetworkStatesAmount() != null) {
-            NetworkStatesAmountField.setText(bitcoinOptions.getNetworkStatesAmount().toString());
-        }
         DebuggingModeTick.setSelected(bitcoinOptions.getDebug());
         DebuggingTimerTick.setSelected(bitcoinOptions.getDebugtimer());
         if (bitcoinOptions.getEnabledDevices() != null) {
@@ -338,11 +335,6 @@ public class MainViewController implements Initializable {
     public void keyTypedInWorkLifetimeField() {
         int workLifetime = Integer.parseInt(WorkLifetimeField.getText());
         bitcoinOptions.setWorklifetime(workLifetime);
-    }
-
-    public void keyTypedInWorkStatesAmountField() {
-        int networkStatesAmount = Integer.parseInt(NetworkStatesAmountField.getText());
-        bitcoinOptions.setNetworkStatesAmount(networkStatesAmount);
     }
 
     public void actionInDebuggingModeTick() {

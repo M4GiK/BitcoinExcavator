@@ -100,25 +100,21 @@ public class BitcoinOptionsBuilder {
             CommandLine commandLine) {
         BitcoinOptions bitcoinOptions = new BitcoinOptions();
 
-        if (commandLine.hasOption("url")) {
-            bitcoinOptions.setUrl(commandLine.getOptionValues("url"));
-        }
-
-        if (commandLine.hasOption("user")) {
-            bitcoinOptions.setUser(commandLine.getOptionValues("user"));
-        }
-
-        if (commandLine.hasOption("pass")) {
-            bitcoinOptions.setPassword(commandLine.getOptionValues("pass"));
-        }
-
-        if (commandLine.hasOption("host")) {
-            bitcoinOptions.setHost(commandLine.getOptionValues("host"));
-        }
-
-        if (commandLine.hasOption("port")) {
-            bitcoinOptions.setPort(commandLine.getOptionValues("port"));
-        }
+//        if (commandLine.hasOption("user")) {
+//            bitcoinOptions.setUser(commandLine.getOptionValues("user"));
+//        }
+//
+//        if (commandLine.hasOption("pass")) {
+//            bitcoinOptions.setPassword(commandLine.getOptionValues("pass"));
+//        }
+//
+//        if (commandLine.hasOption("host")) {
+//            bitcoinOptions.setHost(commandLine.getOptionValues("host"));
+//        }
+//
+//        if (commandLine.hasOption("port")) {
+//            bitcoinOptions.setPort(commandLine.getOptionValues("port"));
+//        }
 
         if (commandLine.hasOption("proxy")) {
             final String[] proxySettings = commandLine.getOptionValue("proxy")

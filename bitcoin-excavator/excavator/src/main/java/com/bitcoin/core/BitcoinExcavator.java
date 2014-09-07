@@ -8,7 +8,7 @@ package com.bitcoin.core;
 import com.bitcoin.core.device.DeviceState;
 import com.bitcoin.core.device.GPUHardwareType;
 import com.bitcoin.core.network.NetworkState;
-import com.bitcoin.core.network.NetworkStateBuilder;
+import com.bitcoin.core.network.NetworkStatesBuilder;
 import com.bitcoin.util.BitcoinOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -123,7 +123,8 @@ public class BitcoinExcavator implements Excavator {
     public void execute() {
         log.info("Bitcoin Excavator process started");
         threads.add(Thread.currentThread());
-        networkStates = NetworkStateBuilder.networkConfiguration(bitcoinOptions, this);
+        NetworkStatesBuilder networkStatesBuilder = new NetworkStatesBuilder();
+        networkStates = networkStatesBuilder.createNetworkStates(bitcoinOptions, this);
 
 
         StringBuilder list = new StringBuilder();

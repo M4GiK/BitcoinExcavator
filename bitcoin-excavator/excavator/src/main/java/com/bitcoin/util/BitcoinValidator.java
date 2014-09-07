@@ -8,6 +8,8 @@ package com.bitcoin.util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collection;
+
 /**
  * Class responsible for validateNetworkParameters connection options.
  *
@@ -28,10 +30,14 @@ public class BitcoinValidator {
      * @return The instance of {@link BitcoinOptions} class with validated options.
      */
     public static BitcoinOptions validateNetworkParameters(BitcoinOptions bitcoinOptions) {
-    if (!((bitcoinOptions.getUser() == null &&
-            bitcoinOptions.getPassword() == null &&
-            bitcoinOptions.getHost() == null &&
-            bitcoinOptions.getPort() == null) || bitcoinOptions.getUrl() == null)) {
+        if (bitcoinOptions == null) {
+            throw new IllegalArgumentException("Bitcoin options cannot be null");
+        }
+        Collection<Credential> credentials = bitcoinOptions.getCredentials();
+        if (credentials == null) {
+            throw new IllegalArgumentException("Credential collection cannot be null");
+        }
+        if (credentials.size() == 0) {
             log.error(
                     "You forgot to give any bitcoin connection info," +
                             " please add either -l, or -u -p -o and -r");
