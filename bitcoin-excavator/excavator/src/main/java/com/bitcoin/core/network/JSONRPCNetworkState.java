@@ -119,7 +119,7 @@ public class JSONRPCNetworkState extends NetworkState {
                     WorkState workState = doGetWorkMessage(true);
                     incomingQueue.add(workState);
                     refreshTimestamp.set(workState.getTimestamp());
-                    log.debug(
+                    getExcavator().debug(
                             (getQueryUrl().getHost() + ": Long poll returned"));
                 } catch (IOException e) {
                     log.error("Cannot connect to " + getQueryUrl().getHost()
@@ -199,7 +199,7 @@ public class JSONRPCNetworkState extends NetworkState {
                                 + " from "
                                 + workState.getExecutionState()
                                 .getExecutionName());
-                        log.debug("Rejected block "
+                        getExcavator().debug("Rejected block "
                                 + (float) (
                                 (getExcavator().getCurrentTime() - workState
                                         .getTimestamp()) / 1000L)
@@ -407,7 +407,7 @@ public class JSONRPCNetworkState extends NetworkState {
 
                     setWorkLifetime(60000L);
 
-                    log.debug(getQueryUrl().getHost()
+                    getExcavator().debug(getQueryUrl().getHost()
                             + ": Enabling long poll support");
                 }
 
@@ -428,7 +428,7 @@ public class JSONRPCNetworkState extends NetworkState {
                             setWorkLifetime(60000L);
                         }
 
-                        log.debug(getQueryUrl().getHost()
+                        getExcavator().debug(getQueryUrl().getHost()
                                 + ": Enabling roll ntime support, expire after "
                                 + (getWorkLifetime() / 1000) + " seconds");
                     } else if ("n".equalsIgnoreCase(xRollNTime)
@@ -443,7 +443,7 @@ public class JSONRPCNetworkState extends NetworkState {
                                             .getWorklifetime()));
                         }
 
-                        log.debug(getQueryUrl().getHost()
+                        getExcavator().debug(getQueryUrl().getHost()
                                 + ": Disabling roll ntime support");
                     }
                 }
