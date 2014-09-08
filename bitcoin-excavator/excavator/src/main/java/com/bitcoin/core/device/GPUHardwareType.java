@@ -49,7 +49,7 @@ public class GPUHardwareType extends HardwareType {
     public final static Integer EXECUTION_TOTAL = 2;
 
     public static String KERNEL_PATH = System.getProperty("user.dir")
-            + "/excavator/src/main/java/com/bitcoin/kernel/BitCoinExcavator.cl";
+            + "/excavator/src/main/java/com/bitcoin/kernel/BitcoinExcavator.cl";
 
     /**
      * The constructor for {@link com.bitcoin.core.device.GPUHardwareType}.

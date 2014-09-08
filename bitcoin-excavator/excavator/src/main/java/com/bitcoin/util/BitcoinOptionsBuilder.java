@@ -231,7 +231,7 @@ public class BitcoinOptionsBuilder {
 
             if(uniformResourceLocator != null) {
                 String[] usernameFix = uniformResourceLocator.split("@", 3);
-                
+
                 if(usernameFix.length > 2) {
                     uniformResourceLocator = usernameFix[0] + URL_SEPARATOR + usernameFix[1] + "@" + usernameFix[2];
                 }

@@ -10,6 +10,7 @@ import java.net.URL;
 import java.util.ArrayList;
 
 public class NetworkStatesBuilder {
+
     /**
      * This method makes configuration for network connections.
      *
@@ -25,7 +26,6 @@ public class NetworkStatesBuilder {
         URLBuilder urlBuilder = new URLBuilder();
 
         for (Credential credential : bitcoinOptions.getCredentials()) {
-            System.out.println(credential.getPort() + "TUTAJ");
             try {
                 URL url = urlBuilder.createURL(credential);
                 NetworkState networkState = new JSONRPCNetworkState(excavator, url, credential.getLogin(), credential.getPassword(), defaultHostChain);
@@ -34,6 +34,7 @@ public class NetworkStatesBuilder {
                 e.printStackTrace();
             }
         }
+
         return networkStates;
     }
 }

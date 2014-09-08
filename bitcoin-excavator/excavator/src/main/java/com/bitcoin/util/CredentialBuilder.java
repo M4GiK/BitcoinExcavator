@@ -1,3 +1,8 @@
+/**
+ * Project BitcoinExcavator.
+ * Copyright Michał Szczygieł & Aleksander Śmierciak
+ * Created at Sept. 7, 2014.
+ */
 package com.bitcoin.util;
 
 public class CredentialBuilder {
