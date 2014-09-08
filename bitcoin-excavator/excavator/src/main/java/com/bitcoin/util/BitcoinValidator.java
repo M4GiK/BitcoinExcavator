@@ -15,25 +15,25 @@ import java.util.Collection;
  *
  * @author m4gik <michal.szczygiel@wp.pl>, Aleksander Śmierciak
  */
-public class BitCoinValidator {
+public class BitcoinValidator {
 
     /**
      * Logger for monitoring runtime.
      */
-    private static final Logger log = LoggerFactory.getLogger(BitCoinOptions.class);
+    private static final Logger log = LoggerFactory.getLogger(BitcoinValidator.class);
 
     /**
-     * Valids the options for networks parameters for {@link BitCoinOptions} class. If validation fails
+     * Valids the options for networks parameters for {@link BitcoinOptions} class. If validation fails
      * throws exception {@link IllegalArgumentException}
      *
-     * @param bitCoinOptions The instance with options.
-     * @return The instance of {@link BitCoinOptions} class with validated options.
+     * @param bitcoinOptions The instance with options.
+     * @return The instance of {@link BitcoinOptions} class with validated options.
      */
-    public static BitCoinOptions validateNetworkParameters(BitCoinOptions bitCoinOptions) {
-        if (bitCoinOptions == null) {
+    public static BitcoinOptions validateNetworkParameters(BitcoinOptions bitcoinOptions) {
+        if (bitcoinOptions == null) {
             throw new IllegalArgumentException("Bitcoin options cannot be null");
         }
-        Collection<Credential> credentials = bitCoinOptions.getCredentials();
+        Collection<Credential> credentials = bitcoinOptions.getCredentials();
         if (credentials == null) {
             throw new IllegalArgumentException("Credential collection cannot be null");
         }
@@ -44,6 +44,6 @@ public class BitCoinValidator {
             throw new IllegalArgumentException("Connection parameters were not specified");
         }
 
-        return bitCoinOptions;
+        return bitcoinOptions;
     }
 }

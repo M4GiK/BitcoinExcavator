@@ -11,40 +11,44 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.Authenticator;
-import java.net.InetSocketAddress;
-import java.net.PasswordAuthentication;
-import java.net.Proxy;
+import java.net.*;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 
-public class BitCoinOptionsBuilder {
+/**
+ * Class responsible for build {@link com.bitcoin.util.BitcoinOptions}.
+ *
+ * @author m4gik <michal.szczygiel@wp.pl>, Aleksander Śmierciak
+ */
+public class BitcoinOptionsBuilder {
 
     /**
      * Logger for monitoring runtime.
      */
-    private static final Logger log = LoggerFactory.getLogger(BitCoinOptions.class);
+    private static final Logger log = LoggerFactory.getLogger(BitcoinOptions.class);
 
-    ObjectDeserializer<BitCoinOptions> deserializer;
+    private static final String URL_SEPARATOR = "+++++";
 
-    public BitCoinOptionsBuilder(ObjectDeserializer<BitCoinOptions> deserializer) {
+    ObjectDeserializer<BitcoinOptions> deserializer;
+
+    public BitcoinOptionsBuilder(ObjectDeserializer<BitcoinOptions> deserializer) {
         this.deserializer = deserializer;
     }
 
-    public BitCoinOptions fromFile(String path) throws IOException {
-        return BitCoinValidator.validateNetworkParameters(deserializer.loadFromFile(path));
+    public BitcoinOptions fromFile(String path) throws IOException {
+        return BitcoinValidator.validateNetworkParameters(deserializer.loadFromFile(path));
     }
 
     /**
-     * This method returns the instance of {@link BitCoinOptions} class
+     * This method returns the instance of {@link BitcoinOptions} class
      * from terminal arguments.
      * (example string  -l http://m4gik24119m4gik:qetuo1357@api.polmine.pl:8347)
      *
      * @param args The list of arguments given from terminal.
-     * @return The instance of {@link BitCoinOptions} class.
+     * @return The instance of {@link BitcoinOptions} class.
      */
-    public static BitCoinOptions terminalOptions(String... args) {
+    public static BitcoinOptions terminalOptions(String... args) {
         Options options = new Options();
         PosixParser parser = new PosixParser();
 
@@ -53,6 +57,7 @@ public class BitCoinOptionsBuilder {
         options.addOption("o", "host", true, "bitcoin host IP");
         options.addOption("r", "port", true, "bitcoin host port");
         options.addOption("l", "url", true, "bitcoin host url");
+        options.addOption("q", "protocol", true, "bitcoin protocol");
         options.addOption("x", "proxy", true,
                 "optional proxy settings IP:PORT<:username:password>");
         options.addOption("g", "worklifetime", true,
@@ -88,42 +93,27 @@ public class BitCoinOptionsBuilder {
                             + "before starting bitcoind or bitcoin --daemon");
         }
 
-        return BitCoinValidator.validateNetworkParameters(getOptionsFromCommanLine(commandLine));
+        return BitcoinValidator.validateNetworkParameters(getOptionsFromCommanLine(commandLine));
     }
 
     /**
-     * This method get infomration from command line and put it to {@link BitCoinOptions}
+     * This method get infomration from command line and put it to {@link BitcoinOptions}
      *
      * @param commandLine The instance of {@link org.apache.commons.cli.CommandLine} with command line parameters.
-     * @return The instance of {@link BitCoinOptions} with options.
+     * @return The instance of {@link BitcoinOptions} with options.
      */
-    public static BitCoinOptions getOptionsFromCommanLine(
+    public static BitcoinOptions getOptionsFromCommanLine(
             CommandLine commandLine) {
-        BitCoinOptions bitCoinOptions = new BitCoinOptions();
+        BitcoinOptions bitcoinOptions = new BitcoinOptions();
 
-//        if (commandLine.hasOption("user")) {
-//            bitcoinOptions.setUser(commandLine.getOptionValues("user"));
-//        }
-//
-//        if (commandLine.hasOption("pass")) {
-//            bitcoinOptions.setPassword(commandLine.getOptionValues("pass"));
-//        }
-//
-//        if (commandLine.hasOption("host")) {
-//            bitcoinOptions.setHost(commandLine.getOptionValues("host"));
-//        }
-//
-//        if (commandLine.hasOption("port")) {
-//            bitcoinOptions.setPort(commandLine.getOptionValues("port"));
-//        }
+        bitcoinOptions.addCredential(getCredentail(commandLine));
 
         if (commandLine.hasOption("proxy")) {
             final String[] proxySettings = commandLine.getOptionValue("proxy")
-                    .split(
-                            ":");
+                    .split(":");
 
             if (proxySettings.length >= 2) {
-                bitCoinOptions.setProxy(new Proxy(Proxy.Type.HTTP,
+                bitcoinOptions.setProxy(new Proxy(Proxy.Type.HTTP,
                         new InetSocketAddress(proxySettings[0],
                                 Integer.valueOf(proxySettings[2]))));
             }
@@ -148,24 +138,24 @@ public class BitCoinOptionsBuilder {
         }
 
         if (commandLine.hasOption("worklifetime")) {
-            bitCoinOptions.setWorklifetime(Integer.parseInt(
+            bitcoinOptions.setWorklifetime(Integer.parseInt(
                     commandLine.getOptionValue("worklifetime")) * 1000);
         }
 
         if (commandLine.hasOption("debug")) {
-            bitCoinOptions.setDebug(true);
+            bitcoinOptions.setDebug(true);
         }
 
         if (commandLine.hasOption("debugtimer")) {
-            bitCoinOptions.setDebugtimer(true);
+            bitcoinOptions.setDebugtimer(true);
         }
 
         if (commandLine.hasOption("devices")) {
             String devices[] = commandLine.getOptionValues("devices");
-            bitCoinOptions.setEnabledDevices(new HashSet<>());
+            bitcoinOptions.setEnabledDevices(new HashSet<>());
 
             for (String device : devices) {
-                bitCoinOptions.getEnabledDevices().add(device);
+                bitcoinOptions.getEnabledDevices().add(device);
 
                 if (Integer.parseInt(device) == 0) {
                     log.error("Do not use 0 with -D, devices start at 1");
@@ -174,56 +164,128 @@ public class BitCoinOptionsBuilder {
         }
 
         if (commandLine.hasOption("fps")) {
-            bitCoinOptions.setGPUTargetFPS(Double.parseDouble(commandLine
+            bitcoinOptions.setGPUTargetFPS(Double.parseDouble(commandLine
                     .getOptionValue("fps")));
 
-            if (bitCoinOptions.getGPUTargetFPS() < 0.1) {
+            if (bitcoinOptions.getGPUTargetFPS() < 0.1) {
                 log.error("--fps argument is too low, adjusting to 0.1");
-                bitCoinOptions.setGPUTargetFPS(0.1);
+                bitcoinOptions.setGPUTargetFPS(0.1);
             }
         }
 
         if (commandLine.hasOption("noarray")) {
-            bitCoinOptions.setGPUNoArray(true);
+            bitcoinOptions.setGPUNoArray(true);
         }
 
         if (commandLine.hasOption("worksize")) {
-            bitCoinOptions.setGPUForceWorkSize(
+            bitcoinOptions.setGPUForceWorkSize(
                     Integer.parseInt(commandLine.getOptionValue("worksize")));
         }
 
         if (commandLine.hasOption("vectors")) {
             String tempVectors[] = commandLine.getOptionValue("vectors")
                     .split(",");
-            bitCoinOptions.setGPUVectors(new Integer[tempVectors.length]);
+            bitcoinOptions.setGPUVectors(new Integer[tempVectors.length]);
 
-            for (int i = 0; i < bitCoinOptions.getGPUVectors().length; i++) {
-                bitCoinOptions.getGPUVectors()[i] = Integer
+            for (int i = 0; i < bitcoinOptions.getGPUVectors().length; i++) {
+                bitcoinOptions.getGPUVectors()[i] = Integer
                         .parseInt(tempVectors[i]);
 
-                if (bitCoinOptions.getGPUVectors()[i] > 16) {
+                if (bitcoinOptions.getGPUVectors()[i] > 16) {
                     log.error("Use comma-seperated vector layouts");
-                } else if (bitCoinOptions.getGPUVectors()[i] != 1
-                        && bitCoinOptions.getGPUVectors()[i] != 2
-                        && bitCoinOptions.getGPUVectors()[i] != 3
-                        && bitCoinOptions.getGPUVectors()[i] != 4
-                        && bitCoinOptions.getGPUVectors()[i] != 8
-                        && bitCoinOptions.getGPUVectors()[i] != 16) {
-                    log.error(bitCoinOptions.getGPUVectors()[i]
+                } else if (bitcoinOptions.getGPUVectors()[i] != 1
+                        && bitcoinOptions.getGPUVectors()[i] != 2
+                        && bitcoinOptions.getGPUVectors()[i] != 3
+                        && bitcoinOptions.getGPUVectors()[i] != 4
+                        && bitcoinOptions.getGPUVectors()[i] != 8
+                        && bitcoinOptions.getGPUVectors()[i] != 16) {
+                    log.error(bitcoinOptions.getGPUVectors()[i]
                             + "is not a vector length of 1, 2, 3, 4, 8, or 16");
                 }
             }
-            Arrays.sort(bitCoinOptions.getGPUVectors(),
+            Arrays.sort(bitcoinOptions.getGPUVectors(),
                     Collections.reverseOrder());
         } else {
-            bitCoinOptions.setGPUVectors(new Integer[1]);
-            bitCoinOptions.getGPUVectors()[0] = 1;
+            bitcoinOptions.setGPUVectors(new Integer[1]);
+            bitcoinOptions.getGPUVectors()[0] = 1;
         }
 
         if (commandLine.hasOption("ds")) {
-            bitCoinOptions.setGPUDebugSource(true);
+            bitcoinOptions.setGPUDebugSource(true);
         }
 
-        return bitCoinOptions;
+        return bitcoinOptions;
+    }
+
+    /**
+     * Method gets credentials from command line.
+     *
+     * @param commandLine  The instance of {@link org.apache.commons.cli.CommandLine} with command line parameters.
+     * @return the instance of {@link com.bitcoin.util.Credential}.
+     */
+    private static Credential getCredentail(CommandLine commandLine) {
+        Credential credential = new Credential();
+
+        if(commandLine.hasOption("url")) {
+            String uniformResourceLocator = commandLine.getOptionValue("url");
+
+            if(uniformResourceLocator != null) {
+                String[] usernameFix = uniformResourceLocator.split("@", 3);
+                
+                if(usernameFix.length > 2) {
+                    uniformResourceLocator = usernameFix[0] + URL_SEPARATOR + usernameFix[1] + "@" + usernameFix[2];
+                }
+
+                try {
+                    URL url = new URL(uniformResourceLocator);
+
+                    if(url.getProtocol() != null && url.getProtocol().length() > 1)
+                        credential.setProtocol(url.getProtocol());
+
+                    if(url.getHost() != null && url.getHost().length() > 1)
+                        credential.setHost(url.getHost());
+
+                    if(url.getPort() != -1)
+                        credential.setPort(url.getPort());
+
+                    if(url.getPath() != null && url.getPath().length() > 1)
+                        credential.setPath(url.getPath());
+
+                    if(url.getUserInfo() != null && url.getUserInfo().length() > 1) {
+                        String[] userPassSplit = url.getUserInfo().split(":");
+
+                       credential.setLogin(userPassSplit[0].replace(URL_SEPARATOR, "@"));
+
+                        if(userPassSplit.length > 1 && userPassSplit[1].length() > 1)
+                            credential.setPassword(userPassSplit[1]);
+                    }
+
+                } catch (MalformedURLException e) {
+                   log.error(e.getMessage());
+                }
+            }
+        }
+
+        if (commandLine.hasOption("user")) {
+            credential.setLogin(commandLine.getOptionValue("user"));
+        }
+
+        if (commandLine.hasOption("pass")) {
+            credential.setPassword(commandLine.getOptionValue("pass"));
+        }
+
+        if (commandLine.hasOption("host")) {
+            credential.setHost(commandLine.getOptionValue("host"));
+        }
+
+        if (commandLine.hasOption("port")) {
+            credential.setPort(Integer.parseInt(commandLine.getOptionValue("port")));
+        }
+
+        if (commandLine.hasOption("protocol")) {
+            credential.setProtocol(commandLine.getOptionValue("protocol"));
+        }
+
+        return credential;
     }
 }

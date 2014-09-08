@@ -7,8 +7,8 @@ package com.bitcoin.view;
 
 import com.aquafx_project.AquaFx;
 import com.bitcoin.controller.MainViewController;
-import com.bitcoin.core.BitCoinExcavator;
-import com.bitcoin.util.BitCoinOptionsBuilder;
+import com.bitcoin.core.BitcoinExcavator;
+import com.bitcoin.util.BitcoinOptionsBuilder;
 import com.bitcoin.util.GuiUtils;
 import com.bitcoin.util.TextFieldValidator;
 import com.bitcoin.util.UTF8Control;
@@ -49,7 +49,7 @@ public class MainView extends Application {
     public static MainView instance;
 
     /** Instance of Bitcoin excavator **/
-    public static BitCoinExcavator excavator;
+    public static BitcoinExcavator excavator;
 
     /** **/
     private StackPane uiStack;
@@ -160,7 +160,7 @@ public class MainView extends Application {
     public static void main(String[] args) throws Exception {
         if (args.length > 0) { // TODO  don't forget replace "==" to ">"
             log.info("Terminal mode is running.");
-            excavator = new BitCoinExcavator(BitCoinOptionsBuilder.terminalOptions(args));
+            excavator = new BitcoinExcavator(BitcoinOptionsBuilder.terminalOptions(args));
             excavator.execute();
         } else {
             launch(args);

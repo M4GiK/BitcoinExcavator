@@ -1,6 +1,12 @@
+/**
+ * Project BitcoinExcavator.
+ * Copyright Michał Szczygieł & Aleksander Śmierciak
+ * Created at Sept. 8, 2014.
+ */
 package com.bitcoin.util;
 
 public class Credential {
+
     private String login;
 
     private String password;
@@ -9,7 +15,7 @@ public class Credential {
 
     private String protocol;
 
-    private String path;
+    private String path = "/";
 
     private Integer port;
 
@@ -21,6 +27,8 @@ public class Credential {
         this.path = path;
         this.port = port;
     }
+
+    public Credential() {}
 
     @Override
     public boolean equals(Object o) {
@@ -74,8 +82,33 @@ public class Credential {
         return this.port;
     }
 
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public void setLogin(String login) {
+        this.login = login;
+    }
+
+    public void setHost(String host) {
+        this.host = host;
+    }
+
+    public void setProtocol(String protocol) {
+        this.protocol = protocol;
+    }
+
+    public void setPort(Integer port) {
+        this.port = port;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
+
     @Override
     public String toString() {
         return String.format("%s://%s:%s@%s:%d", protocol, login, password, host, port);
     }
+
 }

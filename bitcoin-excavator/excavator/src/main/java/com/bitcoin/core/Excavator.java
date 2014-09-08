@@ -6,7 +6,7 @@
 package com.bitcoin.core;
 
 import com.bitcoin.core.network.NetworkState;
-import com.bitcoin.util.BitCoinOptions;
+import com.bitcoin.util.BitcoinOptions;
 import java.util.List;
 
 /**
@@ -64,9 +64,9 @@ public interface Excavator extends Runnable{
     /**
      * Gets options for {@link com.bitcoin.core.Excavator} class.
      *
-     * @return The instance of {@link com.bitcoin.util.BitCoinOptions}.
+     * @return The instance of {@link com.bitcoin.util.BitcoinOptions}.
      */
-    BitCoinOptions getBitCoinOptions();
+    BitcoinOptions getBitcoinOptions();
 
     /**
      * Gets information about running status.
