@@ -14,9 +14,11 @@ import org.lwjgl.opencl.CLPlatform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -48,8 +50,7 @@ public class GPUHardwareType extends HardwareType {
 
     public final static Integer EXECUTION_TOTAL = 2;
 
-    public static String KERNEL_PATH = System.getProperty("user.dir")
-            + "/excavator/src/main/java/com/bitcoin/kernel/BitcoinExcavator.cl";
+    public static String KERNEL_PATH = "/kernel/BitcoinExcavator.cl";
 
     /**
      * The constructor for {@link com.bitcoin.core.device.GPUHardwareType}.
@@ -160,9 +161,21 @@ public class GPUHardwareType extends HardwareType {
     private String loadKernel(String kernelPath) throws ExcavatorFatalException {
         byte[] data = null;
 
-        try (InputStream stream = new FileInputStream(kernelPath)) {
+        try (InputStream stream = getClass().getResourceAsStream(kernelPath)) {
             data = new byte[64 * 1024];
-            stream.read(data);
+            int position = 0;
+
+            while(position < data.length) {
+                int ret = stream.read(data, position, data.length - position);
+
+                if(ret < 1) {
+                    break;
+                }
+                else {
+                    position += ret;
+                }
+            }
+
             stream.close();
         } catch (IOException e) {
             throw new ExcavatorFatalException(getExcavator(), "Unable to read Kernel.cl");
