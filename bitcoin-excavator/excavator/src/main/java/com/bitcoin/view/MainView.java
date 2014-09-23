@@ -6,27 +6,33 @@
 package com.bitcoin.view;
 
 import com.aquafx_project.AquaFx;
+import com.bitcoin.controller.EditCredentialsController;
 import com.bitcoin.controller.MainViewController;
 import com.bitcoin.core.BitcoinExcavator;
-import com.bitcoin.util.BitcoinOptionsBuilder;
-import com.bitcoin.util.GuiUtils;
-import com.bitcoin.util.TextFieldValidator;
-import com.bitcoin.util.UTF8Control;
+import com.bitcoin.util.*;
 import com.google.common.base.Throwables;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.ListView;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import wallet.controller.SendMoneyController;
+import wallet.utils.BitcoinWallet;
 import wallet.utils.FileOperations;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Collection;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+
+import static wallet.utils.GuiUtils.*;
+import static wallet.utils.GuiUtils.blurIn;
 
 
 /**
@@ -37,18 +43,49 @@ import java.util.ResourceBundle;
  */
 public class MainView extends Application {
 
+    public class OverlayUI<T> {
+        public Node ui;
+        public T controller;
+
+        public OverlayUI(Node ui, T controller) {
+            this.ui = ui;
+            this.controller = controller;
+        }
+
+        public void show() {
+            blurOut(mainUI);
+            uiStack.getChildren().add(ui);
+            fadeIn(ui);
+        }
+
+        public void done() {
+            checkGuiThread();
+            fadeOutAndRemove(ui, uiStack);
+            blurIn(mainUI);
+            this.ui = null;
+            this.controller = null;
+        }
+
+    }
+
     /**
      * Application name
      */
     public static String APP_NAME = "bitcoin-excavator";
 
-    /** Instance of wallet view. **/
-    public  static wallet.view.MainView walletView = new wallet.view.MainView();
+    /**
+     * Instance of wallet view. *
+     */
+    public static wallet.view.MainView walletView = new wallet.view.MainView();
 
-    /** Instance of main view what mean the bitcoin-excavator view **/
+    /**
+     * Instance of main view what mean the bitcoin-excavator view *
+     */
     public static MainView instance;
 
-    /** Instance of Bitcoin excavator **/
+    /**
+     * Instance of Bitcoin excavator *
+     */
     public static BitcoinExcavator excavator;
 
     /** **/
@@ -57,7 +94,9 @@ public class MainView extends Application {
     /** **/
     private Pane mainUI;
 
-    /** The main stage of application **/
+    /**
+     * The main stage of application *
+     */
     private Stage mainWindow;
 
     /**
@@ -99,15 +138,16 @@ public class MainView extends Application {
 
     /**
      * THis method stops working wallet and excavator if are running.
+     *
      * @throws Exception
      */
     @Override
     public void stop() throws Exception {
-        if(walletView != null && walletView.isRunning()) {
+        if (walletView != null && walletView.isRunning()) {
             walletView.stop();
         }
 
-        if(excavator != null && excavator.getRunning()) {
+        if (excavator != null && excavator.getRunning()) {
             excavator.stop();
         }
 
@@ -174,5 +214,39 @@ public class MainView extends Application {
 
     public void setMainWindow(Stage mainWindow) {
         this.mainWindow = mainWindow;
+    }
+
+    /**
+     * Loads the FXML file with the given name, blurs out the main UI and puts this one on top.
+     *
+     * @param name            Controler name.
+     * @param credentials     The credentials to manipulate.
+     * @param resources       The resource bundle to set.
+     * @param credentialsView The list view to update.
+     * @param id              The id of current credentials position.
+     * @return pair.
+     */
+    public <T> OverlayUI<T> overlayUIEditCredentials(String name, Credential credentials, ResourceBundle resources,
+                                                     ListView credentialsView, Integer id) {
+        try {
+            checkGuiThread();
+            // Load the UI from disk.
+            URL location = getClass().getResource(name);
+            FXMLLoader loader = new FXMLLoader(location);
+            loader.setResources(resources);
+            Pane ui = loader.load();
+            EditCredentialsController controller = loader.getController();
+            controller.initData(credentials, credentialsView, id);
+            OverlayUI<T> pair = new OverlayUI<T>(ui, (T) controller);
+            // Auto-magically set the overlayUi member, if it's there.
+            try {
+                controller.getClass().getDeclaredField("overlayUi").set(controller, pair);
+            } catch (IllegalAccessException | NoSuchFieldException ignored) {
+            }
+            pair.show();
+            return pair;
+        } catch (IOException e) {
+            throw new RuntimeException(e);  // Can't happen.
+        }
     }
 }

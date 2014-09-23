@@ -101,7 +101,6 @@ public class MainViewController implements Initializable {
         BitcoinOptions options = retrieveOptions();
         setupPageController.setModel(options);
         mainPageController.setOptions(options);
-
     }
 
     private BitcoinOptions retrieveOptions() {
@@ -118,7 +117,6 @@ public class MainViewController implements Initializable {
     private BitcoinOptionsBuilder createBitcoinOptionsBuilder() {
         SerializationFactory serializationFactory = new JsonSerializationFactory();
         ObjectSerializationFactory<BitcoinOptions> bitcoinOptionsFactory = serializationFactory.createObjectSerializationFactory();
-        bitcoinOptionsFactory.createDeserializer();
         return new BitcoinOptionsBuilder(bitcoinOptionsFactory.createDeserializer());
     }
 

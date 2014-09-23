@@ -7,15 +7,17 @@ package com.bitcoin.controller;
 
 import com.bitcoin.util.BitcoinOptions;
 import com.bitcoin.util.Credential;
+import com.bitcoin.util.CredentialsList;
 import com.bitcoin.util.GuiUtils;
+
+import com.bitcoin.view.MainView;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.Initializable;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
-import javafx.scene.control.cell.TextFieldListCell;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
+import javafx.util.converter.DefaultStringConverter;
 
 import java.net.URL;
 import java.util.*;
@@ -37,10 +39,13 @@ public class OptionsController implements Initializable {
     public CheckBox gpuDebugSourceTick;
 
     private BitcoinOptions model;
+    private ResourceBundle resources = null;
+    private ObservableList<String> list;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        credentialsView.setCellFactory(TextFieldListCell.forListView());
+        this.resources = resourceBundle;
+        credentialsView.setCellFactory(param -> new CredentialsList<>(new DefaultStringConverter()));
     }
 
     private void setSetupPageFields() {
@@ -91,7 +96,14 @@ public class OptionsController implements Initializable {
         for (Credential credential : model.getCredentials()) {
             items.add(credential.toString());
         }
-        credentialsView.setItems(FXCollections.observableList(items));
+        list = FXCollections.observableList(items);
+        credentialsView.setItems(list);
+        createEmptyPosition(credentialsView);
+    }
+
+    private void createEmptyPosition(ListView credentialsView) {
+        Integer id = credentialsView.getItems().size();
+        credentialsView.getItems().add(id, resources.getString("pressToAddCredentials"));
     }
 
     public void keyTypedInProxyField() {
@@ -178,6 +190,7 @@ public class OptionsController implements Initializable {
         model.setGPUDebugSource(gpuDebugSource);
     }
 
+
     public void editCommitInCredentialsView(ListView.EditEvent<String> event) {
         credentialsView.getItems().set(event.getIndex(), event.getNewValue());
         Credential oldValue = model.getCredential(event.getIndex());
@@ -198,5 +211,10 @@ public class OptionsController implements Initializable {
 
         model.removeCredential(oldValue);
         model.addCredential(newValue);
+    }
+
+    public void openEditCredentialsView(ListView.EditEvent<String> editEvent) {
+        MainView.instance.overlayUIEditCredentials("/fxml/edit-credentials.fxml",
+                model.getCredential(editEvent.getIndex()), resources, credentialsView, editEvent.getIndex());
     }
 }
