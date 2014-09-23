@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane fx:id="mainPage" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.bitcoin.controller.MainTabController">
+    <children>
+        <Separator layoutX="297.0" layoutY="7.0" orientation="VERTICAL" prefHeight="260.0" prefWidth="6.0"/>
+        <ImageView fx:id="bitcoinExcavator" fitHeight="150.0" fitWidth="200.0" layoutX="40.0" layoutY="54.0"
+                   pickOnBounds="true" preserveRatio="true">
+            <image>
+                <Image url="@../images/bitcoin_excavator.png"/>
+            </image>
+        </ImageView>
+        <ImageView fx:id="bitcoinWallet" fitHeight="150.0" fitWidth="200.0" layoutX="390.0" layoutY="64.0"
+                   pickOnBounds="true" preserveRatio="true">
+            <image>
+                <Image url="@../images/bitcoin_wallet.png"/>
+            </image>
+        </ImageView>
+        <Pane fx:id="excavatorPane" disable="true" opacity="0.0" prefHeight="311.0" prefWidth="296.0">
+            <children>
+                <ImageView fx:id="bitcoinExcavatorStop" fitHeight="100.0" fitWidth="141.0" layoutX="81.0"
+                           layoutY="181.0" pickOnBounds="true" preserveRatio="true">
+                    <image>
+                        <Image url="@../images/stop_icon.png"/>
+                    </image>
+                </ImageView>
+                <Label fx:id="excavatorSpeedLabel" layoutX="25.0" layoutY="20.0" text="%excavatorSpeed"/>
+                <Label fx:id="excavatorSpeed" layoutX="170.0" layoutY="20.0" text="0"/>
+                <Label fx:id="excavatorAvgBasisLabel" layoutX="25.0" layoutY="55.0" text="%excavatorAvgBasis"/>
+                <Label fx:id="excavatorAvgBasis" layoutX="170.0" layoutY="55.0" text="0"/>
+                <Label fx:id="excavatorBlocksLabel" layoutX="25.0" layoutY="90.0" text="%excavatorBlocks"/>
+                <Label fx:id="excavatorBlocks" layoutX="170.0" layoutY="90.0" text="0"/>
+                <Label fx:id="excavatorErrorsLabel" layoutX="25.0" layoutY="125.0" text="%excavatorErrors"/>
+                <Label fx:id="excavatorErrors" layoutX="170.0" layoutY="125.0" text="0"/>
+                <Label fx:id="excavatorHashesLabel" layoutX="25.0" layoutY="160.0" text="%excavatorHashes"/>
+                <Label fx:id="excavatorHashes" layoutX="170.0" layoutY="160.0" text="0"/>
+            </children>
+        </Pane>
+    </children>
+</AnchorPane>
