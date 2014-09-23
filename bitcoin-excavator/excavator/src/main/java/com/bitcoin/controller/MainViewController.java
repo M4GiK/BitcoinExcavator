@@ -6,26 +6,17 @@
 package com.bitcoin.controller;
 
 
-import com.bitcoin.core.BitcoinExcavator;
-import com.bitcoin.core.BitcoinExcavatorFatalException;
 import com.bitcoin.util.BitcoinOptions;
 import com.bitcoin.util.BitcoinOptionsBuilder;
-import com.bitcoin.util.GuiUtils;
 import com.bitcoin.util.serialization.ObjectSerializationFactory;
 import com.bitcoin.util.serialization.SerializationFactory;
 import com.bitcoin.util.serialization.json.JsonSerializationFactory;
-import com.bitcoin.view.MainView;
 import javafx.animation.*;
 import javafx.application.Platform;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
-import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,10 +24,7 @@ import wallet.utils.FileOperations;
 
 import java.net.URL;
 import java.util.ResourceBundle;
-import java.util.Timer;
-import java.util.TimerTask;
 
-import static com.bitcoin.view.MainView.excavator;
 
 /**
  * Main view controller for excavator.
