@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.effect.*?>
@@ -26,16 +27,20 @@
             <tabs>
                 <Tab fx:id="mainTab" text="%mainTab">
                     <content>
-                        <fx:include fx:id="mainPage" source="excavator-main-tab-view.fxml"/>
+                        <fx:include fx:id="mainPage" source="excavator-main-tab-view.fxml" />
                     </content>
                 </Tab>
                 <Tab fx:id="setupTab" text="%setupTab">
-                    <ScrollPane prefViewportHeight="304.0" prefViewportWidth="600.0">
-                        <padding>
-                            <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
-                        </padding>
-                        <fx:include fx:id="setupPage" source="excavator-options.fxml"/>
-                    </ScrollPane>
+                   <content>
+                       <ScrollPane prefViewportHeight="304.0" prefViewportWidth="600.0">
+                           <padding>
+                               <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                           </padding>
+                          <content>
+                              <fx:include fx:id="setupPage" source="excavator-options.fxml" />
+                          </content>
+                       </ScrollPane>
+                   </content>
                 </Tab>
                 <Tab fx:id="aboutTab" text="%aboutTab">
                     <content>
@@ -82,7 +87,7 @@
                 </Pane>
             </children>
         </HBox>
-        <ImageView fitHeight="48.0" fitWidth="72.0" layoutX="354.0" layoutY="5.0" opacity="0.8" pickOnBounds="true" preserveRatio="true" rotate="-12.5">
+        <ImageView fitHeight="48.0" fitWidth="72.0" layoutX="375.0" layoutY="5.0" opacity="0.8" pickOnBounds="true" preserveRatio="true" rotate="-12.5">
             <image>
                 <Image url="@../images/bitcoin_logo_plain.png" />
             </image>
