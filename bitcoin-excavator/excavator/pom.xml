@@ -423,8 +423,8 @@
                                 <configuration>
                                     <target>
                                         <gunzip src="${basedir}/launch4j/launch4j-${launch4j.version}-${launch4j.os}.${launch4j.ext}"
-                                                dest="${basedir}/launch4j/launch4j-${launch4j.version}-${launch4j.os}.tgz"/>
-                                        <untar src="${basedir}/launch4j/launch4j-${launch4j.version}-${launch4j.os}.tgz"
+                                                dest="${basedir}/launch4j/launch4j-${launch4j.version}-${launch4j.os}.tar"/>
+                                        <untar src="${basedir}/launch4j/launch4j-${launch4j.version}-${launch4j.os}.tar"
                                                dest="${basedir}/launch4j"/>
                                         <chmod dir="${launch4j.dir}/bin" perm="755" includes="*"/>
                                     </target>
